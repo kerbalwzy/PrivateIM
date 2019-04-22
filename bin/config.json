@@ -1,0 +1,29 @@
+{
+  "logConfig": {
+    "global": {
+      "outPut": [
+        "console",
+        "file",
+        "mongodb"
+      ],
+      "globalFormat": "Level-Date-Time-AbsolutePositioning",
+      "globalLevel": "INFO"
+    },
+    "console": {
+      "format": "Level-Date-Time-AbsolutePositioning",
+      "level": "DEBUG"
+    },
+    "file": {
+      "format": "Level-Date-Time-RelativePositioning",
+      "level": "INFO"
+    },
+    "mongodb": {
+      "format": "Level-Date-Time-RelativePositioning",
+      "level": "ERROR"
+    }
+  },
+  "serverConfig": {
+    "host": "127.0.0.1",
+    "port": 12366
+  }
+}
