@@ -13,3 +13,7 @@
 
 # goland files
 .idea/
+
+# MacOS files
+.DS_STore
+log
