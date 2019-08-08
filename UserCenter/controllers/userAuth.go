@@ -3,8 +3,13 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 
 	"../models"
+)
+
+const (
+	AuthTokenSalt = "uhfuwhfhw!23rp93242ihashf;3rbi;u2137974789y3kjnf&#^lknfa"
 )
 
 // Sign Up data struct , all field required.
@@ -42,9 +47,11 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	//ok, return user detail and AuthToken
+	authToken, err := MakeAuthToken(user, AuthTokenSalt, int64(time.Hour)*24*30)
+	data := gin.H{"user": user, "AuthToken": authToken}
+	c.JSON(http.StatusOK, data)
 }
-
 
 type UserSignIn struct {
 	Email    string `json:"email"  binding:"required,email"`
@@ -73,6 +80,8 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	//verify ok, return user detail
-	c.JSON(200, user)
+	//verify ok, return user detail and AuthToken
+	authToken, err := MakeAuthToken(user, AuthTokenSalt, int64(time.Hour)*24*30)
+	data := gin.H{"user": user, "AuthToken": authToken}
+	c.JSON(http.StatusOK, data)
 }
