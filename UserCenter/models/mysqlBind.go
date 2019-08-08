@@ -3,28 +3,28 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/bwmarrin/snowflake"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
+
+	"github.com/bwmarrin/snowflake"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
-	UserSignUpSql     = "INSERT INTO tb_user_basic (id, name, email, password)VALUES (?, ?, ?, ?);"
-	GetUserByFieldSql = "SELECT(id, name, mobile, email, gender, create_time, update_time)FROM tb_user_basic WHERE ?=?;"
+	UserDbMySQLURI = "root:mysql@tcp(10.211.55.4:3306)/IMUserCenter?charset=utf8&parseTime=true"
+
+	UserSignUpSql = "INSERT INTO tb_user_basic (id, name, email, password)VALUES (?, ?, ?, ?);"
+
+	GetUserByFieldSql = "SELECT id, name, mobile, email, gender, create_time, update_time, password FROM tb_user_basic WHERE %s=?;"
 )
 
 var (
-	UserDbSQLite3Path = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/userDb.SQLite3"
-	SQLite3           = new(sql.DB)
-	SnowFlakeNode     = new(snowflake.Node)
+	MySQLClient   = new(sql.DB)
+	SnowFlakeNode = new(snowflake.Node)
 )
 
 func init() {
-	//path, _ := filepath.Abs(os.Args[0])
-	//BaseDir := filepath.Dir(path)
-	//UserDbSQLite3Path = filepath.Join(BaseDir, "userDb.SQLite3")
 	var err error
-	SQLite3, err = sql.Open("sqlite3", UserDbSQLite3Path)
+	MySQLClient, err = sql.Open("mysql", UserDbMySQLURI)
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -35,77 +35,60 @@ func init() {
 
 }
 
-// If success, saving the id, name, email on the user instance
-func (u *UserBasic) Save() error {
-	UserInsertStmt, err := SQLite3.Prepare(UserSignUpSql)
+// Save user with id, name, email,password to database.
+// If successful, get full information of user from database and update to user.
+func (user *UserBasic) MySQLSignUp() error {
+	// start a Transaction
+	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
 	}
+
+	// try to insert user data into database
 	id := SnowFlakeNode.Generate()
-	ret, err := UserInsertStmt.Exec(id, u.Name, u.Email, u.password)
+	ret, err := tx.Exec(UserSignUpSql, id, user.Name, user.Email, user.password)
 	if nil != err {
+		tx.Rollback()
 		return err
 	}
 	aff, err := ret.RowsAffected()
 	if 0 == aff || nil != err {
+		tx.Rollback()
 		return err
 	}
-	u.Id = id.Int64()
-	return nil
-}
 
-// Query an user by name and password, For SignIn API.
-// And the password is a hash value, not a plaintext
-func (u *UserBasic) QueryUserByX(name, password string) error {
-
-	return nil
-}
-
-// Get an user by id or email or mobile
-func (u *UserBasic) GetUserByField(field string) error {
-	switch field {
-	case "id":
-		raw, err := SQLite3.Query(GetUserByFieldSql, field, u.Id)
-		if nil != err {
-			return err
-		}
-		for raw.Next() {
-			err = raw.Scan(u.Id, u.Name, u.Mobile, u.Email, u.Gender, u.CreateTime, u.UpdateTIme)
-			if nil != err {
-				return err
-			}
-		}
-
-	case "email":
-		raw, err := SQLite3.Query(GetUserByFieldSql, field, u.Email)
-		if nil != err {
-			log.Printf("@@@@@@@@@@")
-			return err
-		}
-		for raw.Next() {
-			log.Println("xxxxxxxxxx")
-			err = raw.Scan(u.Id, u.Name, u.Mobile, u.Email, u.Gender, u.CreateTime, u.UpdateTIme)
-			if nil != err {
-				return err
-			}
-		}
-
-	case "mobile":
-		raw, err := SQLite3.Query(GetUserByFieldSql, field, u.Mobile)
-		if nil != err {
-			return err
-		}
-		for raw.Next() {
-			err = raw.Scan(u.Id, u.Name, u.Mobile, u.Email, u.Gender, u.CreateTime, u.UpdateTIme)
-			if nil != err {
-				return err
-			}
-		}
-
-	default:
-		return fmt.Errorf("can only chose in id, email and mobile")
+	// try to get full information of user from database, and update to user.
+	tmpSql := fmt.Sprintf(GetUserByFieldSql, "id")
+	err = tx.QueryRow(tmpSql, id).Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
+		&(user.CreateTime), &(user.UpdateTime), &(user.password))
+	if nil != err {
+		tx.Rollback()
+		return err
 	}
 
-	//}
+	// commit Transaction
+	err = tx.Commit()
+	if nil != err {
+		tx.Rollback()
+	}
+	return nil
+}
+
+// Get an user basic by id or email or mobile
+func (user *UserBasic) MySQLGetByField(field string) error {
+	value, err := GetReflectValueByField(*user, field)
+	if nil != err {
+		return err
+	}
+	tempSQL := fmt.Sprintf(GetUserByFieldSql, field)
+	row := MySQLClient.QueryRow(tempSQL, value)
+	err = row.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
+		&(user.CreateTime), &(user.UpdateTime), &(user.password))
+	if nil != err {
+		return err
+	}
+	if user.Id == 0 {
+		return fmt.Errorf("get user by <%s> fail", field)
+	}
 	return nil
 }
