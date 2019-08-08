@@ -25,22 +25,22 @@
   | update_time | DATETIME     | DEFAULT CURRENT_TIMESTAMP | 最后活跃时间, 默认值自动生成   |
 
   ```mysql
-  Create Table: CREATE TABLE `tb_user_basic` (
+  CREATE TABLE `tb_user_basic` (
     `id` bigint(20) unsigned NOT NULL,
     `name` varchar(10) NOT NULL,
-    `mobile` varchar(11) DEFAULT NULL,
-    `email` varchar(100) DEFAULT NULL,
-    `password` varchar(100) NOT NULL,
-    `gender` tinyint(1) DEFAULT NULL,
+    `mobile` varchar(11) DEFAULT '',
+    `email` varchar(100) DEFAULT '',
+    `password` varchar(100) NOT NULL DEFAULT '',
+    `gender` tinyint(1) NOT NULL DEFAULT -1,
     `create_time` datetime DEFAULT current_timestamp(),
     `update_time` datetime DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
-    UNIQUE KEY `mobile` (`mobile`),
     UNIQUE KEY `email` (`email`),
     KEY `find_by_name` (`name`),
     KEY `find_by_email` (`email`),
     KEY `find_by_mobile` (`mobile`)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
   ```
 
 - #### tb_user_more
@@ -52,7 +52,7 @@
   | qr_code | VARCHAR(100) | UNIQUE NULL          | 二维码地址, 最多100个字符 |
 
   ```mysql
-  Create Table: CREATE TABLE `tb_user_more` (
+  CREATE TABLE `tb_user_more` (
     `usr_id` bigint(20) unsigned NOT NULL,
     `avatar` varchar(100) DEFAULT NULL,
     `qr_code` varchar(100) DEFAULT NULL,
@@ -72,7 +72,7 @@
   | isDelete | TINYINT(1) | NOT NULL DEFAULT 0   | 是否删除                       |
 
   ```mysql
-  Create Table: CREATE TABLE `tb_friend_relation` (
+  CREATE TABLE `tb_friend_relation` (
     `id` bigint(20) unsigned NOT NULL,
     `src_id` bigint(20) NOT NULL,
     `dst_id` bigint(20) NOT NULL,
