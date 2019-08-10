@@ -1,23 +1,21 @@
 package controllers
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 
 	"../models"
-)
-
-const (
-	AuthTokenSalt = "uhfuwhfhw!23rp93242ihashf;3rbi;u2137974789y3kjnf&#^lknfa"
+	"../utils"
 )
 
 // Sign Up data struct , all field required.
 // Verify data by the validators of gin binding.
 type UserSignUp struct {
-	Name            string `json:"name" binding:"required,max=10"`
-	Email           string `json:"email"  binding:"required,email"`
-	Password        string `json:"password"  binding:"required,min=8,max=12"`
+	Name            string `json:"name" binding:"nameValidator"`
+	Email           string `json:"email"  binding:"emailValidator"`
+	Password        string `json:"password"  binding:"passwordValidator"`
 	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=Password"`
 }
 
@@ -32,30 +30,28 @@ func SignUp(c *gin.Context) {
 	}
 
 	// check the email if registered
-	user := models.UserBasic{Name: item.Name, Email: item.Email}
-	err = user.MySQLGetByField("Email")
+	userP := &models.UserBasic{Name: item.Name, Email: item.Email}
+	err = userP.MySQLGetByField("Email")
 	if nil == err {
 		c.JSON(400, gin.H{"error": "email is already sign up, please sign in"})
 		return
 	}
 
 	// save user information to database
-	user.SetPassword(item.Password)
-	err = user.MySQLSignUp()
+	userP.SetPassword(item.Password)
+	err = userP.MySQLSignUp()
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	//ok, return user detail and AuthToken
-	authToken, err := MakeAuthToken(user, AuthTokenSalt, int64(time.Hour)*24*30)
-	data := gin.H{"user": user, "AuthToken": authToken}
-	c.JSON(http.StatusOK, data)
+	//ok, return user detail and auth token
+	c.JSON(201, detailAndToken(userP))
 }
 
 type UserSignIn struct {
-	Email    string `json:"email"  binding:"required,email"`
-	Password string `json:"password"  binding:"required,min=8,max=12"`
+	Email    string `json:"email"  binding:"emailValidator"`
+	Password string `json:"password"  binding:"passwordValidator"`
 }
 
 // SignIn(Login) HTTP API function
@@ -69,19 +65,30 @@ func SignIn(c *gin.Context) {
 	}
 
 	// check email and password for user
-	user := models.UserBasic{Email: item.Email}
-	err = user.MySQLGetByField("Email")
+	userP := &models.UserBasic{Email: item.Email}
+	err = userP.MySQLGetByField("Email")
 	if nil != err {
 		c.JSON(400, gin.H{"error": "verify fail"})
 		return
 	}
-	if !user.CheckPassword(item.Password) {
+	if !userP.CheckPassword(item.Password) {
 		c.JSON(400, gin.H{"error": "verify fail"})
 		return
 	}
 
 	//verify ok, return user detail and AuthToken
-	authToken, err := MakeAuthToken(user, AuthTokenSalt, int64(time.Hour)*24*30)
-	data := gin.H{"user": user, "AuthToken": authToken}
-	c.JSON(http.StatusOK, data)
+	c.JSON(http.StatusOK, detailAndToken(userP))
+}
+
+// Create auth token by user, and return data
+func detailAndToken(user *models.UserBasic) gin.H {
+	claims := utils.CustomJWTClaims{
+		Id: user.Id,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: int64(time.Now().Unix() + AuthTokenAliveTime), // expire time
+			Issuer:    AuthTokenIssuer,                               //signal issuer
+		},
+	}
+	authToken, _ := utils.CreateJWTToken(claims, []byte(AuthTokenSalt))
+	return gin.H{"user": user, "auth_token": authToken}
 }
