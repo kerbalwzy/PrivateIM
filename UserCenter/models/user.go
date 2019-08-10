@@ -18,7 +18,6 @@ type UserBasic struct {
 	Email      string    `json:"email"`
 	Gender     int       `json:"gender"`
 	CreateTime time.Time `json:"create_time" time_format:"2006-01-02 15:04:05"`
-	UpdateTime time.Time `json:"update_time" time_format:"2006-01-02 15:04:05"`
 
 	password string
 }
