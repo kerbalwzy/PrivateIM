@@ -24,15 +24,18 @@ func MobileValidator(
 	v *validator.Validate, topStruct reflect.Value, currentStructOrField reflect.Value,
 	field reflect.Value, fieldType reflect.Type, fieldKind reflect.Kind, param string,
 ) bool {
-	// Require the type is String and contains 11 numeric characters.
+	// Require the type is String and contains 0 or 11 numeric characters.
 	if fieldKind != reflect.String {
 		return false
 	}
 	value := field.String()
-	if len(value) != 11 {
-		return false
+
+	if len(value) == 11 {
+		return validator.IsNumeric(v, topStruct, currentStructOrField, field, fieldType, fieldKind, param)
+	} else if len(value) == 0 {
+		return true
 	}
-	return validator.IsNumeric(v, topStruct, currentStructOrField, field, fieldType, fieldKind, param)
+	return false
 }
 
 func EmailValidator(
