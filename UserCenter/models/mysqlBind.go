@@ -16,9 +16,13 @@ const (
 
 	UserSignUpSql = "INSERT INTO tb_user_basic (id, name, email, password)VALUES (?, ?, ?, ?);"
 
-	GetUserByFieldSql = "SELECT id, name, mobile, email, gender, create_time, password FROM tb_user_basic WHERE %s = ?;"
+	UserGetByFieldSql = "SELECT id, name, mobile, email, gender, create_time, password FROM tb_user_basic WHERE %s = ?;"
 
-	UserPutProfileSQl = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
+	UserPutProfileSql = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
+
+	UserGetAvatarSql = "SELECT avatar FROM tb_user_more WHERE usr_id = ?"
+
+	UserCheckAvatarNameSql = "SELECT COUNT()"
 )
 
 var (
@@ -39,9 +43,28 @@ func init() {
 
 }
 
+// Get an user basic by id or email or mobile
+func MySQLGetUserByField(field string, user *UserBasic) error {
+	value, err := utils.GetReflectValueByField(*user, field)
+	if nil != err {
+		return err
+	}
+	tempSQL := fmt.Sprintf(UserGetByFieldSql, field)
+	row := MySQLClient.QueryRow(tempSQL, value)
+	err = row.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
+		&(user.CreateTime), &(user.password))
+	if nil != err {
+		return err
+	}
+	if user.Id == 0 {
+		return fmt.Errorf("get user by <%s> fail", field)
+	}
+	return nil
+}
+
 // Save user with id, name, email,password to database.
 // If successful, get full information of user from database and update to user.
-func (user *UserBasic) MySQLSignUp() error {
+func MySQLUserSignUp(user *UserBasic) error {
 	// start a Transaction
 	tx, err := MySQLClient.Begin()
 	if nil != err {
@@ -57,7 +80,7 @@ func (user *UserBasic) MySQLSignUp() error {
 	}
 
 	// try to get full information of user from database, and update to user.
-	tmpSql := fmt.Sprintf(GetUserByFieldSql, "id")
+	tmpSql := fmt.Sprintf(UserGetByFieldSql, "id")
 	err = tx.QueryRow(tmpSql, id).Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
 		&(user.CreateTime), &(user.password))
 	if nil != err {
@@ -73,34 +96,15 @@ func (user *UserBasic) MySQLSignUp() error {
 	return nil
 }
 
-// Get an user basic by id or email or mobile
-func (user *UserBasic) MySQLGetByField(field string) error {
-	value, err := utils.GetReflectValueByField(*user, field)
-	if nil != err {
-		return err
-	}
-	tempSQL := fmt.Sprintf(GetUserByFieldSql, field)
-	row := MySQLClient.QueryRow(tempSQL, value)
-	err = row.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
-		&(user.CreateTime), &(user.password))
-	if nil != err {
-		return err
-	}
-	if user.Id == 0 {
-		return fmt.Errorf("get user by <%s> fail", field)
-	}
-	return nil
-}
-
 // Update name,mobile and gender of user basic by id
-func (user *UserBasic) MySQLUpdateProfile(name, mobile string, gender int) error {
+func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		tx.Rollback()
 		return err
 	}
 	// update user profile
-	ret, err := tx.Exec(UserPutProfileSQl, name, mobile, gender, user.Id)
+	ret, err := tx.Exec(UserPutProfileSql, name, mobile, gender, userId)
 	if nil != err {
 		tx.Rollback()
 		return err
@@ -119,5 +123,25 @@ func (user *UserBasic) MySQLUpdateProfile(name, mobile string, gender int) error
 	if nil != err {
 		tx.Rollback()
 	}
+	return nil
+}
+
+// Get user avatar url by id
+func MySQLGetUserAvatar(userId int64, avatar *string) error {
+	row := MySQLClient.QueryRow(UserGetAvatarSql, userId)
+	err := row.Scan(avatar)
+
+	// if not found, it dose not need to abort en error, but return.
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	if nil != err {
+		log.Println(err.Error())
+		return err
+	}
+	return nil
+}
+
+func MySQLPutUserAvatar(userId int64, hashName string) error {
 	return nil
 }

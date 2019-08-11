@@ -46,7 +46,6 @@ func (user *UserBasic) CheckPassword(password string) bool {
 	return user.password == GetPasswordHash(password, user.Email, PasswordSalt)
 }
 
-
 type UserMore struct {
 	UserId int64  `json:"user_id"`
 	Avatar string `json:"avatar"`

@@ -31,15 +31,15 @@ func SignUp(c *gin.Context) {
 
 	// check the email if registered
 	userP := &models.UserBasic{Name: item.Name, Email: item.Email}
-	err = userP.MySQLGetByField("Email")
-	if nil == err {
+	err = models.MySQLGetUserByField("Email", userP)
+	if nil == err || userP.Id != 0 {
 		c.JSON(400, gin.H{"error": "email is already sign up, please sign in"})
 		return
 	}
 
 	// save user information to database
 	userP.SetPassword(item.Password)
-	err = userP.MySQLSignUp()
+	err = models.MySQLUserSignUp(userP)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -66,7 +66,7 @@ func SignIn(c *gin.Context) {
 
 	// check email and password for user
 	userP := &models.UserBasic{Email: item.Email}
-	err = userP.MySQLGetByField("Email")
+	err = models.MySQLGetUserByField("Email", userP)
 	if nil != err {
 		c.JSON(400, gin.H{"error": "verify fail"})
 		return

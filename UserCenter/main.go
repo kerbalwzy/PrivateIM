@@ -26,6 +26,8 @@ func main() {
 	info := r.Group("/info", controllers.JWTAuthMiddleware())
 	info.GET("/profile", controllers.GetProfile)
 	info.PUT("/profile", controllers.PutProfile)
+	info.GET("/avatar", controllers.GetAvatar)
+	info.PUT("/avatar", controllers.PutAvatar)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", utils.NameValidator)
@@ -33,6 +35,8 @@ func main() {
 		_ = v.RegisterValidation("mobileValidator", utils.MobileValidator)
 		_ = v.RegisterValidation("passwordValidator", utils.PasswordValidator)
 		_ = v.RegisterValidation("genderValidator", utils.GenderValidator)
+	} else {
+		log.Fatal("binding custom validators fail!!!")
 	}
 
 	err := r.Run(":8080")
