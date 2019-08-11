@@ -1,5 +1,5 @@
 # UserCenter
-- #### HTTP-API Functions 
+- #### HTTP-API Functions  <span id="0"> </span>
 
   | Name       | Method | URL               | Auth Required | Description                    |
   | :--------- | :----- | :---------------- | :------------ | :----------------------------- |
@@ -7,7 +7,7 @@
   | [SignIn](#2)     | POST   | /auth/profile     | 0             | 登录                           |
   | [GetProfile](#3) | GET    | /info/profile     | 1             | 获取个人信息                   |
   | [PutProfile](#4) | PUT    | /info/profile     | 1             | 修改个人信息                   |
-  | [etAvatar](#5)  | GET    | /info/avatar      | 1             | 获取个人头像                   |
+  | [GetAvatar](#5) | GET    | /info/avatar      | 1             | 获取个人头像                   |
   | [PutAvatar](#6)  | PUT    | /info/avatar      | 1             | 更新个人头像                   |
   | [GetQrCode](#7)  | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
   | [PutQrCode](#8)  | PUT    | /info/qrcode      | 1             | 更新个人二维码                 |
@@ -19,7 +19,7 @@
 
 ----
 
-- #### <span id="1">SignUp 注册</span>
+- #### <span id="1">SignUp 注册</span>															[Top](#0)
 
 ##### Request: 
 
@@ -77,7 +77,7 @@ JsonBodyResult:
 
 ----
 
-- #### <span id="2">SignIn 登录</span>
+- #### <span id="2">SignIn 登录</span>															[Top](#0)
 
 ##### Request:
 
@@ -103,7 +103,7 @@ JsonBodyParams: `所有参数均为必传`
 
 ----
 
-- #### <span id="3">GetProfile 获取用户个人详细信息</span>
+- #### <span id="3">GetProfile 获取用户个人详细信息</span>									      [Top](#0)
 
 ##### Request:
 
@@ -139,7 +139,7 @@ JsonBodyResult:
 
 ----
 
-- #### <span id="4">PutProfile 修改用户的个人信息</span>
+- #### <span id="4">PutProfile 修改用户的个人信息</span>											[Top](#0)
 
 ##### Request:
 
@@ -175,4 +175,26 @@ JsonBodyResult:
 }
 ```
 ---
+
+- #### <span id="5">GetAvatar 获取用户头像</span>				     							       [Top](#0)
+
+##### Request:
+
+Path: `/info/avatar`		Method: `GET`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+##### Response: 
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column     | DataType | Description  |
+| ---------- | -------- | ------------ |
+| avatar_url | string   | 用户头像地址 |
+
+```json
+
+```
 
