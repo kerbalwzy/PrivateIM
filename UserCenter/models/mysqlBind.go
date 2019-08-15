@@ -20,9 +20,15 @@ const (
 
 	UserPutProfileSql = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
 
-	UserGetAvatarSql = "SELECT avatar FROM tb_user_more WHERE usr_id = ?"
+	UserGetAvatarSql = "SELECT avatar FROM tb_user_more WHERE user_id = ?"
 
-	UserCheckAvatarNameSql = "SELECT COUNT()"
+	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id) VALUES (?)  ON DUPLICATE KEY UPDATE avatar=?;"
+
+	UserAvatarHashNameCount = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
+
+	UserGetQRCodeSql = "SELECT qr_code FROM tb_user_more WHERE user_id = ?"
+
+	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id) VALUES (?)  ON DUPLICATE KEY UPDATE qr_code=?;"
 )
 
 var (
@@ -126,7 +132,7 @@ func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 	return nil
 }
 
-// Get user avatar url by id
+// Get user avatar name by user id
 func MySQLGetUserAvatar(userId int64, avatar *string) error {
 	row := MySQLClient.QueryRow(UserGetAvatarSql, userId)
 	err := row.Scan(avatar)
@@ -136,12 +142,74 @@ func MySQLGetUserAvatar(userId int64, avatar *string) error {
 		return nil
 	}
 	if nil != err {
-		log.Println(err.Error())
 		return err
 	}
 	return nil
 }
 
+// Insert or Update avatar hash name into database
 func MySQLPutUserAvatar(userId int64, hashName string) error {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec(UserInsertOrUpdateAvatar, userId, hashName)
+	if nil != err {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if nil != err {
+		tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+// Get the count of avatar hash name in tb_user_more table
+func MySQLAvatarHashNameCount(hashName string) int {
+	row := MySQLClient.QueryRow(UserAvatarHashNameCount, hashName)
+	count := new(int)
+	err := row.Scan(count)
+	if nil != err {
+		return 0
+	}
+	return *count
+}
+
+// Get user QRCode name by user id
+func MySQLGetUserQRCode(userId int64, qrCode *string) error {
+	row := MySQLClient.QueryRow(UserGetQRCodeSql, userId)
+	err := row.Scan(qrCode)
+
+	// if not found, it dose not need to abort en error, but return.
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	if nil != err {
+		return err
+	}
+	return nil
+}
+
+// Insert or Update QRCode hash name into database
+func MySQLPutUserQRCode(userId int64, hashName string) error {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec(UserInsertOrUpdateQRCode, userId, hashName)
+	if nil != err {
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if nil != err {
+		tx.Rollback()
+		return err
+	}
 	return nil
 }
