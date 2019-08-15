@@ -1,22 +1,26 @@
 package controllers
 
 import (
-	"../models"
-	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"io"
-	"mime/multipart"
+
+	"../models"
+	"../utils"
 )
 
 const (
-	DefaultAvatarUrl        = "this is the default avatar url"
-	StaticResourceUrlPrefix = "this is the static resource url prefix"
-	MaxAvatarUploadSize     = 100 * 2 << 10
+	AuthTokenSalt      = "this is a auth token salt"
+	AuthTokenAliveTime = 3600 * 24 //unit:second
+	AuthTokenIssuer    = "userCenter"
+
+	PhotoSaveFoldPath   = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/photos/"
+	PhotoSuffix         = ".png"
+	DefaultAvatarUrl    = "/static/photos/defaultAvatar.png"
+	PhotosUrlPrefix     = "/static/photos/" // if you use oss , should change this value
+	MaxAvatarUploadSize = 100 * 2 << 10
 )
 
 // GetProfile HTTP API function
@@ -104,12 +108,12 @@ func GetAvatar(c *gin.Context) {
 		c.JSON(200, gin.H{"avatar": DefaultAvatarUrl})
 		return
 	}
-	c.JSON(200, gin.H{"avatar": StaticResourceUrlPrefix + *avatar})
+	c.JSON(200, gin.H{"avatar": PhotosUrlPrefix + *avatar + PhotoSuffix})
 }
 
 // PutAvatar HTTP API function
 func PutAvatar(c *gin.Context) {
-	//userId := c.MustGet("user_id")
+	// get file data and hash value as name
 	file, err := c.FormFile("new_avatar")
 	if nil != err {
 		c.JSON(400, gin.H{"error": err.Error()})
@@ -119,47 +123,46 @@ func PutAvatar(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "the upload image size need gt=0kb and lte=100kb"})
 		return
 	}
-	hashName, err := saveAvatarFile(file)
+	hashName, data, err := utils.GinFormFileHash(file)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+
+	// check if the hash name is existed more then one in the table
+	// if true, it meanings that has the same file already upload.
+	// not need to save the file again.
+	count := models.MySQLAvatarHashNameCount(hashName)
+	if count == 0 {
+		// save the file data to local or static server
+		if err := UploadAvatarLocal(data, hashName); nil != err {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+	}
+
+	// save the information into database
 	userId := c.MustGet("user_id")
 	err = models.MySQLPutUserAvatar(userId.(int64), hashName)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
-
-	c.JSON(200, gin.H{"avatar": StaticResourceUrlPrefix + hashName})
+	c.JSON(200, gin.H{"avatar": PhotosUrlPrefix + hashName + PhotoSuffix})
 }
 
-// try to save avatar file data with a hashName
-func saveAvatarFile(file *multipart.FileHeader) (hashName string, err error) {
-	// read data from file
-	buff := new(bytes.Buffer)
-	fp, err := file.Open()
-	defer fp.Close()
-	if nil != err {
-		return
+// save avatar file to local
+func UploadAvatarLocal(data []byte, hashName string) error {
+	prefix := PhotoSaveFoldPath
+	suffix := PhotoSuffix
+	path := prefix + hashName + suffix
+	if err := utils.UploadFileToLocal(data, path); nil != err {
+		return err
 	}
-	n, err := io.Copy(buff, fp)
-	if nil != err {
-		return
-	}
-	if n == 0 {
-		err = errors.New("read file data error")
-		return
-	}
-	// get hashName of data
-	h := md5.New()
-	h.Write(buff.Bytes())
-	hashName = hex.EncodeToString(h.Sum(nil))
-	err = UploadDataToStaticServer(buff.Bytes(), hashName)
-	return
+	return nil
 }
 
-// upload the data to static file server with a hashName
-func UploadDataToStaticServer(data []byte, hashName string) error {
-	// todo
+// todo upload the data to cloud with a hashName
+func UploadDataToCloud(data []byte, hashName string) error {
 	return nil
 }
