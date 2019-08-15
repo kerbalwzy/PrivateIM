@@ -17,8 +17,12 @@ func init() {
 
 }
 
+const StaticFoldPath = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/"
+
 func main() {
 	r := gin.Default()
+	r.Static("/static", StaticFoldPath)
+
 	auth := r.Group("/auth")
 	auth.POST("/user", controllers.SignUp)
 	auth.POST("profile", controllers.SignIn)
