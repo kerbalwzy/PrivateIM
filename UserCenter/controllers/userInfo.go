@@ -18,7 +18,7 @@ const (
 
 	PhotoSaveFoldPath   = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/photos/"
 	PhotoSuffix         = ".png"
-	DefaultAvatarUrl    = "/static/photos/defaultAvatar.png"
+	DefaultAvatarUrl    = "/static/photos/defaultAvatar.jpg"
 	PhotosUrlPrefix     = "/static/photos/" // if you use oss , should change this value
 	MaxAvatarUploadSize = 100 * 2 << 10
 )
