@@ -32,6 +32,7 @@ func main() {
 	info.PUT("/profile", controllers.PutProfile)
 	info.GET("/avatar", controllers.GetAvatar)
 	info.PUT("/avatar", controllers.PutAvatar)
+	info.GET("/qrcode", controllers.GetQrCode)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", utils.NameValidator)

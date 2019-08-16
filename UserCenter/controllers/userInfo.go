@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"encoding/json"
-	"errors"
-
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-
 	"../models"
 	"../utils"
+	"encoding/json"
+	"errors"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"io/ioutil"
 )
 
 const (
@@ -21,11 +20,15 @@ const (
 	DefaultAvatarUrl    = "/static/photos/defaultAvatar.jpg"
 	PhotosUrlPrefix     = "/static/photos/" // if you use oss , should change this value
 	MaxAvatarUploadSize = 100 * 2 << 10
+
+	JWTDataKey = "user_id"
+
+	QRCodeBaseUrl = "http://127.0.0.1:8080/qrcode/"
 )
 
 // GetProfile HTTP API function
 func GetProfile(c *gin.Context) {
-	user := models.UserBasic{Id: c.MustGet("user_id").(int64)}
+	user := models.UserBasic{Id: c.MustGet(JWTDataKey).(int64)}
 	err := models.MySQLGetUserByField("Id", &user)
 	if nil != err {
 		c.JSON(404, gin.H{"error": "get user information fail"})
@@ -53,7 +56,7 @@ func PutProfile(c *gin.Context) {
 		return
 	}
 	// Update user info
-	userId := c.MustGet("user_id")
+	userId := c.MustGet(JWTDataKey)
 	err = models.MySQLUpdateProfile(tempProfileP.Name, tempProfileP.Mobile, tempProfileP.Gender, userId.(int64))
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -97,7 +100,7 @@ func parseTempProfile(c *gin.Context) (*TempProfile, error) {
 
 // GetAvatar HTTP API function
 func GetAvatar(c *gin.Context) {
-	userId := c.MustGet("user_id")
+	userId := c.MustGet(JWTDataKey)
 	avatar := new(string)
 	err := models.MySQLGetUserAvatar(userId.(int64), avatar)
 	if nil != err {
@@ -108,7 +111,7 @@ func GetAvatar(c *gin.Context) {
 		c.JSON(200, gin.H{"avatar": DefaultAvatarUrl})
 		return
 	}
-	c.JSON(200, gin.H{"avatar": PhotosUrlPrefix + *avatar + PhotoSuffix})
+	c.JSON(200, gin.H{"avatar_url": PhotosUrlPrefix + *avatar + PhotoSuffix})
 }
 
 // PutAvatar HTTP API function
@@ -142,13 +145,13 @@ func PutAvatar(c *gin.Context) {
 	}
 
 	// save the information into database
-	userId := c.MustGet("user_id")
+	userId := c.MustGet(JWTDataKey)
 	err = models.MySQLPutUserAvatar(userId.(int64), hashName)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"avatar": PhotosUrlPrefix + hashName + PhotoSuffix})
+	c.JSON(200, gin.H{"avatar_url": PhotosUrlPrefix + hashName + PhotoSuffix})
 }
 
 // save avatar file to local
@@ -157,6 +160,55 @@ func UploadAvatarLocal(data []byte, hashName string) error {
 	suffix := PhotoSuffix
 	path := prefix + hashName + suffix
 	if err := utils.UploadFileToLocal(data, path); nil != err {
+		return err
+	}
+	return nil
+}
+
+// GetQRCode HTT API function
+func GetQrCode(c *gin.Context) {
+	// try to get QrCode hash name from database. if existed, return.
+	userId := c.MustGet(JWTDataKey)
+	hashNameP := new(string)
+	err := models.MySQLGetUserQRCode(userId.(int64), hashNameP)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	if *hashNameP != "" {
+		c.JSON(200, gin.H{"qr_code": PhotosUrlPrefix + *hashNameP + PhotoSuffix})
+		return
+	}
+	// if the qr code hash name is not existed, create an new and save
+	content := QRCodeContent(userId.(int64))
+	data, _ := utils.CreatQRCodeBytes(content)
+	*hashNameP = utils.BytesDataHash(data)
+	err = SaveQRCodeLocal(data, *hashNameP)
+	if nil != err {
+		c.JSON(500, gin.H{"error": "create QRCode fail"})
+		return
+	}
+	err = models.MySQLPutUserQRCode(userId.(int64), *hashNameP)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"qr_code_url": PhotosUrlPrefix + *hashNameP + PhotoSuffix})
+
+}
+
+// todo make the content for create a QRCode
+func QRCodeContent(userId int64) string {
+
+	return "https://www.baidu.com" // temp value
+}
+
+// save QRCode file to local
+func SaveQRCodeLocal(data []byte, hashName string) error {
+	savePath := PhotoSaveFoldPath + hashName + PhotoSuffix
+	err := ioutil.WriteFile(savePath, data, 0644)
+	if nil != err {
 		return err
 	}
 	return nil

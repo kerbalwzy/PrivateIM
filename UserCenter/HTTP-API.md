@@ -9,7 +9,7 @@
   | [PutProfile](#4) | PUT    | /info/profile     | 1             | 修改个人信息                   |
   | [GetAvatar](#5) | GET    | /info/avatar      | 1             | 获取个人头像                   |
   | [PutAvatar](#6)  | PUT    | /info/avatar      | 1             | 更新个人头像                   |
-  | [GetQrCode]  | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
+  | [GetQrCode](#7) | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
   | [GetFriends] | GET    | /relation/friends | 1             | 获取好友列表                   |
   | [GetFriend] | GET    | /relation/friend  | 1             | 获取单个好友信息               |
   | [AddFriend] | POST   | /relation/friend  | 1             | 添加好友                       |
@@ -195,7 +195,7 @@ JsonBodyResult:
 
 ```json
 {
-    "avatar": "this is the avatar url"
+    "avatar_url": "this is the avatar url"
 }
 ```
 
@@ -218,3 +218,30 @@ FormBodyParams: `所有参数为必填`
 | new_avatar | file     | 图片文件,上传前进行裁剪压缩处理, 保证图片尺寸为618*618像素, 分辨率80, 最大体积100kb. | 用户头像文件 |
 
 ##### Response: ⚠️ 与GetAvatar完全一致
+
+---
+
+- #### <span id="7"> GetQrCode 获取个人二维码</span> [Top](#0)
+
+##### Request:
+
+Path: `/info/qrcode`		Method: `GET`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column      | DataType | Description    |
+| ----------- | -------- | -------------- |
+| qr_code_url | string   | 二维码链接地址 |
+
+```json
+{
+    "qr_code_url": "this is the QRCode url"
+}
+```
+
