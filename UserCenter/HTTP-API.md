@@ -10,6 +10,7 @@
   | [GetAvatar](#5) | GET    | /info/avatar      | 1             | 获取个人头像                   |
   | [PutAvatar](#6)  | PUT    | /info/avatar      | 1             | 更新个人头像                   |
   | [GetQrCode](#7) | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
+  | [ParseQrCode](#8) | POST | /info/qrcode | 1 | 解析上传的二维码 |
   | [GetFriends] | GET    | /relation/friends | 1             | 获取好友列表                   |
   | [GetFriend] | GET    | /relation/friend  | 1             | 获取单个好友信息               |
   | [AddFriend] | POST   | /relation/friend  | 1             | 添加好友                       |
@@ -242,6 +243,40 @@ JsonBodyResult:
 ```json
 {
     "qr_code_url": "this is the QRCode url"
+}
+```
+
+---
+
+- #### <span id="8"> ParseQrCode 解析上传的二维码</span> [Top](#0)
+
+##### Requset:
+
+Path: `/info/qrcode`		Method: `POST`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​                 `Content-Type: multipart/form-data"`
+
+FormBodyParams: `所有参数为必填`
+
+| Column  | DataType | Constraints                                                  | Description        |
+| ------- | -------- | ------------------------------------------------------------ | ------------------ |
+| qr_code | file     | 图片文件,上传前进行裁剪压缩处理, 图片内容只能包含纯二维码区域, 分辨率80, 最大体积100kb. | 截取到的二维码图片 |
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column     | DataType | Description          |
+| ---------- | -------- | -------------------- |
+| qr_content | string   | 二维码包含的真实信息 |
+
+```json
+{
+    "qr_content": "the real content of qr code"
 }
 ```
 

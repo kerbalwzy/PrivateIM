@@ -33,6 +33,7 @@ func main() {
 	info.GET("/avatar", controllers.GetAvatar)
 	info.PUT("/avatar", controllers.PutAvatar)
 	info.GET("/qrcode", controllers.GetQrCode)
+	info.POST("/qrcode", controllers.ParseQrCode)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", utils.NameValidator)

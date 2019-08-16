@@ -154,17 +154,6 @@ func PutAvatar(c *gin.Context) {
 	c.JSON(200, gin.H{"avatar_url": PhotosUrlPrefix + hashName + PhotoSuffix})
 }
 
-// save avatar file to local
-func UploadAvatarLocal(data []byte, hashName string) error {
-	prefix := PhotoSaveFoldPath
-	suffix := PhotoSuffix
-	path := prefix + hashName + suffix
-	if err := utils.UploadFileToLocal(data, path); nil != err {
-		return err
-	}
-	return nil
-}
-
 // GetQRCode HTT API function
 func GetQrCode(c *gin.Context) {
 	// try to get QrCode hash name from database. if existed, return.
@@ -196,6 +185,43 @@ func GetQrCode(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"qr_code_url": PhotosUrlPrefix + *hashNameP + PhotoSuffix})
 
+}
+
+// ParseQrCode HTTP API function
+func ParseQrCode(c *gin.Context) {
+	// get file data
+	file, err := c.FormFile("qr_code")
+	if nil != err {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	if file.Size == 0 {
+		c.JSON(400, gin.H{"error": "the upload image size need gt=0kb and lte=2MB"})
+		return
+	}
+	_, data, err := utils.GinFormFileHash(file)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	content, err := utils.ParseQRCodeBytes(data)
+	if nil != err {
+		c.JSON(400, gin.H{"error": "QRCode parse fail"})
+		return
+	}
+	c.JSON(200, gin.H{"qr_content": content})
+
+}
+
+// save avatar file to local
+func UploadAvatarLocal(data []byte, hashName string) error {
+	prefix := PhotoSaveFoldPath
+	suffix := PhotoSuffix
+	path := prefix + hashName + suffix
+	if err := utils.UploadFileToLocal(data, path); nil != err {
+		return err
+	}
+	return nil
 }
 
 // todo make the content for create a QRCode
