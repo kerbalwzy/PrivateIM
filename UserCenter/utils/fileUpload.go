@@ -46,6 +46,8 @@ func UploadFileToLocal(data []byte, path string) error {
 }
 
 // todo upload file data to oss or other static file server
-func UploadFileToCloud() error {
+func UploadDataToCloud() error {
 	return nil
 }
+
+

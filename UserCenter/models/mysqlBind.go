@@ -22,13 +22,13 @@ const (
 
 	UserGetAvatarSql = "SELECT avatar FROM tb_user_more WHERE user_id = ?"
 
-	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id) VALUES (?)  ON DUPLICATE KEY UPDATE avatar=?;"
+	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id, avatar) VALUES (?, ?)  ON DUPLICATE KEY UPDATE avatar=?;"
 
 	UserAvatarHashNameCount = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
 
 	UserGetQRCodeSql = "SELECT qr_code FROM tb_user_more WHERE user_id = ?"
 
-	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id) VALUES (?)  ON DUPLICATE KEY UPDATE qr_code=?;"
+	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id, qr_code) VALUES (?, ?)  ON DUPLICATE KEY UPDATE qr_code=?;"
 )
 
 var (
@@ -133,9 +133,9 @@ func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 }
 
 // Get user avatar name by user id
-func MySQLGetUserAvatar(userId int64, avatar *string) error {
+func MySQLGetUserAvatar(userId int64, avatarP *string) error {
 	row := MySQLClient.QueryRow(UserGetAvatarSql, userId)
-	err := row.Scan(avatar)
+	err := row.Scan(avatarP)
 
 	// if not found, it dose not need to abort en error, but return.
 	if err == sql.ErrNoRows {
@@ -154,7 +154,7 @@ func MySQLPutUserAvatar(userId int64, hashName string) error {
 		tx.Rollback()
 		return err
 	}
-	_, err = tx.Exec(UserInsertOrUpdateAvatar, userId, hashName)
+	_, err = tx.Exec(UserInsertOrUpdateAvatar, userId, hashName, hashName)
 	if nil != err {
 		tx.Rollback()
 		return err
@@ -180,9 +180,9 @@ func MySQLAvatarHashNameCount(hashName string) int {
 }
 
 // Get user QRCode name by user id
-func MySQLGetUserQRCode(userId int64, qrCode *string) error {
+func MySQLGetUserQRCode(userId int64, hashNameP *string) error {
 	row := MySQLClient.QueryRow(UserGetQRCodeSql, userId)
-	err := row.Scan(qrCode)
+	err := row.Scan(hashNameP)
 
 	// if not found, it dose not need to abort en error, but return.
 	if err == sql.ErrNoRows {
@@ -201,7 +201,7 @@ func MySQLPutUserQRCode(userId int64, hashName string) error {
 		tx.Rollback()
 		return err
 	}
-	_, err = tx.Exec(UserInsertOrUpdateQRCode, userId, hashName)
+	_, err = tx.Exec(UserInsertOrUpdateQRCode, userId, hashName, hashName)
 	if nil != err {
 		tx.Rollback()
 		return err
