@@ -35,6 +35,10 @@ func main() {
 	info.GET("/qrcode", controllers.GetQrCode)
 	info.POST("/qrcode", controllers.ParseQrCode)
 
+	relate := r.Group("/relation", controllers.JWTAuthMiddleware())
+	relate.GET("/friend", controllers.GetFriend)
+	relate.POST("/friend", controllers.AddFriend)
+
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", utils.NameValidator)
 		_ = v.RegisterValidation("emailValidator", utils.EmailValidator)

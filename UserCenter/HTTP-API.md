@@ -11,11 +11,12 @@
   | [PutAvatar](#6)  | PUT    | /info/avatar      | 1             | 更新个人头像                   |
   | [GetQrCode](#7) | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
   | [ParseQrCode](#8) | POST | /info/qrcode | 1 | 解析上传的二维码 |
-  | [GetFriends] | GET    | /relation/friends | 1             | 获取好友列表                   |
-  | [GetFriend] | GET    | /relation/friend  | 1             | 获取单个好友信息               |
-  | [AddFriend] | POST   | /relation/friend  | 1             | 添加好友                       |
+  | [GetFriend](#9) | GET | /relation/friend | 1 | 搜索用户/获取好友信息 |
+  | [AddFriend](#10) | POST   | /relation/friend  | 1             | 添加好友                       |
+  |                   |        |                   |               |                                |
   | [PutFriend] | PUT    | /relation/friend  | 1             | 修改好友备注; 加入、移出黑名单 |
   | [DelFriend] | DELETE | /relation/friend  | 1             | 删除好友                       |
+  | [GetFriends] | GET | /relation/friends | 1 | 获取好友列表 |
 
 ----
 
@@ -147,13 +148,15 @@ Path: `/info/profile`		Method: `PUT`
 
 Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
+​		    `Content-Type: application/json;`
+
 JsonBodyParams: `所有参数为必填, 如果未发生改变则填写原值`
 
-| Columns | DataType | Constraints                                  | Descripton |
-| ------- | -------- | -------------------------------------------- | ---------- |
-| name    | string   | 1到10个字符                                  | 用户昵称   |
-| mobile  | string   | 0个或者11个数字字符                          | 用户手机号 |
-| gender  | int      | -1/0/1;  (-1: 未知) ;    (0: 女)    (1: 男); | 性别       |
+| Columns | DataType | Constraints                                | Descripton |
+| ------- | -------- | ------------------------------------------ | ---------- |
+| name    | string   | 1到10个字符                                | 用户昵称   |
+| mobile  | string   | 0个或者11个数字字符                        | 用户手机号 |
+| gender  | int      | 0/1/2;  (0: 未知) ;    (1: 女)    (2: 男); | 性别       |
 
 ##### Response: 
 
@@ -161,11 +164,11 @@ Headers: `Content-Type: application/json;`
 
 JsonBodyResult:
 
-| Column | DataType | Description                         |
-| ------ | -------- | ----------------------------------- |
-| name   | string   | 用户昵称                            |
-| mobile | string   | 手机号, 默认为空                    |
-| gender | int      | 性别 (-1: 未知)   (0: 女)   (1: 男) |
+| Column | DataType | Description                        |
+| ------ | -------- | ---------------------------------- |
+| name   | string   | 用户昵称                           |
+| mobile | string   | 手机号, 默认为空                   |
+| gender | int      | 性别 (0: 未知)   (1: 女)   (2: 男) |
 
 ```json
 {
@@ -279,4 +282,105 @@ JsonBodyResult:
     "qr_content": "the real content of qr code"
 }
 ```
+
+---
+
+- #### <span id="9">GetFriend 搜索用户/获取单个好友信息</span> [Top](#0) 
+
+##### Request:
+
+Path: `/relation/friend`		Method: `GET`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+JsonBodyParams: `至少包含三个参数中的一个, 如果有id则都优先使用id`
+
+| Column | DataType | Constraints                 | Descritption       |
+| ------ | -------- | --------------------------- | ------------------ |
+| id     | int64    | 无符号整型                  | 目标用户的ID       |
+| email  | string   | 符合邮箱格式,最多100个字符; | 目标用户的邮箱地址 |
+| name   | string   | 1到10个字符                 | 目标用户的昵称     |
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult: `id, mobile, gender, note只当两个用户存在有效好友关系,且好友保存了相关信息才会返回有效值, 否则都返回数据类型的默认值; 使用name作为搜索参数时可能返回多条数据`
+
+| Column | DataType | Description      |
+| ------ | -------- | ---------------- |
+| id     | int64    | 目标用户ID       |
+| email  | string   | 目标用户邮箱地址 |
+| name   | string   | 目标用户昵称     |
+| mobile | string   | 目标用户手机号   |
+| gender | int      | 目标用户的性别   |
+| note   | string   | 给好友备注的名称 |
+
+```json
+{
+    "result": [
+        {
+            "id": 1162262948794597376,
+            "email": "test@test.com",
+            "name": "test",
+            "mobile": "",
+            "gender": 0,
+            "note": ""
+        },
+        {
+            "id": 1162663753959866368,
+            "email": "demo@demo.com",
+            "name": "test",
+            "mobile": "",
+            "gender": 0,
+            "note": ""
+        },
+        ...
+    ]
+}
+```
+
+---
+
+- #### <span id="10">AddFriend 添加好友</span> [Top](#0)
+
+##### Requset:
+
+Path: `/relation/friend`		Method: `POST`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​		    `Content-Type: application/json;`
+
+JsonBodyParams: `所有参数均为必传`
+
+| Column | DataType | Constraints                                  | Description          |
+| ------ | -------- | -------------------------------------------- | -------------------- |
+| id     | int64    | 无符号整型                                   | 目标用户的ID         |
+| note   | string   | 最多10个字符(为空字符串时默认为对方的用户名) | 给目标用户设置的昵称 |
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column    | DataType | Description                        |
+| --------- | -------- | ---------------------------------- |
+| email     | string   | 目标用户邮箱                       |
+| name      | string   | 目标用户昵称                       |
+| note      | string   | 给对方用户的设置的昵称             |
+| is_accept | int      | 是否激活了好友关系(0:否)(1:是)     |
+| is_refuse | int      | 是否进入了对方的黑名单(0:否)(1:是) |
+| is_delete | int      | 是否删除了好友关系(0:否)(1:是)     |
+
+```json
+
+```
+
+---
+
+
+
+
 
