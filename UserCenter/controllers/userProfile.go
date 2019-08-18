@@ -8,12 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"io/ioutil"
+	"strconv"
 )
 
 const (
 	AuthTokenSalt      = "this is a auth token salt"
 	AuthTokenAliveTime = 3600 * 24 //unit:second
 	AuthTokenIssuer    = "userCenter"
+	JWTDataKey         = "user_id"
 
 	PhotoSaveFoldPath   = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/photos/"
 	PhotoSuffix         = ".png"
@@ -21,15 +23,13 @@ const (
 	PhotosUrlPrefix     = "/static/photos/" // if you use oss , should change this value
 	MaxAvatarUploadSize = 100 * 2 << 10
 
-	JWTDataKey = "user_id"
-
 	QRCodeBaseUrl = "http://127.0.0.1:8080/qrcode/"
 )
 
 // GetProfile HTTP API function
 func GetProfile(c *gin.Context) {
 	user := models.UserBasic{Id: c.MustGet(JWTDataKey).(int64)}
-	err := models.MySQLGetUserByField("Id", &user)
+	err := models.MySQLGetUserById(&user)
 	if nil != err {
 		c.JSON(404, gin.H{"error": "get user information fail"})
 		return
@@ -49,6 +49,7 @@ func PutProfile(c *gin.Context) {
 	tempProfileP, err := parseTempProfile(c)
 	if nil != err {
 		c.JSON(400, gin.H{"error": err.Error()})
+		return
 	}
 	errs := binding.Validator.ValidateStruct(tempProfileP)
 	if nil != errs {
@@ -226,8 +227,8 @@ func UploadAvatarLocal(data []byte, hashName string) error {
 
 // todo make the content for create a QRCode
 func QRCodeContent(userId int64) string {
-
-	return "https://www.baidu.com" // temp value
+	//QRCodeBaseUrl
+	return "https://www.baidu.com " + strconv.FormatInt(userId,10) // temp value
 }
 
 // save QRCode file to local

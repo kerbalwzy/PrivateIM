@@ -72,12 +72,12 @@ func GenderValidator(
 	v *validator.Validate, topStruct reflect.Value, currentStructOrField reflect.Value,
 	field reflect.Value, fieldType reflect.Type, fieldKind reflect.Kind, param string,
 ) bool {
-	// Require the type is Int, and value is -1 or 0 or 1
+	// Require the type is Int, and value is 0, 1, 2
 	if fieldKind != reflect.Int {
 		return false
 	}
 	value := field.Int()
-	if value < -1 || value > 1 {
+	if value < 0 || value > 2 {
 		return false
 	}
 	return true

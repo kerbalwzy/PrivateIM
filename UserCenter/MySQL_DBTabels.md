@@ -19,7 +19,7 @@
   | mobile      | CHAR(11)     | UNIQUE NULL INDEX         | 手机号, 最多11个字符           |
   | email       | VARCHAR(100) | UNIQUE NULL INDEX         | 邮箱号, 最多100个字符          |
   | password    | VARCHAR(100) | NOT NULL                  | 密码hash值, 最多100个字符      |
-  | gender      | TINYINT(1)   | NULL                      | 性别(0:女,1:男, null:未知)     |
+  | gender      | TINYINT(1)   | NULL                      | 性别(0:未知 1:女, 2:男)        |
   | create_time | DATETIME     | DEFAULT CURRENT_TIMESTAMP | 创建时间, 默认值自动生成       |
 
   ```mysql
@@ -29,14 +29,14 @@
     `mobile` varchar(11) DEFAULT '',
     `email` varchar(100) DEFAULT '',
     `password` varchar(100) NOT NULL DEFAULT '',
-    `gender` tinyint(1) NOT NULL DEFAULT -1,
+    `gender` tinyint(1) NOT NULL DEFAULT 0,
     `create_time` datetime DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
     UNIQUE KEY `email` (`email`),
     KEY `find_by_name` (`name`),
     KEY `find_by_email` (`email`),
     KEY `find_by_mobile` (`mobile`)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   
   ```
 
@@ -49,11 +49,11 @@
   | qr_code | VARCHAR(100) | UNIQUE NULL          | 二维码文件名称, 最多100个字符 |
 
   ```mysql
-  CREATE TABLE `tb_user_more` (
-    `usr_id` bigint(20) unsigned NOT NULL,
-    `avatar` varchar(100) DEFAULT NULL,
-    `qr_code` varchar(100) DEFAULT NULL,
-    PRIMARY KEY (`usr_id`),
+   CREATE TABLE `tb_user_more` (
+    `user_id` bigint(20) unsigned NOT NULL,
+    `avatar` varchar(100) DEFAULT '',
+    `qr_code` varchar(100) DEFAULT '',
+    PRIMARY KEY (`user_id`),
     UNIQUE KEY `qr_code` (`qr_code`)
   ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
   ```
@@ -75,14 +75,13 @@
     `id` bigint(20) unsigned NOT NULL,
     `src_id` bigint(20) NOT NULL,
     `dst_id` bigint(20) NOT NULL,
-    `note` varchar(20) NOT NULL,
-    `isAccept` tinyint(1) NOT NULL DEFAULT 0,
-    `isBlack` tinyint(1) NOT NULL DEFAULT 0,
-    `isDelete` tinyint(1) NOT NULL DEFAULT 0,
+    `note` varchar(10) DEFAULT '',
+    `is_accept` tinyint(1) NOT NULL DEFAULT 0,
+    `is_refuse` tinyint(1) NOT NULL DEFAULT 0,
+    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
-    KEY `src_user` (`src_id`),
-    KEY `dst_user` (`dst_id`)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    UNIQUE KEY `src_dst_id_index` (`src_id`,`dst_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
   ```
 
 
