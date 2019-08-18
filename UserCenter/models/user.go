@@ -11,6 +11,7 @@ const (
 	PasswordSalt = "fasdfasf87tr3h87sf23386t123!@e23BLfishf"
 )
 
+// user basic information in `tb_user_basic` table
 type UserBasic struct {
 	Id         int64     `json:"id"`
 	Name       string    `json:"name" `
@@ -46,8 +47,20 @@ func (user *UserBasic) CheckPassword(password string) bool {
 	return user.password == GetPasswordHash(password, user.Email, PasswordSalt)
 }
 
+// user more information in `tb_user_more` table
 type UserMore struct {
 	UserId int64  `json:"user_id"`
 	Avatar string `json:"avatar"`
 	QrCode string `json:"qr_code"`
+}
+
+// user relationship information in `tb_friend_relation` table
+type UserRelate struct {
+	Id         int64  `json:"id"`
+	SelfId     int64  `json:"self_id"`
+	FriendId   int64  `json:"friend_id"`
+	FriendNote string `json:"friend_note"`
+	IsAccept   bool   `json:"is_accept"`
+	IsRefuse    bool   `json:"is_black"`
+	IsDelete   bool   `json:"is_delete"`
 }

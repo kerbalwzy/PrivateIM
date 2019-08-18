@@ -3,32 +3,9 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/bwmarrin/snowflake"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
-
-	"../utils"
-)
-
-const (
-	UserDbMySQLURI = "root:mysql@tcp(10.211.55.4:3306)/IMUserCenter?charset=utf8&parseTime=true"
-
-	UserSignUpSql = "INSERT INTO tb_user_basic (id, name, email, password)VALUES (?, ?, ?, ?);"
-
-	UserGetByFieldSql = "SELECT id, name, mobile, email, gender, create_time, password FROM tb_user_basic WHERE %s = ?;"
-
-	UserPutProfileSql = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
-
-	UserGetAvatarSql = "SELECT avatar FROM tb_user_more WHERE user_id = ?"
-
-	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id, avatar) VALUES (?, ?)  ON DUPLICATE KEY UPDATE avatar=?;"
-
-	UserAvatarHashNameCount = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
-
-	UserGetQRCodeSql = "SELECT qr_code FROM tb_user_more WHERE user_id = ?"
-
-	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id, qr_code) VALUES (?, ?)  ON DUPLICATE KEY UPDATE qr_code=?;"
 )
 
 var (
@@ -49,23 +26,73 @@ func init() {
 
 }
 
-// Get an user basic by id or email or mobile
-func MySQLGetUserByField(field string, user *UserBasic) error {
-	value, err := utils.GetReflectValueByField(*user, field)
+// user basic information sql strings
+const (
+	UserDbMySQLURI = "root:mysql@tcp(10.211.55.4:3306)/IMUserCenter?charset=utf8&parseTime=true"
+
+	UserNewOne = "INSERT INTO tb_user_basic (id, name, email, password)VALUES (?, ?, ?, ?);"
+
+	UserGetProfileBasic = "SELECT id, name, mobile, email, gender, create_time, password FROM tb_user_basic "
+
+	UserGetProfileById = UserGetProfileBasic + "WHERE id = ?"
+
+	UserGetProfileByEmail = UserGetProfileBasic + "WHERE email = ?"
+
+	UserGetProfileByName = UserGetProfileBasic + "WHERE name = ?"
+
+	UserUpdateProfile = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
+)
+
+// scan user from the row
+func ScanUserFromRow(rowP *sql.Row, userP *UserBasic) error {
+	err := rowP.Scan(&(userP.Id), &(userP.Name), &(userP.Mobile), &(userP.Email), &(userP.Gender),
+		&(userP.CreateTime), &(userP.password))
 	if nil != err {
 		return err
 	}
-	tempSQL := fmt.Sprintf(UserGetByFieldSql, field)
-	row := MySQLClient.QueryRow(tempSQL, value)
-	err = row.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
-		&(user.CreateTime), &(user.password))
-	if nil != err {
-		return err
-	}
-	if user.Id == 0 {
-		return fmt.Errorf("get user by <%s> fail", field)
+	if userP.Id == 0 {
+		return errors.New("get user profile fail")
 	}
 	return nil
+}
+
+// Get user all information in `tb_user_basic` table by ID
+func MySQLGetUserById(userP *UserBasic) error {
+	rowP := MySQLClient.QueryRow(UserGetProfileById, userP.Id)
+	err := ScanUserFromRow(rowP, userP)
+	if nil != err {
+		return err
+	}
+	return nil
+}
+
+// Get user all information in `tb_user_basic` table by email
+func MySQLGetUserByEmail(userP *UserBasic) error {
+	rowP := MySQLClient.QueryRow(UserGetProfileByEmail, userP.Email)
+	err := ScanUserFromRow(rowP, userP)
+	if nil != err {
+		return err
+	}
+	return nil
+}
+
+// Get users all information in `tb_user_basic` table by name
+func MySQLGetUserByName(name string) ([]*UserBasic, error) {
+	rows, err := MySQLClient.Query(UserGetProfileByName, name)
+	if nil != err {
+		return nil, err
+	}
+	users := make([]*UserBasic, 0)
+	for rows.Next() {
+		user := &UserBasic{}
+		err := rows.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
+			&(user.CreateTime), &(user.password))
+		if nil != err {
+			continue
+		}
+		users = append(users, user)
+	}
+	return users, nil
 }
 
 // Save user with id, name, email,password to database.
@@ -79,15 +106,14 @@ func MySQLUserSignUp(user *UserBasic) error {
 
 	// try to insert user data into database
 	id := SnowFlakeNode.Generate()
-	_, err = tx.Exec(UserSignUpSql, id, user.Name, user.Email, user.password)
+	_, err = tx.Exec(UserNewOne, id, user.Name, user.Email, user.password)
 	if nil != err {
 		tx.Rollback()
 		return err
 	}
 
 	// try to get full information of user from database, and update to user.
-	tmpSql := fmt.Sprintf(UserGetByFieldSql, "id")
-	err = tx.QueryRow(tmpSql, id).Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
+	err = tx.QueryRow(UserGetProfileById, id).Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
 		&(user.CreateTime), &(user.password))
 	if nil != err {
 		tx.Rollback()
@@ -110,7 +136,7 @@ func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 		return err
 	}
 	// update user profile
-	ret, err := tx.Exec(UserPutProfileSql, name, mobile, gender, userId)
+	ret, err := tx.Exec(UserUpdateProfile, name, mobile, gender, userId)
 	if nil != err {
 		tx.Rollback()
 		return err
@@ -132,9 +158,22 @@ func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 	return nil
 }
 
+// user more information sql string
+const (
+	UserGetAvatar = "SELECT avatar FROM tb_user_more WHERE user_id = ?"
+
+	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id, avatar) VALUES (?, ?)  ON DUPLICATE KEY UPDATE avatar=?;"
+
+	UserAvatarHashNameCount = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
+
+	UserGetQRCode = "SELECT qr_code FROM tb_user_more WHERE user_id = ?"
+
+	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id, qr_code) VALUES (?, ?)  ON DUPLICATE KEY UPDATE qr_code=?;"
+)
+
 // Get user avatar name by user id
 func MySQLGetUserAvatar(userId int64, avatarP *string) error {
-	row := MySQLClient.QueryRow(UserGetAvatarSql, userId)
+	row := MySQLClient.QueryRow(UserGetAvatar, userId)
 	err := row.Scan(avatarP)
 
 	// if not found, it dose not need to abort en error, but return.
@@ -181,7 +220,7 @@ func MySQLAvatarHashNameCount(hashName string) int {
 
 // Get user QRCode name by user id
 func MySQLGetUserQRCode(userId int64, hashNameP *string) error {
-	row := MySQLClient.QueryRow(UserGetQRCodeSql, userId)
+	row := MySQLClient.QueryRow(UserGetQRCode, userId)
 	err := row.Scan(hashNameP)
 
 	// if not found, it dose not need to abort en error, but return.
@@ -211,5 +250,68 @@ func MySQLPutUserQRCode(userId int64, hashName string) error {
 		tx.Rollback()
 		return err
 	}
+	return nil
+}
+
+// user relationship information sql strings
+const (
+	UserGetFriendBasic = "SELECT id, dst_id, src_id, note, is_accept, is_refuse, is_delete FROM tb_friend_relation "
+
+	UserGetOneFriend = UserGetFriendBasic + "WHERE src_id = ? AND dst_id = ?"
+
+	UserGetAllFriends = UserGetFriendBasic + "WHERE src_id = ?"
+
+	UserAddOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, note,is_delete) VALUES(?,?,?,?,?) 
+ON DUPLICATE KEY UPDATE note = ?,is_delete=false`
+
+	UserAcceptOneFriend = ""
+
+	UserBlackOneFriend = ""
+
+	UserDeleteOneFriend = ""
+)
+
+// Get one friend relation information of user
+func MySQLGetUserOneFriend(relateP *UserRelate) error {
+	rowP := MySQLClient.QueryRow(UserGetOneFriend, relateP.SelfId, relateP.FriendId)
+	err := rowP.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
+		&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsRefuse), &(relateP.IsDelete))
+	if nil != err {
+		return err
+	}
+	return nil
+}
+
+// Get all friends relation information of uer
+func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
+	rows, err := MySQLClient.Query(UserGetAllFriends, userId)
+	if nil != err {
+		return nil, err
+	}
+	friends := make([]*UserRelate, 0)
+	for rows.Next() {
+		relateP := new(UserRelate)
+		err := rows.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
+			&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsRefuse), &(relateP.IsDelete))
+		if nil != err {
+			continue
+		}
+		friends = append(friends, relateP)
+	}
+	return friends, nil
+}
+
+// Add one friend relation information of user
+func MySQLAddOneFriend(relateP *UserRelate) error {
+	// open a Transaction
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return err
+	}
+
+	// try save or update a relationship row data
+	relateP.Id = SnowFlakeNode.Generate().Int64()
+	_, err = tx.Exec(UserAddOneFriend, relateP.Id, relateP.SelfId, relateP.FriendId, relateP.FriendNote, relateP.FriendNote)
+
 	return nil
 }

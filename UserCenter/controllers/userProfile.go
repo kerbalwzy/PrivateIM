@@ -164,11 +164,11 @@ func GetQrCode(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-
 	if *hashNameP != "" {
 		c.JSON(200, gin.H{"qr_code": PhotosUrlPrefix + *hashNameP + PhotoSuffix})
 		return
 	}
+
 	// if the qr code hash name is not existed, create an new and save
 	content := QRCodeContent(userId.(int64))
 	data, _ := utils.CreatQRCodeBytes(content)
