@@ -108,7 +108,7 @@ func MySQLUserSignUp(user *UserBasic) error {
 	id := SnowFlakeNode.Generate()
 	_, err = tx.Exec(UserNewOne, id, user.Name, user.Email, user.password)
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 
@@ -116,14 +116,14 @@ func MySQLUserSignUp(user *UserBasic) error {
 	err = tx.QueryRow(UserGetProfileById, id).Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
 		&(user.CreateTime), &(user.password))
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 
 	// commit Transaction
 	err = tx.Commit()
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 	}
 	return nil
 }
@@ -132,28 +132,27 @@ func MySQLUserSignUp(user *UserBasic) error {
 func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
-		tx.Rollback()
 		return err
 	}
 	// update user profile
 	ret, err := tx.Exec(UserUpdateProfile, name, mobile, gender, userId)
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 	aff, err := ret.RowsAffected()
 	if aff == 0 {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return errors.New("not thing need to update")
 	}
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 	// commit Transaction
 	err = tx.Commit()
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 	}
 	return nil
 }
@@ -190,18 +189,17 @@ func MySQLGetUserAvatar(userId int64, avatarP *string) error {
 func MySQLPutUserAvatar(userId int64, hashName string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
-		tx.Rollback()
 		return err
 	}
 	_, err = tx.Exec(UserInsertOrUpdateAvatar, userId, hashName, hashName)
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 
 	err = tx.Commit()
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 	return nil
@@ -237,17 +235,16 @@ func MySQLGetUserQRCode(userId int64, hashNameP *string) error {
 func MySQLPutUserQRCode(userId int64, hashName string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
-		tx.Rollback()
 		return err
 	}
 	_, err = tx.Exec(UserInsertOrUpdateQRCode, userId, hashName, hashName)
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 	err = tx.Commit()
 	if nil != err {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 	return nil
@@ -255,14 +252,14 @@ func MySQLPutUserQRCode(userId int64, hashName string) error {
 
 // user relationship information sql strings
 const (
-	UserGetFriendBasic = "SELECT id, dst_id, src_id, note, is_accept, is_refuse, is_delete FROM tb_friend_relation "
+	UserGetFriendBasic = "SELECT id, src_id, dst_id, note, is_accept, is_refuse, is_delete FROM tb_friend_relation "
 
 	UserGetOneFriend = UserGetFriendBasic + "WHERE src_id = ? AND dst_id = ?"
 
 	UserGetAllFriends = UserGetFriendBasic + "WHERE src_id = ?"
 
 	UserAddOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, note,is_delete) VALUES(?,?,?,?,?) 
-ON DUPLICATE KEY UPDATE note = ?,is_delete=false`
+ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE,is_delete = FALSE`
 
 	UserAcceptOneFriend = ""
 
@@ -273,8 +270,8 @@ ON DUPLICATE KEY UPDATE note = ?,is_delete=false`
 
 // Get one friend relation information of user
 func MySQLGetUserOneFriend(relateP *UserRelate) error {
-	rowP := MySQLClient.QueryRow(UserGetOneFriend, relateP.SelfId, relateP.FriendId)
-	err := rowP.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
+	row := MySQLClient.QueryRow(UserGetOneFriend, relateP.SelfId, relateP.FriendId)
+	err := row.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
 		&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsRefuse), &(relateP.IsDelete))
 	if nil != err {
 		return err
@@ -311,7 +308,17 @@ func MySQLAddOneFriend(relateP *UserRelate) error {
 
 	// try save or update a relationship row data
 	relateP.Id = SnowFlakeNode.Generate().Int64()
-	_, err = tx.Exec(UserAddOneFriend, relateP.Id, relateP.SelfId, relateP.FriendId, relateP.FriendNote, relateP.FriendNote)
+	_, err = tx.Exec(UserAddOneFriend, relateP.Id, relateP.SelfId, relateP.FriendId,
+		relateP.FriendNote, relateP.IsDelete, relateP.FriendNote)
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
 
 	return nil
 }

@@ -319,23 +319,23 @@ JsonBodyResult: `id, mobile, gender, note只当两个用户存在有效好友关
 ```json
 {
     "result": [
-        {
+        {	// friend
             "id": 1162262948794597376,
             "email": "test@test.com",
             "name": "test",
-            "mobile": "",
-            "gender": 0,
-            "note": ""
+            "mobile": "13122222223",
+            "gender": 1,
+            "note": "Li"
         },
-        {
+        {	// not friend
             "id": 1162663753959866368,
             "email": "demo@demo.com",
             "name": "test",
             "mobile": "",
             "gender": 0,
             "note": ""
-        },
-        ...
+        }
+        ....
     ]
 }
 ```
@@ -370,12 +370,19 @@ JsonBodyResult:
 | email     | string   | 目标用户邮箱                       |
 | name      | string   | 目标用户昵称                       |
 | note      | string   | 给对方用户的设置的昵称             |
-| is_accept | int      | 是否激活了好友关系(0:否)(1:是)     |
-| is_refuse | int      | 是否进入了对方的黑名单(0:否)(1:是) |
-| is_delete | int      | 是否删除了好友关系(0:否)(1:是)     |
+| is_accept | bool     | 是否激活了好友关系(0:否)(1:是)     |
+| is_refuse | bool     | 是否进入了对方的黑名单(0:否)(1:是) |
+| is_delete | bool     | 是否删除了好友关系(0:否)(1:是)     |
 
 ```json
-
+{
+    "email": "test@test.com",
+    "is_accept": false,
+    "is_delete": false,
+    "is_refuse": false,
+    "name": "test",
+    "note": "Li"
+}
 ```
 
 ---

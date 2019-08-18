@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/gin-gonic/gin"
 
@@ -48,6 +49,7 @@ func GetFriend(c *gin.Context) {
 		result := &GetFriendResult{Id: userP.Id, Email: userP.Email, Name: userP.Name}
 		if note, ok := friendsIdAndNote[userP.Id]; ok {
 			result.Gender = userP.Gender
+			result.Mobile = userP.Mobile
 			result.Note = note
 		}
 		resultSlice = append(resultSlice, result)
@@ -151,37 +153,42 @@ func AddFriend(c *gin.Context) {
 	relateP := &models.UserRelate{SelfId: selfId, FriendId: userP.Id}
 	if statusCode, err := CheckDuplicateAddAndBlackList(relateP); nil != err {
 		c.JSON(statusCode, gin.H{"error": err.Error()})
+		return
 	}
 
 	// try save relation data into database
 	relateP.FriendNote = params.Note
+	err = models.MySQLAddOneFriend(relateP)
+	if nil != err {
+		c.JSON(500, gin.H{"error": "save relation error: " + err.Error()})
+		return
+	}
 
+	c.JSON(200, gin.H{"email": userP.Email, "name": userP.Name,
+		"note": relateP.FriendNote, "is_accept": relateP.IsAccept,
+		"is_refuse": relateP.IsRefuse, "is_delete": relateP.IsDelete})
+
+	// todo: Let the communication center notify the target user
+	NotifyTargetUser(relateP)
 
 }
 
 // check if duplicate add the user as friend or the user is in black list
 func CheckDuplicateAddAndBlackList(relateP *models.UserRelate) (int, error) {
-	if err := models.MySQLGetUserOneFriend(relateP); nil != err {
+	if err := models.MySQLGetUserOneFriend(relateP); nil != err && sql.ErrNoRows != err {
 		return 500, errors.New("database error:" + err.Error())
 	}
-	if relateP.Id != 0 && relateP.IsAccept && !relateP.IsRefuse {
-		return 400, errors.New("you are already friend, don't duplicate add")
+	if relateP.Id != 0 && relateP.IsAccept && !relateP.IsRefuse && !relateP.IsDelete {
+		return 400, errors.New("you are already friends")
 	}
 	if relateP.Id != 0 && relateP.IsRefuse {
-		return 403, errors.New("please remove user from black list first")
+		return 403, errors.New("there's a blacklist relationship between you")
 	}
 	return 200, nil
 }
 
-//Check the user relationship.
-//If they are friends, return true, relation data id and friend note
-//otherwise return false, 0 and empty string
-func CheckFriendRelation(selfId, friendId int64) (bool, *models.UserRelate) {
-	relateP := &models.UserRelate{SelfId: selfId, FriendId: friendId}
-	_ = models.MySQLGetUserOneFriend(relateP)
-	if relateP.Id == 0 || !relateP.IsAccept || relateP.IsDelete {
-		return false, relateP
-	}
-	return true, relateP
+// todo: Let the communication center notify the target user,
+//  there is a friend request;
+func NotifyTargetUser(relateP *models.UserRelate) {
 
 }
