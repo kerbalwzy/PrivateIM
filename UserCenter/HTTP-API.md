@@ -15,7 +15,7 @@
   | [AddFriend](#10) | POST   | /relation/friend  | 1             | 添加好友                       |
   | [PutFriend](#11) | PUT    | /relation/friend  | 1             | 修改好友备注; 接受\拒绝好友申请; 加入\移出黑名单 |
   | [DelFriend](#12) | DELETE | /relation/friend  | 1             | 删除好友                       |
-  | [GetFriends] | GET | /relation/friends | 1 | 获取好友列表 |
+  | [AllFriends](#13) | GET | /relation/friends | 1 | 获取好友列表 |
 
 ----
 
@@ -443,6 +443,50 @@ JsonBodyResult:
 | message | string   | 操作结果提示 |
 
 ```json
+{
+    "message": "the record has been deleted and will not be notified to your friend."
+}
+```
 
+---
+
+- #### <span id="13">AllFriends 获取自己的好友列表</span> [Top](#0)
+
+##### Request:
+
+Path: `/relation/friends` 	Method: `GET`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column    | DataType | Description                        |
+| --------- | -------- | ---------------------------------- |
+| friend_id | int64    | 好友的Id                           |
+| name      | string   | 好友的呢称                         |
+| email     | string   | 好友的邮箱                         |
+| mobile    | string   | 好友的手机号, 可能为空             |
+| gender    | int      | 好友的性别(0:未知, 1:女性, 2:男性) |
+| note      | string   | 给好友设置的备注                   |
+| is_black  | bool     | 是否在黑名单内                     |
+
+```json
+{
+    "friends": [
+        {
+            "friend_id": 1162262948794597376,
+            "name": "test",
+            "email": "test@test.com",
+            "mobile": "13122222223",
+            "gender": 1,
+            "note": "demoNote",
+            "is_black": false
+        }
+    ]
+}
 ```
 

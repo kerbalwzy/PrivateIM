@@ -253,34 +253,36 @@ func MySQLPutUserQRCode(userId int64, hashName string) error {
 
 // user relationship information sql strings
 const (
-	UserGetFriendBasic = "SELECT id, src_id, dst_id, note, is_accept, is_black, is_delete FROM tb_friend_relation "
-
-	UserGetOneFriend = UserGetFriendBasic + "WHERE src_id = ? AND dst_id = ?"
-
-	UserGetAllFriends = UserGetFriendBasic + "WHERE src_id = ?"
+	UserGetFriendsRelate = `SELECT id, src_id, dst_id, note, is_accept, is_black, is_delete FROM tb_friend_relation 
+WHERE src_id = ?`
 
 	UserCheckTargetFriendExisted = "SELECT id FROM tb_user_basic WHERE id = ?"
 
-	UserCheckBlackList = "SELECT is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
+	UserCheckBlackList = `SELECT is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?`
 
 	UserCheckFriendshipAlreadyInEffect = "SELECT is_accept FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
 
 	UserAddOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, note) VALUES(?,?,?,?) 
 ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE, is_black=FALSE, is_delete = FALSE`
 
-	UserCheckFriendRequest = "SELECT id from tb_friend_relation WHERE src_id =? AND dst_id = ?"
+	UserCheckFriendRequest = `SELECT id from tb_friend_relation WHERE src_id =? AND dst_id = ?`
 
 	UserAcceptOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, is_accept) VALUES(?,?,?,?) 
 ON DUPLICATE KEY UPDATE is_accept = TRUE, is_black = FALSE, is_delete = FALSE `
 
-	UserCheckBlacklist = "SELECT id, is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
+	UserCheckBlacklist = `SELECT id, is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?`
 
 	UserBlackOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, is_black) VALUES(?,?,?,?) 
 ON DUPLICATE KEY UPDATE is_black = ? `
 
-	UserNoteOneFriend = "UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?"
+	UserNoteOneFriend = `UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?`
 
-	UserDeleteOneFriend = "UPDATE tb_friend_relation SET is_accept = FALSE, is_black = FALSE, is_delete=TRUE WHERE src_id=? AND dst_id = ?"
+	UserDeleteOneFriend = `UPDATE tb_friend_relation SET is_accept = FALSE, is_black = FALSE, is_delete=TRUE 
+WHERE src_id=? AND dst_id = ?`
+
+	UserGetFriendsInfo = `SELECT id, name, email, mobile, gender, note, is_black FROM tb_user_basic as basic, 
+(SELECT dst_id, note, is_black from tb_friend_relation where src_id= ? and is_delete = FALSE and is_accept=TRUE) 
+as friends where friends.dst_id = basic.id`
 )
 
 var (
@@ -506,8 +508,8 @@ func MySQLDeleteOneFriend(selfId, friendId int64) error {
 }
 
 // Get all friends relation information of uer
-func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
-	rows, err := MySQLClient.Query(UserGetAllFriends, userId)
+func MySQLGetUserFriendsRelates(userId int64) ([]*UserRelate, error) {
+	rows, err := MySQLClient.Query(UserGetFriendsRelate, userId)
 	if nil != err {
 		return nil, err
 	}
@@ -524,13 +526,21 @@ func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
 	return friends, nil
 }
 
-// Get one friend relation information of user
-func MySQLGetUserOneFriend(relateP *UserRelate) error {
-	row := MySQLClient.QueryRow(UserGetOneFriend, relateP.SelfId, relateP.FriendId)
-	err := row.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
-		&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsBlack), &(relateP.IsDelete))
+// Get the friends basic and relate information of user
+func MySQLGetUserFriendsInfo(selfId int64) ([]*FriendInformation, error) {
+	rows, err := MySQLClient.Query(UserGetFriendsInfo, selfId)
 	if nil != err {
-		return err
+		return nil, err
 	}
-	return nil
+	
+	friendsInfo := make([]*FriendInformation, 0)
+	for rows.Next() {
+		temp := new(FriendInformation)
+		_ = rows.Scan(&(temp.FriendId), &(temp.Name), &(temp.Email), &(temp.Mobile),
+			&(temp.Gender), &(temp.Note), &(temp.IsBlack))
+
+		friendsInfo = append(friendsInfo, temp)
+	}
+
+	return friendsInfo, nil
 }

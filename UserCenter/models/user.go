@@ -64,3 +64,14 @@ type UserRelate struct {
 	IsBlack    bool   `json:"is_black"`
 	IsDelete   bool   `json:"is_delete"`
 }
+
+// user basic and relate information from `tb_user_basic` and `tb_friend_relation` table
+type FriendInformation struct {
+	FriendId int64  `json:"friend_id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Mobile   string `json:"mobile"`
+	Gender   int    `json:"gender"`
+	Note     string `json:"note"`
+	IsBlack  bool   `json:"is_black"`
+}

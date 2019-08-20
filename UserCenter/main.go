@@ -39,6 +39,7 @@ func main() {
 	relate.POST("/friend", controllers.AddFriend)
 	relate.PUT("/friend", controllers.PutFriend)
 	relate.DELETE("/friend", controllers.DeleteFriend)
+	relate.GET("/friends", controllers.AllFriends)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", controllers.NameValidator)

@@ -111,14 +111,14 @@ func SearchUsers(params *GetFriendParams) ([]*models.UserBasic, error) {
 // Get the id and note of the friends, and return a map, key is id, value is note
 func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 	tempMap := make(map[int64]string)
-	friends, err := models.MySQLGetUserAllFriends(userId)
+	friendsRelates, err := models.MySQLGetUserFriendsRelates(userId)
 	if nil != err {
 		return tempMap, err
 	}
-	for _, friend := range friends {
-		// Judging the validity of friendship
-		if friend.IsAccept && !friend.IsBlack && !friend.IsDelete {
-			tempMap[friend.FriendId] = friend.FriendNote
+	for _, relate := range friendsRelates {
+		// Judging the validity of relationship
+		if relate.IsAccept && !relate.IsBlack && !relate.IsDelete {
+			tempMap[relate.FriendId] = relate.FriendNote
 		}
 	}
 	return tempMap, nil
@@ -293,5 +293,16 @@ func DeleteFriend(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"message": "your friendship is deleted, it's will not notice your friend."})
+	c.JSON(200, gin.H{"message": "the record has been deleted and will not be notified to your friend."})
+}
+
+// Get All Friend HTTP API function
+func AllFriends(c *gin.Context) {
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	data, err := models.MySQLGetUserFriendsInfo(selfId)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"friends": data})
 }
