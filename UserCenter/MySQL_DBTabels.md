@@ -77,11 +77,13 @@
     `dst_id` bigint(20) NOT NULL,
     `note` varchar(10) DEFAULT '',
     `is_accept` tinyint(1) NOT NULL DEFAULT 0,
-    `is_refuse` tinyint(1) NOT NULL DEFAULT 0,
+    `is_black` tinyint(1) NOT NULL DEFAULT 0,
     `is_delete` tinyint(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `src_dst_id_index` (`src_id`,`dst_id`)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    UNIQUE KEY `src_dst_id_index` (`src_id`,`dst_id`),
+    KEY `dst_id__index` (`dst_id`),
+    KEY `src_id_index` (`src_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```
 
 
