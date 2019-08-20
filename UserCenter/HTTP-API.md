@@ -14,7 +14,7 @@
   | [GetFriend](#9) | GET | /relation/friend | 1 | 搜索用户/获取好友信息 |
   | [AddFriend](#10) | POST   | /relation/friend  | 1             | 添加好友                       |
   | [PutFriend](#11) | PUT    | /relation/friend  | 1             | 修改好友备注; 接受\拒绝好友申请; 加入\移出黑名单 |
-  | [DelFriend] | DELETE | /relation/friend  | 1             | 删除好友                       |
+  | [DelFriend](#12) | DELETE | /relation/friend  | 1             | 删除好友                       |
   | [GetFriends] | GET | /relation/friends | 1 | 获取好友列表 |
 
 ----
@@ -353,10 +353,10 @@ Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
 JsonBodyParams: `所有参数均为必传`
 
-| Column    | DataType | Constraints                                 | Description          |
-| --------- | -------- | ------------------------------------------- | -------------------- |
-| friend_id | int64    | 无符号整型                                  | 目标用户的ID         |
-| note      | string   | 最多10个字符,可以为空字符串, 表示不设置昵称 | 给目标用户设置的昵称 |
+| Column | DataType | Constraints                                 | Description          |
+| ------ | -------- | ------------------------------------------- | -------------------- |
+| dst_id | int64    | 无符号整型                                  | 目标用户的ID         |
+| note   | string   | 最多10个字符,可以为空字符串, 表示不设置昵称 | 给目标用户设置的昵称 |
 
 ##### Response:
 
@@ -414,5 +414,35 @@ JsonBodyResult:
 }
 ```
 
+---
 
+- #### <span id="12">DelFriend 删除好友</span> [Top](#0)
+
+##### Request:
+
+Path: `/relation/friend` 		Method: `DELETE`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​		    `Content-Type: application/json;`
+
+JsonBodyParams: `在删除好友的同时,会将好友关系记录中的is_accept, is_black都重置为false; 除非自己重新请求添加对方为好友,或者对象重新请求添加好友,删除状态不可更改`
+
+| Column | DataType | Constraints      | Description  |
+| ------ | -------- | ---------------- | ------------ |
+| dst_id | int64    | 无符号整型[必填] | 目标用户的ID |
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column  | DataType | Description  |
+| ------- | -------- | ------------ |
+| message | string   | 操作结果提示 |
+
+```json
+
+```
 

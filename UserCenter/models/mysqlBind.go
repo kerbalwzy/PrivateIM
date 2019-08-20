@@ -280,7 +280,7 @@ ON DUPLICATE KEY UPDATE is_black = ? `
 
 	UserNoteOneFriend = "UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?"
 
-	UserDeleteOneFriend = ""
+	UserDeleteOneFriend = "UPDATE tb_friend_relation SET is_accept = FALSE, is_black = FALSE, is_delete=TRUE WHERE src_id=? AND dst_id = ?"
 )
 
 var (
@@ -457,6 +457,54 @@ func MySQLManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
 	return nil
 }
 
+// Delete friend relationship record
+func MySQLDeleteOneFriend(selfId, friendId int64) error {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return err
+	}
+
+	// update self record
+	affect, err := tx.Exec(UserDeleteOneFriend, selfId, friendId)
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	affectCount, err := affect.RowsAffected()
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	if affectCount == 0 {
+		_ = tx.Rollback()
+		return ErrNoFriendship
+	}
+
+	// update friend record
+	affect, err = tx.Exec(UserDeleteOneFriend, friendId, selfId)
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	affectCount, err = affect.RowsAffected()
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	if affectCount == 0 {
+		_ = tx.Rollback()
+		return ErrNoFriendship
+	}
+
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	return nil
+
+}
+
 // Get all friends relation information of uer
 func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
 	rows, err := MySQLClient.Query(UserGetAllFriends, userId)
@@ -475,7 +523,6 @@ func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
 	}
 	return friends, nil
 }
-
 
 // Get one friend relation information of user
 func MySQLGetUserOneFriend(relateP *UserRelate) error {

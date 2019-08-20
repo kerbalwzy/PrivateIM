@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"errors"
-
-	"github.com/gin-gonic/gin"
-
 	"../models"
+	"errors"
+	"github.com/gin-gonic/gin"
 )
 
 type GetFriendParams struct {
@@ -127,7 +125,7 @@ func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 }
 
 type AddFriendParams struct {
-	FriendId int64  `json:"friend_id" binding:"required"`
+	FriendId int64  `json:"dst_id" binding:"required"`
 	Note     string `json:"note" binding:"nameValidator"`
 }
 
@@ -234,7 +232,7 @@ func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 		}
 	}
 
-	return 200, "modify note for friend successful"
+	return 200, "modify note for friend successfully"
 }
 
 // Handle a friend relationship request
@@ -268,8 +266,32 @@ func ManageFriendShipBlacklist(selfId, friendId int64, isBlack bool) (int, strin
 		return 500, err.Error()
 	}
 	if isBlack {
-		return 200, "move friend into blacklist successful"
+		return 200, "move friend into blacklist successfully"
 	} else {
-		return 200, "move friend out from blacklist successful"
+		return 200, "move friend out from blacklist successfully"
 	}
+}
+
+type DeleteFriendParams struct {
+	FriendId int64 `json:"dst_id" binding:"required"`
+}
+
+// Delete friend HTTP API function
+func DeleteFriend(c *gin.Context) {
+	params := new(DeleteFriendParams)
+	if err := c.ShouldBindJSON(params); nil != err {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	err := models.MySQLDeleteOneFriend(selfId, params.FriendId)
+	if models.ErrNoFriendship == err {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"message": "your friendship is deleted, it's will not notice your friend."})
 }
