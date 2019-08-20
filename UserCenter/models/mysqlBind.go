@@ -3,9 +3,10 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"log"
+
 	"github.com/bwmarrin/snowflake"
 	_ "github.com/go-sql-driver/mysql"
-	"log"
 )
 
 var (
@@ -252,27 +253,204 @@ func MySQLPutUserQRCode(userId int64, hashName string) error {
 
 // user relationship information sql strings
 const (
-	UserGetFriendBasic = "SELECT id, src_id, dst_id, note, is_accept, is_refuse, is_delete FROM tb_friend_relation "
+	UserGetFriendBasic = "SELECT id, src_id, dst_id, note, is_accept, is_black, is_delete FROM tb_friend_relation "
 
 	UserGetOneFriend = UserGetFriendBasic + "WHERE src_id = ? AND dst_id = ?"
 
 	UserGetAllFriends = UserGetFriendBasic + "WHERE src_id = ?"
 
-	UserAddOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, note,is_delete) VALUES(?,?,?,?,?) 
-ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE,is_delete = FALSE`
+	UserCheckTargetFriendExisted = "SELECT id FROM tb_user_basic WHERE id = ?"
 
-	UserAcceptOneFriend = ""
+	UserCheckBlackList = "SELECT is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
 
-	UserBlackOneFriend = ""
+	UserCheckFriendshipAlreadyInEffect = "SELECT is_accept FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
+
+	UserAddOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, note) VALUES(?,?,?,?) 
+ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE, is_black=FALSE, is_delete = FALSE`
+
+	UserCheckFriendRequest = "SELECT id from tb_friend_relation WHERE src_id =? AND dst_id = ?"
+
+	UserAcceptOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, is_accept) VALUES(?,?,?,?) 
+ON DUPLICATE KEY UPDATE is_accept = TRUE, is_black = FALSE, is_delete = FALSE `
+
+	UserCheckBlacklist = "SELECT id, is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
+
+	UserBlackOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, is_black) VALUES(?,?,?,?) 
+ON DUPLICATE KEY UPDATE is_black = ? `
+
+	UserNoteOneFriend = "UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?"
 
 	UserDeleteOneFriend = ""
 )
 
-// Get one friend relation information of user
-func MySQLGetUserOneFriend(relateP *UserRelate) error {
-	row := MySQLClient.QueryRow(UserGetOneFriend, relateP.SelfId, relateP.FriendId)
-	err := row.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
-		&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsRefuse), &(relateP.IsDelete))
+var (
+	ErrNoFriendship              = errors.New("you are not friends yet")
+	ErrTargetUserNotExisted      = errors.New("the target user you want dose not existed")
+	ErrInBlackList               = errors.New("you are in the black list of target user")
+	ErrFriendshipAlreadyInEffect = errors.New("your friendship already in effect")
+	ErrFriendRequestNotExisted   = errors.New("there have not a friend request you can accept")
+	ErrFriendBlacklistNoChange   = errors.New("the status of friend blacklist is not change")
+)
+
+// Add one friend relation information of user
+func MySQLAddOneFriend(selfId, friendId int64, note string) error {
+	// open a Transaction
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return err
+	}
+	// check the target user if existed
+	row := tx.QueryRow(UserCheckTargetFriendExisted, friendId)
+	err = row.Scan(&friendId)
+	if nil != err {
+		_ = tx.Rollback()
+		return ErrTargetUserNotExisted
+	}
+	// check the self if existed in target user's black list
+	isBlack := new(bool)
+	row = tx.QueryRow(UserCheckBlackList, friendId, selfId)
+	_ = row.Scan(isBlack)
+	if *isBlack {
+		_ = tx.Rollback()
+		return ErrInBlackList
+	}
+	// check the friendship is already in effect
+	isAccept := new(bool)
+	row = tx.QueryRow(UserCheckFriendshipAlreadyInEffect, selfId, friendId)
+	_ = row.Scan(isAccept)
+	if *isAccept {
+		_ = tx.Rollback()
+		return ErrFriendshipAlreadyInEffect
+	}
+	// every thing ok, add a friendship record
+	relateId := SnowFlakeNode.Generate()
+	_, err = tx.Exec(UserAddOneFriend, relateId, selfId, friendId, note, note)
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+// Update one friend note
+func MySQLModifyNoteOfFriend(selfId, friendId int64, note string) error {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return err
+	}
+	affect, err := tx.Exec(UserNoteOneFriend, note, selfId, friendId)
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	// if affect 0 row, means the friendship not existed
+	if count, _ := affect.RowsAffected(); count == 0 {
+		_ = tx.Rollback()
+		return ErrNoFriendship
+	}
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	return nil
+
+}
+
+// Handle a friend request, chose accept or not
+func MySQLAcceptOneFriend(selfId, friendId int64, note string, isAccept bool) error {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return err
+	}
+
+	// check the friend request if existed
+	row := tx.QueryRow(UserCheckFriendRequest, friendId, selfId)
+	friendRecordId := new(int64)
+	if err := row.Scan(friendRecordId); nil != err {
+		_ = tx.Rollback()
+		return ErrFriendRequestNotExisted
+	}
+
+	selfRecordId := SnowFlakeNode.Generate()
+
+	// check the friendship if already in effect
+	isEffect := new(bool)
+	row = tx.QueryRow(UserCheckFriendshipAlreadyInEffect, selfId, friendId)
+	_ = row.Scan(isEffect)
+	if *isEffect {
+		_ = tx.Rollback()
+		return ErrFriendshipAlreadyInEffect
+	}
+
+	// accept or refuse the friendship request
+	if isAccept {
+		// add a friend relationship record for self
+		_, err = tx.Exec(UserAcceptOneFriend, selfRecordId, selfId, friendId, isAccept)
+		if nil != err {
+			_ = tx.Rollback()
+			return err
+		}
+		// change the friend relationship record of requester, make the `is_accept` also be true
+		_, err = tx.Exec(UserAcceptOneFriend, friendRecordId, friendId, selfId, isAccept)
+		if nil != err {
+			_ = tx.Rollback()
+			return err
+		}
+
+	} else {
+		// refuse the friend request, also need add one record for self, make the requester in blacklist
+		_, err = tx.Exec(UserBlackOneFriend, selfRecordId, selfId, friendId, !isAccept, !isAccept)
+		if nil != err {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+	if note != "" {
+		// change the note for friend, if fail not need rollback
+		_, _ = tx.Exec(UserNoteOneFriend, note, selfId, friendId)
+	}
+	if err := tx.Commit(); nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+// Move friend to blacklist in or out
+func MySQLManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return err
+	}
+	// check the friendship data if recorded by self
+	relateId := new(int64)
+	blackRecord := new(bool)
+	row := tx.QueryRow(UserCheckBlacklist, selfId, friendId)
+	_ = row.Scan(relateId, blackRecord)
+
+	// if the friend blacklist status if not change, don't continue
+	if *relateId != 0 && *blackRecord == isBlack {
+		_ = tx.Rollback()
+		return ErrFriendBlacklistNoChange
+	}
+
+	if *relateId == 0 {
+		*relateId = SnowFlakeNode.Generate().Int64()
+	}
+
+	// move friend to blacklist in or out
+	_, err = tx.Exec(UserBlackOneFriend, relateId, selfId, friendId, isBlack, isBlack)
+	if nil != err {
+		_ = tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
 	if nil != err {
 		return err
 	}
@@ -289,7 +467,7 @@ func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
 	for rows.Next() {
 		relateP := new(UserRelate)
 		err := rows.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
-			&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsRefuse), &(relateP.IsDelete))
+			&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsBlack), &(relateP.IsDelete))
 		if nil != err {
 			continue
 		}
@@ -298,27 +476,14 @@ func MySQLGetUserAllFriends(userId int64) ([]*UserRelate, error) {
 	return friends, nil
 }
 
-// Add one friend relation information of user
-func MySQLAddOneFriend(relateP *UserRelate) error {
-	// open a Transaction
-	tx, err := MySQLClient.Begin()
-	if nil != err {
-		return err
-	}
 
-	// try save or update a relationship row data
-	relateP.Id = SnowFlakeNode.Generate().Int64()
-	_, err = tx.Exec(UserAddOneFriend, relateP.Id, relateP.SelfId, relateP.FriendId,
-		relateP.FriendNote, relateP.IsDelete, relateP.FriendNote)
+// Get one friend relation information of user
+func MySQLGetUserOneFriend(relateP *UserRelate) error {
+	row := MySQLClient.QueryRow(UserGetOneFriend, relateP.SelfId, relateP.FriendId)
+	err := row.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
+		&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsBlack), &(relateP.IsDelete))
 	if nil != err {
-		_ = tx.Rollback()
 		return err
 	}
-	err = tx.Commit()
-	if nil != err {
-		_ = tx.Rollback()
-		return err
-	}
-
 	return nil
 }

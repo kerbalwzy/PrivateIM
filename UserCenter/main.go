@@ -24,7 +24,7 @@ func main() {
 
 	auth := r.Group("/auth")
 	auth.POST("/user", controllers.SignUp)
-	auth.POST("profile", controllers.SignIn)
+	auth.POST("/profile", controllers.SignIn)
 
 	info := r.Group("/info", controllers.JWTAuthMiddleware())
 	info.GET("/profile", controllers.GetProfile)
@@ -37,6 +37,7 @@ func main() {
 	relate := r.Group("/relation", controllers.JWTAuthMiddleware())
 	relate.GET("/friend", controllers.GetFriend)
 	relate.POST("/friend", controllers.AddFriend)
+	relate.PUT("/friend", controllers.PutFriend)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", controllers.NameValidator)

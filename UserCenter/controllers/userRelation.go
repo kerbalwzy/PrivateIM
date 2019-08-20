@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"database/sql"
 	"errors"
+
 	"github.com/gin-gonic/gin"
 
 	"../models"
@@ -34,7 +34,7 @@ func GetFriend(c *gin.Context) {
 		return
 	}
 	// search the other users by params
-	selfId := c.MustGet(JWTDataKey).(int64)
+	selfId := c.MustGet(JWTGetUserId).(int64)
 	users, err := SearchOtherUsers(selfId, params)
 	if nil != err {
 		c.JSON(404, gin.H{"error": err.Error()})
@@ -119,7 +119,7 @@ func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 	}
 	for _, friend := range friends {
 		// Judging the validity of friendship
-		if friend.IsAccept && !friend.IsRefuse && !friend.IsDelete {
+		if friend.IsAccept && !friend.IsBlack && !friend.IsDelete {
 			tempMap[friend.FriendId] = friend.FriendNote
 		}
 	}
@@ -127,9 +127,13 @@ func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 }
 
 type AddFriendParams struct {
-	Id   int64  `json:"id" binding:"required"`
-	Note string `json:"note" binding:"nameValidator"`
+	FriendId int64  `json:"friend_id" binding:"required"`
+	Note     string `json:"note" binding:"nameValidator"`
 }
+
+var (
+	ErrAddSelfAsFriend = errors.New("can't build a friendship with yourself")
+)
 
 // Add friend HTTP API function
 func AddFriend(c *gin.Context) {
@@ -138,62 +142,43 @@ func AddFriend(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	// check user if existed
-	userP := &models.UserBasic{Id: params.Id}
-	err := models.MySQLGetUserById(userP)
-	if nil != err || userP.Email == "" {
-		c.JSON(404, gin.H{"error": "not found"})
-		return
-	}
-
-	// if duplicate add or `is_refuse` is true, don't continue
-	// `is_refuse` is true meaning the user don't accept the friend request
-	// or some one between them move the other into black list
-	selfId := c.MustGet(JWTDataKey).(int64)
-	relateP := &models.UserRelate{SelfId: selfId, FriendId: userP.Id}
-	if statusCode, err := CheckDuplicateAddAndBlackList(relateP); nil != err {
+	// check the params
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	statusCode, err := CheckAndAddFriend(selfId, params.FriendId, params.Note)
+	if nil != err {
 		c.JSON(statusCode, gin.H{"error": err.Error()})
 		return
 	}
-
-	// try save relation data into database
-	relateP.FriendNote = params.Note
-	err = models.MySQLAddOneFriend(relateP)
-	if nil != err {
-		c.JSON(500, gin.H{"error": "save relation error: " + err.Error()})
-		return
-	}
-
-	c.JSON(200, gin.H{"email": userP.Email, "name": userP.Name,
-		"note": relateP.FriendNote, "is_accept": relateP.IsAccept,
-		"is_refuse": relateP.IsRefuse, "is_delete": relateP.IsDelete})
+	c.JSON(statusCode, gin.H{"message": "initiate and add friends successfully, wait for the target user to agree"})
 
 	// todo: Let the communication center notify the target user
-	NotifyTargetUser(relateP)
+	//NotifyTargetUser(params.FriendId)
 
 }
 
-// check if duplicate add the user as friend or the user is in black list
-func CheckDuplicateAddAndBlackList(relateP *models.UserRelate) (int, error) {
-	if err := models.MySQLGetUserOneFriend(relateP); nil != err && sql.ErrNoRows != err {
-		return 500, errors.New("database error:" + err.Error())
+// Check if duplicate add the user as friend or self is in black list of target user
+func CheckAndAddFriend(selfId, friendId int64, note string) (int, error) {
+	if selfId == friendId {
+		return 400, ErrAddSelfAsFriend
 	}
-	if relateP.Id != 0 && relateP.IsAccept && !relateP.IsRefuse && !relateP.IsDelete {
-		return 400, errors.New("you are already friends")
+	err := models.MySQLAddOneFriend(selfId, friendId, note)
+	if err == models.ErrTargetUserNotExisted || err == models.ErrFriendshipAlreadyInEffect {
+		return 400, err
 	}
-	if relateP.Id != 0 && relateP.IsRefuse {
-		return 403, errors.New("there's a blacklist relationship between you")
+
+	if err == models.ErrInBlackList {
+		return 403, err
 	}
+
 	return 200, nil
 }
 
 type PutFriendParams struct {
-	Action   int    `json:"action binding:relateActionValidator"`
-	SelfId   int64  `json:"src_id" binding:"required"`
+	Action   int    `json:"action" binding:"relateActionValidator"`
 	FriendId int64  `json:"dst_id" binding:"required"`
-	Note     string `json:"note binding:max=10"`
+	Note     string `json:"note" binding:"max=10"`
 	IsAccept bool   `json:"is_accept"`
-	IsRefuse bool   `json:"is_refuse"`
+	IsBlack  bool   `json:"is_black"`
 }
 
 // Put friend HTTP API function
@@ -203,29 +188,88 @@ func PutFriend(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
+
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	if params.FriendId == selfId {
+		c.JSON(400, gin.H{"action": params.Action,
+			"error": "can't modify a friendship with yourself"})
+		return
+	}
+
+	statusCode := 200
+	message := ""
 	// modify friend note
 	if params.Action == 1 {
-
+		statusCode, message = ModifyFriendNote(selfId, params)
 	}
 
 	// handle friend request
 	if params.Action == 2 {
-		if status, message := HandleFriendRequest(params); 200 != status {
-			c.JSON(status, gin.H{"error": message})
-			return
-		} else {
-			c.JSON(status, gin.H{"message": message})
-			return
-		}
+		statusCode, message = CheckAndAcceptFriend(selfId, params)
+	}
 
+	// move friend to blacklist in or out
+	if params.Action == 3 {
+		statusCode, message = ManageFriendShipBlacklist(selfId, params.FriendId, params.IsBlack)
+	}
+
+	if 200 != statusCode {
+		c.JSON(statusCode, gin.H{"action": params.Action, "error": message})
+	} else {
+		c.JSON(statusCode, gin.H{"action": params.Action, "message": message})
 	}
 
 }
 
-func ModifyFriendNote(params *PutFriendParams) (int, string) {
-	return 200, ""
+// Modify note on my friends
+func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
+	if params.Note == "" {
+		return 400, "note for friend not allow be an empty string"
+	}
+	if err := models.MySQLModifyNoteOfFriend(selfId, params.FriendId, params.Note); nil != err {
+		if err == models.ErrNoFriendship {
+			return 400, err.Error()
+		} else {
+			return 500, err.Error()
+		}
+	}
+
+	return 200, "modify note for friend successful"
 }
 
-func HandleFriendRequest(params *PutFriendParams) (int, string) {
-	return 200, "you are friend now, chat happy"
+// Handle a friend relationship request
+func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
+	// check if the friend request existed
+	err := models.MySQLAcceptOneFriend(selfId, params.FriendId, params.Note, params.IsAccept)
+	if err == models.ErrFriendRequestNotExisted || err == models.ErrFriendshipAlreadyInEffect {
+		return 400, err.Error()
+	}
+
+	if nil != err {
+		return 500, err.Error()
+	}
+
+	if params.IsAccept {
+		return 200, "you are friend now, chat happy"
+	} else {
+		return 200, "you refused and move the user to you blacklist"
+	}
+
+}
+
+// Manage the friend blacklist
+func ManageFriendShipBlacklist(selfId, friendId int64, isBlack bool) (int, string) {
+	err := models.MySQLManageFriendBlacklist(selfId, friendId, isBlack)
+	if models.ErrFriendBlacklistNoChange == err {
+		return 400, err.Error()
+	}
+
+	if nil != err {
+		return 500, err.Error()
+	}
+	if isBlack {
+		return 200, "move friend into blacklist successful"
+	} else {
+		return 200, "move friend out from blacklist successful"
+	}
 }

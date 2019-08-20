@@ -15,7 +15,7 @@ const (
 	AuthTokenSalt      = "this is a auth token salt"
 	AuthTokenAliveTime = 3600 * 24 //unit:second
 	AuthTokenIssuer    = "userCenter"
-	JWTDataKey         = "user_id"
+	JWTGetUserId         = "user_id"
 
 	PhotoSaveFoldPath   = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/photos/"
 	PhotoSuffix         = ".png"
@@ -28,7 +28,7 @@ const (
 
 // GetProfile HTTP API function
 func GetProfile(c *gin.Context) {
-	user := models.UserBasic{Id: c.MustGet(JWTDataKey).(int64)}
+	user := models.UserBasic{Id: c.MustGet(JWTGetUserId).(int64)}
 	err := models.MySQLGetUserById(&user)
 	if nil != err {
 		c.JSON(404, gin.H{"error": "get user information fail"})
@@ -57,7 +57,7 @@ func PutProfile(c *gin.Context) {
 		return
 	}
 	// Update user info
-	userId := c.MustGet(JWTDataKey)
+	userId := c.MustGet(JWTGetUserId)
 	err = models.MySQLUpdateProfile(tempProfileP.Name, tempProfileP.Mobile, tempProfileP.Gender, userId.(int64))
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -101,7 +101,7 @@ func parseTempProfile(c *gin.Context) (*TempProfile, error) {
 
 // GetAvatar HTTP API function
 func GetAvatar(c *gin.Context) {
-	userId := c.MustGet(JWTDataKey)
+	userId := c.MustGet(JWTGetUserId)
 	avatar := new(string)
 	err := models.MySQLGetUserAvatar(userId.(int64), avatar)
 	if nil != err {
@@ -146,7 +146,7 @@ func PutAvatar(c *gin.Context) {
 	}
 
 	// save the information into database
-	userId := c.MustGet(JWTDataKey)
+	userId := c.MustGet(JWTGetUserId)
 	err = models.MySQLPutUserAvatar(userId.(int64), hashName)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -158,7 +158,7 @@ func PutAvatar(c *gin.Context) {
 // GetQRCode HTT API function
 func GetQrCode(c *gin.Context) {
 	// try to get QrCode hash name from database. if existed, return.
-	userId := c.MustGet(JWTDataKey)
+	userId := c.MustGet(JWTGetUserId)
 	hashNameP := new(string)
 	err := models.MySQLGetUserQRCode(userId.(int64), hashNameP)
 	if nil != err {

@@ -61,6 +61,6 @@ type UserRelate struct {
 	FriendId   int64  `json:"friend_id"`
 	FriendNote string `json:"friend_note"`
 	IsAccept   bool   `json:"is_accept"`
-	IsRefuse    bool   `json:"is_black"`
+	IsBlack    bool   `json:"is_black"`
 	IsDelete   bool   `json:"is_delete"`
 }

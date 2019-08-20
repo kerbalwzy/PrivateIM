@@ -353,10 +353,10 @@ Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
 JsonBodyParams: `所有参数均为必传`
 
-| Column | DataType | Constraints                                  | Description          |
-| ------ | -------- | -------------------------------------------- | -------------------- |
-| id     | int64    | 无符号整型                                   | 目标用户的ID         |
-| note   | string   | 最多10个字符(为空字符串时默认为对方的用户名) | 给目标用户设置的昵称 |
+| Column    | DataType | Constraints                                 | Description          |
+| --------- | -------- | ------------------------------------------- | -------------------- |
+| friend_id | int64    | 无符号整型                                  | 目标用户的ID         |
+| note      | string   | 最多10个字符,可以为空字符串, 表示不设置昵称 | 给目标用户设置的昵称 |
 
 ##### Response:
 
@@ -364,23 +364,13 @@ Headers: `Content-Type: application/json;`
 
 JsonBodyResult:
 
-| Column    | DataType | Description                        |
-| --------- | -------- | ---------------------------------- |
-| email     | string   | 目标用户邮箱                       |
-| name      | string   | 目标用户昵称                       |
-| note      | string   | 给对方用户的设置的昵称             |
-| is_accept | bool     | 是否激活了好友关系(0:否)(1:是)     |
-| is_refuse | bool     | 是否进入了对方的黑名单(0:否)(1:是) |
-| is_delete | bool     | 是否删除了好友关系(0:否)(1:是)     |
+| Column  | DataType | Description        |
+| ------- | -------- | ------------------ |
+| message | string   | 操作结果提示字符串 |
 
 ```json
 {
-    "email": "test@test.com",
-    "is_accept": false,
-    "is_delete": false,
-    "is_refuse": false,
-    "name": "test",
-    "note": "Li"
+    "message": "initiate and add friends successfully, wait for the target user to agree"
 }
 ```
 
@@ -396,16 +386,15 @@ Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
 ​		    `Content-Type: application/json;`
 
-JsonBodyParams: `在拒绝好友申请的时,会将用户加入黑名单;`
+JsonBodyParams: `在拒绝好友申请的同时,会将用户加入黑名单;`
 
-| Column     | DataType | Constraints                                                  | Description      |
-| ---------- | -------- | ------------------------------------------------------------ | ---------------- |
-| action     | int      | 1/2/3 (1:修改备注 2:接受/拒绝好友申请 3:加入/移除黑名单 )[必填] | 要执行的操作     |
-| src_id     | int64    | 无符号整型[必填]                                             | 自己的用户ID     |
-| dst_id     | int64    | 无符号整型[必填]                                             | 目标用户的ID     |
-| note       | string   | 小于10个字符[根据action选填]                                 | 给目标用户的备注 |
-| is_accept  | bool     | 默认为false[根据action选填]                                  | 是否接受好友申请 |
-| is_resfuse | bool     | 默认为false[根据action选填]                                  | 是否加入黑名单   |
+| Column    | DataType | Constraints                                                  | Description      |
+| --------- | -------- | ------------------------------------------------------------ | ---------------- |
+| action    | int      | 1/2/3 (1:修改备注 2:接受/拒绝好友申请 3:加入/移除黑名单 )[必填] | 要执行的操作     |
+| dst_id    | int64    | 无符号整型[必填]                                             | 目标用户的ID     |
+| note      | string   | 小于10个字符[action为1时必填, action为2时选填]               | 给目标用户的备注 |
+| is_accept | bool     | 默认为false[action为2时必填]                                 | 是否接受好友申请 |
+| is_black  | bool     | 默认为false[action为3时必填]                                 | 是否加入黑名单   |
 
 ##### Response:
 
@@ -417,6 +406,13 @@ JsonBodyResult:
 | ------- | -------- | --------------------------------------------------------- |
 | action  | int      | 1/2/3 (1:修改备注 2:接受/拒绝好友申请 3:加入/移除黑名单 ) |
 | message | string   | 执行结果描述                                              |
+
+```json
+{
+    "action": 3,
+    "message": "move friend into blacklist successful"
+}
+```
 
 
 
