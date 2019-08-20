@@ -9,7 +9,6 @@ import (
 
 	"./controllers"
 	_ "./models"
-	"./utils"
 )
 
 func init() {
@@ -40,11 +39,12 @@ func main() {
 	relate.POST("/friend", controllers.AddFriend)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		_ = v.RegisterValidation("nameValidator", utils.NameValidator)
-		_ = v.RegisterValidation("emailValidator", utils.EmailValidator)
-		_ = v.RegisterValidation("mobileValidator", utils.MobileValidator)
-		_ = v.RegisterValidation("passwordValidator", utils.PasswordValidator)
-		_ = v.RegisterValidation("genderValidator", utils.GenderValidator)
+		_ = v.RegisterValidation("nameValidator", controllers.NameValidator)
+		_ = v.RegisterValidation("emailValidator", controllers.EmailValidator)
+		_ = v.RegisterValidation("mobileValidator", controllers.MobileValidator)
+		_ = v.RegisterValidation("passwordValidator", controllers.PasswordValidator)
+		_ = v.RegisterValidation("genderValidator", controllers.GenderValidator)
+		_ = v.RegisterValidation("relateActionValidator", controllers.RelateActionValidator)
 	} else {
 		log.Fatal("binding custom validators fail!!!")
 	}

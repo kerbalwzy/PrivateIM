@@ -1,4 +1,4 @@
-package utils
+package controllers
 
 import (
 	"gopkg.in/go-playground/validator.v8"
@@ -78,6 +78,21 @@ func GenderValidator(
 	}
 	value := field.Int()
 	if value < 0 || value > 2 {
+		return false
+	}
+	return true
+}
+
+func RelateActionValidator(
+	v *validator.Validate, topStruct reflect.Value, currentStructOrField reflect.Value,
+	field reflect.Value, fieldType reflect.Type, fieldKind reflect.Kind, param string,
+) bool {
+	// Require the type is Int, and value is 1 or 2 or 3
+	if fieldKind != reflect.Int {
+		return false
+	}
+	value := field.Int()
+	if value < 1 || value > 3 {
 		return false
 	}
 	return true

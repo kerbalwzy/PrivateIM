@@ -128,7 +128,7 @@ func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 
 type AddFriendParams struct {
 	Id   int64  `json:"id" binding:"required"`
-	Note string `json:"note" binding:"required,max=10"`
+	Note string `json:"note" binding:"nameValidator"`
 }
 
 // Add friend HTTP API function
@@ -187,8 +187,45 @@ func CheckDuplicateAddAndBlackList(relateP *models.UserRelate) (int, error) {
 	return 200, nil
 }
 
-// todo: Let the communication center notify the target user,
-//  there is a friend request;
-func NotifyTargetUser(relateP *models.UserRelate) {
+type PutFriendParams struct {
+	Action   int    `json:"action binding:relateActionValidator"`
+	SelfId   int64  `json:"src_id" binding:"required"`
+	FriendId int64  `json:"dst_id" binding:"required"`
+	Note     string `json:"note binding:max=10"`
+	IsAccept bool   `json:"is_accept"`
+	IsRefuse bool   `json:"is_refuse"`
+}
 
+// Put friend HTTP API function
+func PutFriend(c *gin.Context) {
+	params := new(PutFriendParams)
+	if err := c.ShouldBindJSON(params); nil != err {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	// modify friend note
+	if params.Action == 1 {
+
+	}
+
+	// handle friend request
+	if params.Action == 2 {
+		if status, message := HandleFriendRequest(params); 200 != status {
+			c.JSON(status, gin.H{"error": message})
+			return
+		} else {
+			c.JSON(status, gin.H{"message": message})
+			return
+		}
+
+	}
+
+}
+
+func ModifyFriendNote(params *PutFriendParams) (int, string) {
+	return 200, ""
+}
+
+func HandleFriendRequest(params *PutFriendParams) (int, string) {
+	return 200, "you are friend now, chat happy"
 }

@@ -13,8 +13,7 @@
   | [ParseQrCode](#8) | POST | /info/qrcode | 1 | 解析上传的二维码 |
   | [GetFriend](#9) | GET | /relation/friend | 1 | 搜索用户/获取好友信息 |
   | [AddFriend](#10) | POST   | /relation/friend  | 1             | 添加好友                       |
-  |                   |        |                   |               |                                |
-  | [PutFriend] | PUT    | /relation/friend  | 1             | 修改好友备注; 加入、移出黑名单 |
+  | [PutFriend](#11) | PUT    | /relation/friend  | 1             | 修改好友备注; 接受\拒绝好友申请; 加入\移出黑名单 |
   | [DelFriend] | DELETE | /relation/friend  | 1             | 删除好友                       |
   | [GetFriends] | GET | /relation/friends | 1 | 获取好友列表 |
 
@@ -293,7 +292,7 @@ Path: `/relation/friend`		Method: `GET`
 
 Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
-JsonBodyParams: `至少包含三个参数中的一个, 如果有id则都优先使用id`
+JsonBodyParams: `至少包含三个参数中的一个, 参数优先级:id > email > name`
 
 | Column | DataType | Constraints                 | Descritption       |
 | ------ | -------- | --------------------------- | ------------------ |
@@ -317,7 +316,7 @@ JsonBodyResult: `id, mobile, gender, note只当两个用户存在有效好友关
 | note   | string   | 给好友备注的名称 |
 
 ```json
-{
+{	// the demo result is search by name = "test"
     "result": [
         {	// friend
             "id": 1162262948794597376,
@@ -387,7 +386,37 @@ JsonBodyResult:
 
 ---
 
+- #### <span id="11">PutFriend 修改好友备注; 接受\拒绝好友申请; 加入\移出黑名单</span> [Top](#0)
 
+##### Request:
+
+Path: `/relation/friend`		Method: `PUT`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​		    `Content-Type: application/json;`
+
+JsonBodyParams: `在拒绝好友申请的时,会将用户加入黑名单;`
+
+| Column     | DataType | Constraints                                                  | Description      |
+| ---------- | -------- | ------------------------------------------------------------ | ---------------- |
+| action     | int      | 1/2/3 (1:修改备注 2:接受/拒绝好友申请 3:加入/移除黑名单 )[必填] | 要执行的操作     |
+| src_id     | int64    | 无符号整型[必填]                                             | 自己的用户ID     |
+| dst_id     | int64    | 无符号整型[必填]                                             | 目标用户的ID     |
+| note       | string   | 小于10个字符[根据action选填]                                 | 给目标用户的备注 |
+| is_accept  | bool     | 默认为false[根据action选填]                                  | 是否接受好友申请 |
+| is_resfuse | bool     | 默认为false[根据action选填]                                  | 是否加入黑名单   |
+
+##### Response:
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column  | DataType | Description                                               |
+| ------- | -------- | --------------------------------------------------------- |
+| action  | int      | 1/2/3 (1:修改备注 2:接受/拒绝好友申请 3:加入/移除黑名单 ) |
+| message | string   | 执行结果描述                                              |
 
 
 
