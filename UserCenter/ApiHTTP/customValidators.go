@@ -1,4 +1,4 @@
-package controllers
+package ApiHTTP
 
 import (
 	"gopkg.in/go-playground/validator.v8"

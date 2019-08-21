@@ -1,4 +1,4 @@
-package controllers
+package ApiHTTP
 
 import (
 	"github.com/dgrijalva/jwt-go"

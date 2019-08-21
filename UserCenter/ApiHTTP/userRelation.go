@@ -1,4 +1,4 @@
-package controllers
+package ApiHTTP
 
 import (
 	"../models"
