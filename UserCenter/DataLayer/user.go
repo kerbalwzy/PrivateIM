@@ -1,4 +1,4 @@
-package models
+package DataLayer
 
 import (
 	"crypto/hmac"

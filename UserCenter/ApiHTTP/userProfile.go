@@ -1,7 +1,7 @@
 package ApiHTTP
 
 import (
-	"../models"
+	"../DataLayer"
 	"../utils"
 	"encoding/json"
 	"errors"
@@ -28,8 +28,8 @@ const (
 
 // GetProfile HTTP API function
 func GetProfile(c *gin.Context) {
-	user := models.UserBasic{Id: c.MustGet(JWTGetUserId).(int64)}
-	err := models.MySQLGetUserById(&user)
+	user := DataLayer.UserBasic{Id: c.MustGet(JWTGetUserId).(int64)}
+	err := DataLayer.MySQLGetUserById(&user)
 	if nil != err {
 		c.JSON(404, gin.H{"error": "get user information fail"})
 		return
@@ -58,7 +58,7 @@ func PutProfile(c *gin.Context) {
 	}
 	// Update user info
 	userId := c.MustGet(JWTGetUserId)
-	err = models.MySQLUpdateProfile(tempProfileP.Name, tempProfileP.Mobile, tempProfileP.Gender, userId.(int64))
+	err = DataLayer.MySQLUpdateProfile(tempProfileP.Name, tempProfileP.Mobile, tempProfileP.Gender, userId.(int64))
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -103,7 +103,7 @@ func parseTempProfile(c *gin.Context) (*TempProfile, error) {
 func GetAvatar(c *gin.Context) {
 	userId := c.MustGet(JWTGetUserId)
 	avatar := new(string)
-	err := models.MySQLGetUserAvatar(userId.(int64), avatar)
+	err := DataLayer.MySQLGetUserAvatar(userId.(int64), avatar)
 	if nil != err {
 		c.JSON(500, gin.H{"error": "query avatar fail"})
 		return
@@ -136,7 +136,7 @@ func PutAvatar(c *gin.Context) {
 	// check if the hash name is existed more then one in the table
 	// if true, it meanings that has the same file already upload.
 	// not need to save the file again.
-	count := models.MySQLAvatarHashNameCount(hashName)
+	count := DataLayer.MySQLAvatarHashNameCount(hashName)
 	if count == 0 {
 		// save the file data to local or static server
 		if err := UploadAvatarLocal(data, hashName); nil != err {
@@ -147,7 +147,7 @@ func PutAvatar(c *gin.Context) {
 
 	// save the information into database
 	userId := c.MustGet(JWTGetUserId)
-	err = models.MySQLPutUserAvatar(userId.(int64), hashName)
+	err = DataLayer.MySQLPutUserAvatar(userId.(int64), hashName)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -160,7 +160,7 @@ func GetQrCode(c *gin.Context) {
 	// try to get QrCode hash name from database. if existed, return.
 	userId := c.MustGet(JWTGetUserId)
 	hashNameP := new(string)
-	err := models.MySQLGetUserQRCode(userId.(int64), hashNameP)
+	err := DataLayer.MySQLGetUserQRCode(userId.(int64), hashNameP)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -179,7 +179,7 @@ func GetQrCode(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "create QRCode fail"})
 		return
 	}
-	err = models.MySQLPutUserQRCode(userId.(int64), *hashNameP)
+	err = DataLayer.MySQLPutUserQRCode(userId.(int64), *hashNameP)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

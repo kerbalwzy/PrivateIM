@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package ApiRPC;
+
+// protoc -I ./ ./UserCenter.proto --go_out=plugins=grpc:./
+
+service UserCenter {
+    rpc CheckAuthToken (AuthToken) returns (TokenCheckResult);
+}
+
+message ClientInfo {
+    string host = 1;
+    string name = 2;
+    string auth_key = 3;
+
+}
+
+message AuthToken {
+    string token = 1;
+    ClientInfo client_info = 2;
+}
+
+message TokenCheckResult {
+    bool ok = 1;
+}
+
+

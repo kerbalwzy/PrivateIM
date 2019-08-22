@@ -1,11 +1,11 @@
 package ApiRPC
 
 import (
-	"../models"
+	"../DataLayer"
 )
 
 // todo: Let the communication center notify the target user,
 //  there is a friend request;
-func NotifyTargetUserHasAnFriendRequest(relateP *models.UserRelate) {
+func NotifyTargetUserHasAnFriendRequest(relateP *DataLayer.UserRelate) {
 
 }

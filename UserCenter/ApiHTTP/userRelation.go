@@ -1,9 +1,10 @@
 package ApiHTTP
 
 import (
-	"../models"
 	"errors"
 	"github.com/gin-gonic/gin"
+
+	"../DataLayer"
 )
 
 type GetFriendParams struct {
@@ -56,7 +57,7 @@ func GetFriend(c *gin.Context) {
 }
 
 // Search other users by params (GetFriendParams)
-func SearchOtherUsers(selfId int64, params *GetFriendParams) ([]*models.UserBasic, error) {
+func SearchOtherUsers(selfId int64, params *GetFriendParams) ([]*DataLayer.UserBasic, error) {
 	users, err := SearchUsers(params)
 	if nil != err {
 		return nil, err
@@ -81,22 +82,22 @@ func SearchOtherUsers(selfId int64, params *GetFriendParams) ([]*models.UserBasi
 }
 
 // Search users by params (GetFriendParams)
-func SearchUsers(params *GetFriendParams) ([]*models.UserBasic, error) {
-	users := make([]*models.UserBasic, 0)
+func SearchUsers(params *GetFriendParams) ([]*DataLayer.UserBasic, error) {
+	users := make([]*DataLayer.UserBasic, 0)
 	// if the Id not zero, use Id to query user first
-	userP := new(models.UserBasic)
+	userP := new(DataLayer.UserBasic)
 	if params.Id != 0 {
 		userP.Id = params.Id
-		_ = models.MySQLGetUserById(userP)
+		_ = DataLayer.MySQLGetUserById(userP)
 	}
 	// if the email still empty string, mean not found by id
 	if userP.Email == "" {
 		userP.Email = params.Email
-		_ = models.MySQLGetUserByEmail(userP)
+		_ = DataLayer.MySQLGetUserByEmail(userP)
 	}
 	// if the name still empty string, mean not found by id and email
 	if userP.Name == "" {
-		users, _ = models.MySQLGetUserByName(params.Name)
+		users, _ = DataLayer.MySQLGetUserByName(params.Name)
 	}
 	// if the id is not zero, mean found by id or email
 	if userP.Id != 0 {
@@ -111,7 +112,7 @@ func SearchUsers(params *GetFriendParams) ([]*models.UserBasic, error) {
 // Get the id and note of the friends, and return a map, key is id, value is note
 func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 	tempMap := make(map[int64]string)
-	friendsRelates, err := models.MySQLGetUserFriendsRelates(userId)
+	friendsRelates, err := DataLayer.MySQLGetUserFriendsRelates(userId)
 	if nil != err {
 		return tempMap, err
 	}
@@ -159,12 +160,12 @@ func CheckAndAddFriend(selfId, friendId int64, note string) (int, error) {
 	if selfId == friendId {
 		return 400, ErrAddSelfAsFriend
 	}
-	err := models.MySQLAddOneFriend(selfId, friendId, note)
-	if err == models.ErrTargetUserNotExisted || err == models.ErrFriendshipAlreadyInEffect {
+	err := DataLayer.MySQLAddOneFriend(selfId, friendId, note)
+	if err == DataLayer.ErrTargetUserNotExisted || err == DataLayer.ErrFriendshipAlreadyInEffect {
 		return 400, err
 	}
 
-	if err == models.ErrInBlackList {
+	if err == DataLayer.ErrInBlackList {
 		return 403, err
 	}
 
@@ -224,8 +225,8 @@ func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 	if params.Note == "" {
 		return 400, "note for friend not allow be an empty string"
 	}
-	if err := models.MySQLModifyNoteOfFriend(selfId, params.FriendId, params.Note); nil != err {
-		if err == models.ErrNoFriendship {
+	if err := DataLayer.MySQLModifyNoteOfFriend(selfId, params.FriendId, params.Note); nil != err {
+		if err == DataLayer.ErrNoFriendship {
 			return 400, err.Error()
 		} else {
 			return 500, err.Error()
@@ -238,8 +239,8 @@ func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 // Handle a friend relationship request
 func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
 	// check if the friend request existed
-	err := models.MySQLAcceptOneFriend(selfId, params.FriendId, params.Note, params.IsAccept)
-	if err == models.ErrFriendRequestNotExisted || err == models.ErrFriendshipAlreadyInEffect {
+	err := DataLayer.MySQLAcceptOneFriend(selfId, params.FriendId, params.Note, params.IsAccept)
+	if err == DataLayer.ErrFriendRequestNotExisted || err == DataLayer.ErrFriendshipAlreadyInEffect {
 		return 400, err.Error()
 	}
 
@@ -257,8 +258,8 @@ func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
 
 // Manage the friend blacklist
 func ManageFriendShipBlacklist(selfId, friendId int64, isBlack bool) (int, string) {
-	err := models.MySQLManageFriendBlacklist(selfId, friendId, isBlack)
-	if models.ErrFriendBlacklistNoChange == err {
+	err := DataLayer.MySQLManageFriendBlacklist(selfId, friendId, isBlack)
+	if DataLayer.ErrFriendBlacklistNoChange == err {
 		return 400, err.Error()
 	}
 
@@ -284,8 +285,8 @@ func DeleteFriend(c *gin.Context) {
 		return
 	}
 	selfId := c.MustGet(JWTGetUserId).(int64)
-	err := models.MySQLDeleteOneFriend(selfId, params.FriendId)
-	if models.ErrNoFriendship == err {
+	err := DataLayer.MySQLDeleteOneFriend(selfId, params.FriendId)
+	if DataLayer.ErrNoFriendship == err {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
@@ -299,7 +300,7 @@ func DeleteFriend(c *gin.Context) {
 // Get All Friend HTTP API function
 func AllFriends(c *gin.Context) {
 	selfId := c.MustGet(JWTGetUserId).(int64)
-	data, err := models.MySQLGetUserFriendsInfo(selfId)
+	data, err := DataLayer.MySQLGetUserFriendsInfo(selfId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

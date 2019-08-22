@@ -3,7 +3,6 @@ package utils
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"log"
 	"time"
 )
 
@@ -33,7 +32,6 @@ func ParseJWTToken(tokenString string, salt []byte) (*CustomJWTClaims, error) {
 		return salt, nil
 	})
 	if err != nil {
-		log.Println(err.Error())
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				return nil, TokenMalformed
@@ -46,8 +44,7 @@ func ParseJWTToken(tokenString string, salt []byte) (*CustomJWTClaims, error) {
 				return nil, TokenInvalid
 			}
 		}
-	}
-	if claims, ok := token.Claims.(*CustomJWTClaims); ok && token.Valid {
+	} else if claims, ok := token.Claims.(*CustomJWTClaims); ok && token.Valid {
 		return claims, nil
 	}
 	return nil, TokenInvalid
@@ -58,9 +55,9 @@ func RefreshJWTToken(tokenString string, salt []byte, survivalTime time.Duration
 	jwt.TimeFunc = func() time.Time {
 		return time.Unix(0, 0)
 	}
-	token, err := jwt.ParseWithClaims(tokenString, &CustomJWTClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return salt, nil
-	})
+	token, err := jwt.ParseWithClaims( tokenString, &CustomJWTClaims{},
+		func(token *jwt.Token) (interface{}, error) { return salt, nil } )
+
 	if err != nil {
 		return "", err
 	}

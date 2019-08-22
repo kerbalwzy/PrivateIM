@@ -8,7 +8,7 @@ import (
 	"gopkg.in/go-playground/validator.v8"
 
 	"./ApiHTTP"
-	_ "./models"
+	_ "./DataLayer"
 )
 
 const StaticFoldPath = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/"
