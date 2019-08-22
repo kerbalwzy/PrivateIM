@@ -2,18 +2,21 @@ package main
 
 import (
 	"log"
-	"ruozhuo"
+	"net/http"
+
+	"./ApiWS"
 )
 
 func init() {
 	log.SetPrefix("MsgCenter ")
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 }
 
 func main() {
-	worker := &ruozhuo.Worker{
-		Tag:          "msg",
-		Address:      "127.0.0.1:10000",
-		ManagerAdder: "127.0.0.1:7070",
+	http.HandleFunc("/", ApiWS.BeginChat)
+	log.Println("start message center websocket server...")
+	err := http.ListenAndServe(":8000", nil)
+	if nil != err {
+		log.Fatal(err)
 	}
-	ruozhuo.StartWorker(worker)
 }
