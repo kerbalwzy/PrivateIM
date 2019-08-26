@@ -68,6 +68,7 @@ func MongoQueryWaitSendMessage(id int64) ([][]byte, error) {
 	temp := new(TempWaitSendMsg)
 	err := WaitSendMsgColl.FindOneAndDelete(getTimeOutCtx(3), bson.M{"_id": id}).Decode(temp)
 	if nil != err {
+		log.Printf("Error: query WaitSendMessage fail for user(%d), error detail: %s", id, err.Error())
 		return nil, err
 	}
 	return temp.Message, nil
@@ -86,6 +87,7 @@ func MongoAddFriendId(srcId, dstId int64) error {
 		options.Update().SetUpsert(true))
 	if nil != err {
 		log.Printf("Error: add friends fail for user(%d), error detail: %s", srcId, err.Error())
+		return err
 	}
 	return nil
 }
@@ -127,6 +129,7 @@ func MongoBlackListAdd(srcId, dstId int64) error {
 		options.Update().SetUpsert(true))
 	if nil != err {
 		log.Printf("Error: add friends fail for user(%d), error detail: %s", srcId, err.Error())
+		return err
 	}
 	return nil
 }
