@@ -1,10 +1,9 @@
 package ApiWS
 
 import (
+	"github.com/gorilla/websocket"
 	"log"
 	"sync"
-
-	"github.com/gorilla/websocket"
 
 	"../DataLayer"
 )
@@ -14,14 +13,14 @@ type NodePool struct {
 	wt      sync.RWMutex
 }
 
-// add a new client note
+// Add a new client node into ClientPool
 func (obj *NodePool) Add(node *Node) {
 	obj.wt.Lock()
 	obj.clients[node.Id] = node
 	obj.wt.Unlock()
 }
 
-// get a client note by id
+// Get a client node by id from ClientPool
 func (obj *NodePool) Get(id int64) (*Node, bool) {
 	obj.wt.RLock()
 	node, ok := obj.clients[id]
@@ -30,7 +29,7 @@ func (obj *NodePool) Get(id int64) (*Node, bool) {
 
 }
 
-// delete a client note
+// Delete a client node from ClientPool
 func (obj *NodePool) Del(node *Node) {
 	obj.wt.Lock()
 	delete(obj.clients, node.Id)
@@ -38,42 +37,52 @@ func (obj *NodePool) Del(node *Node) {
 
 }
 
-// client node
-type Node struct {
-	Id        int64 // userId
-	conn      *websocket.Conn
-	dataQueue chan []byte
+var nodePool = &NodePool{
+	clients: make(map[int64]*Node),
+	wt:      sync.RWMutex{},
 }
 
-// send message loop, send message to client
-// If fail will remove the node from ClientPool, and record message into database as "waiting send message",
-// When the client online again, then try send again.
+// Create a ClientPool to save nodes, (Singleton Design Pattern)
+func NewNodePool() *NodePool {
+	return nodePool
+}
+
+// client node
+type Node struct {
+	Id           int64 // userId
+	conn         *websocket.Conn
+	messageQueue chan DataLayer.Message
+}
+
+// Send message loop, send message to client.
+// If fail will remove the node from ClientPool,
+// and move the message into `WaitSendChan`.
 func (obj *Node) SendLoop() {
 	defer func() {
 		ClientPool.Del(obj)
-		obj.conn.Close()
+		_ = obj.conn.Close()
 	}()
 	for {
 		select {
-		case data := <-obj.dataQueue:
-			err := obj.conn.WriteMessage(websocket.TextMessage, data)
+		case message := <-obj.messageQueue:
+			err := obj.conn.WriteMessage(websocket.TextMessage, message.ToJson())
 			if err != nil {
 				log.Println(err.Error())
-				DataLayer.RecordWaitSendMessage(obj.Id, data)
+				WaitSendChan <- message
 				return
 			}
 		}
 	}
 }
 
-// recv message loop, recv message from client
+// Recv message loop, recv message from client
 // If recv error, will remove the node from ClientPool.
 // Send the message to target user by Dispatch function,
 // when dispatch error, it will also send back the error information to client
 func (obj *Node) RecvLoop() {
 	defer func() {
 		ClientPool.Del(obj)
-		obj.conn.Close()
+		_ = obj.conn.Close()
 	}()
 	for {
 		_, data, err := obj.conn.ReadMessage()
@@ -81,20 +90,11 @@ func (obj *Node) RecvLoop() {
 			log.Println(err.Error())
 			return
 		}
-		err = Dispatch(data)
-		if nil != err {
-			log.Println(err.Error())
-			msg := ErrorMessage{Code: 400, Error: err.Error()}
-			data, _ = msg.ToJson()
-			obj.dataQueue <- data
-		}
+		// dispatch the chat message from ordinary user
+		ChatDispatch(obj.Id, data)
 	}
 }
 
-// create a ClientPool to save nodes
-func NewNodePool() *NodePool {
-	return &NodePool{
-		clients: make(map[int64]*Node),
-		wt:      sync.RWMutex{},
-	}
+func NewNode(userId int64, conn *websocket.Conn) (*Node, error) {
+	return nil, nil
 }
