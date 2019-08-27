@@ -75,3 +75,57 @@ func TestMongoBlackListDel(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+var (
+	groupId1 int64 = 12345678
+	groupId2 int64 = 98765432
+)
+
+func TestMongoGroupChatAddUser(t *testing.T) {
+	err := MongoGroupChatAddUser(groupId1, srcId)
+	if nil != err {
+		t.Error(err)
+	}
+	err = MongoGroupChatAddUser(groupId1, dstId)
+	if nil != err {
+		t.Error(err)
+	}
+	err = MongoGroupChatAddUser(groupId2, srcId)
+	if nil != err {
+		t.Error(err)
+	}
+	err = MongoGroupChatAddUser(groupId2, dstId)
+	if nil != err {
+		t.Error(err)
+	}
+}
+
+func TestMongoQueryGroupChatUsers(t *testing.T) {
+	users, err := MongoQueryGroupChatUsers(groupId1)
+	if nil != err {
+		t.Error(err)
+	}
+	log.Printf("user count= %d", len(users))
+}
+
+func TestMongoQueryGroupChatAll(t *testing.T) {
+	data, err := MongoQueryGroupChatAll()
+	if nil != err {
+		t.Error(err)
+	}
+	log.Printf("data count= %d", len(data))
+	for _, detail := range data {
+		log.Printf("group(%d) has users: %v", detail.Id, detail.UsersId)
+	}
+}
+
+func TestMongoGroupChatDelUser(t *testing.T) {
+	err := MongoGroupChatDelUser(groupId1, srcId)
+	if nil != err {
+		t.Error(err)
+	}
+}
+
+func TestMongoQueryGroupChatUsers2(t *testing.T) {
+	TestMongoQueryGroupChatUsers(t)
+}

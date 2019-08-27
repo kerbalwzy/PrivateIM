@@ -16,25 +16,36 @@ const (
 )
 
 var (
-	Mongo           *mongo.Client
-	WaitSendMsgColl *mongo.Collection
-	UserFriendsColl *mongo.Collection
-	UserBlackColl   *mongo.Collection
+	MongoClient *mongo.Client
+	MsgCenterDB *mongo.Database
+
+	WaitSendMsgColl  *mongo.Collection
+	UserFriendsColl  *mongo.Collection
+	UserBlackColl    *mongo.Collection
+	UserGroupChat    *mongo.Collection
+	UserSubscription *mongo.Collection
+
+	GroupChats    *mongo.Collection
+	Subscriptions *mongo.Collection
 )
 
 func init() {
 	var err error
-	Mongo, err = mongo.Connect(getTimeOutCtx(10), options.Client().ApplyURI(MongoDBURI))
+	MongoClient, err = mongo.Connect(getTimeOutCtx(10), options.Client().ApplyURI(MongoDBURI))
 	if nil != err {
 		log.Fatal(err)
 	}
-	err = Mongo.Ping(getTimeOutCtx(3), readpref.Primary())
+	err = MongoClient.Ping(getTimeOutCtx(3), readpref.Primary())
 	if nil != err {
 		log.Fatal(err)
 	}
-	WaitSendMsgColl = Mongo.Database("MsgCenter").Collection("WaitSendMsg")
-	UserFriendsColl = Mongo.Database("MsgCenter").Collection("UserFriends")
-	UserBlackColl = Mongo.Database("MsgCenter").Collection("UserBlackList")
+	MsgCenterDB = MongoClient.Database("MsgCenter")
+	WaitSendMsgColl = MsgCenterDB.Collection("WaitSendMsg")
+	UserFriendsColl = MsgCenterDB.Collection("UserFriends")
+	UserBlackColl = MsgCenterDB.Collection("UserBlackList")
+
+	GroupChats = MsgCenterDB.Collection("GroupChats")
+	Subscriptions = MsgCenterDB.Collection("Subscriptions")
 
 }
 
@@ -118,14 +129,14 @@ func MongoDelFriendId(srcId, dstId int64) error {
 
 type TempBlackList struct {
 	Id        int64   `bson:"_id"`
-	BlackList []int64 `bson:"blackList"`
+	BlackList []int64 `bson:"blacklist"`
 }
 
 // Add a user'id into the blacklist of current user
 func MongoBlackListAdd(srcId, dstId int64) error {
 	_, err := UserBlackColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": srcId},
-		bson.M{"$addToSet": bson.M{"blackList": dstId}},
+		bson.M{"$addToSet": bson.M{"blacklist": dstId}},
 		options.Update().SetUpsert(true))
 	if nil != err {
 		log.Printf("Error: add friends fail for user(%d), error detail: %s", srcId, err.Error())
@@ -149,10 +160,74 @@ func MongoQueryBlackList(id int64) ([]int64, error) {
 func MongoBlackListDel(srcId, dstId int64) error {
 	_, err := UserBlackColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": srcId},
-		bson.M{"$pull": bson.M{"blackList": dstId}},
+		bson.M{"$pull": bson.M{"blacklist": dstId}},
 		options.Update().SetUpsert(true))
 	if nil != err {
 		log.Printf("Error: move a friend out from blacklist fail for user(%d), error detail: %s", srcId, err.Error())
+		return err
+	}
+	return nil
+}
+
+type TempGroupChat struct {
+	Id      int64   `bson:"_id"`
+	UsersId []int64 `bson:"users_id"`
+}
+
+// Add a group's id into the groups_id of current user
+func MongoGroupChatAddUser(groupId, userId int64) error {
+	_, err := GroupChats.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": groupId},
+		bson.M{"$addToSet": bson.M{"users_id": userId}},
+		options.Update().SetUpsert(true))
+	if nil != err {
+		log.Printf("Error: add user fail for groupChat(%d), error detail: %s", groupId, err.Error())
+		return err
+	}
+	return nil
+}
+
+// Query the user's id of the group
+func MongoQueryGroupChatUsers(groupId int64) ([]int64, error) {
+	temp := new(TempGroupChat)
+	err := GroupChats.FindOne(getTimeOutCtx(3), bson.M{"_id": groupId}).Decode(temp)
+	if nil != err {
+		log.Printf("Error: query users fail for groupChat(%d), error detail: %s", groupId, err.Error())
+		return nil, err
+	}
+	return temp.UsersId, nil
+}
+
+// Query the all groups information
+func MongoQueryGroupChatAll() ([]TempGroupChat, error) {
+	ctx := getTimeOutCtx(30)
+	curs, err := GroupChats.Find(ctx, bson.D{})
+	if nil != err {
+		log.Printf("Error: query all group chat information fail")
+		return nil, err
+	}
+	defer curs.Close(ctx)
+	data := make([]TempGroupChat, 0)
+	for curs.Next(ctx) {
+		temp := new(TempGroupChat)
+		err := curs.Decode(temp)
+		if nil != err {
+			log.Printf("Error: query all group chat error, detail: %s", err.Error())
+			continue
+		}
+		data = append(data, *temp)
+	}
+	return data, nil
+}
+
+// Move a user's id out from a group chat
+func MongoGroupChatDelUser(groupId, userId int64) error {
+	_, err := GroupChats.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": groupId},
+		bson.M{"$pull": bson.M{"users_id": userId}},
+		options.Update().SetUpsert(true))
+	if nil != err {
+		log.Printf("Error: remove user fail for groupChat(%d), error detail: %s", groupId, err.Error())
 		return err
 	}
 	return nil
