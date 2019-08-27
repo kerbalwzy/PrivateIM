@@ -129,3 +129,57 @@ func TestMongoGroupChatDelUser(t *testing.T) {
 func TestMongoQueryGroupChatUsers2(t *testing.T) {
 	TestMongoQueryGroupChatUsers(t)
 }
+
+var (
+	subsId1 int64 = 56789098765
+	subsId2 int64 = 5678987656789
+)
+
+func TestMongoSubscriptionAddUser(t *testing.T) {
+	err := MongoSubscriptionAddUser(subsId1, srcId)
+	if nil != err {
+		t.Error(err)
+	}
+	err = MongoSubscriptionAddUser(subsId1, dstId)
+	if nil != err {
+		t.Error(err)
+	}
+	err = MongoSubscriptionAddUser(subsId2, srcId)
+	if nil != err {
+		t.Error(err)
+	}
+	err = MongoSubscriptionAddUser(subsId2, dstId)
+	if nil != err {
+		t.Error(err)
+	}
+
+}
+
+func TestMongoQuerySubscriptionUsers(t *testing.T) {
+	users, err := MongoQuerySubscriptionUsers(subsId1)
+	if nil != err {
+		t.Error(err)
+	}
+	log.Printf("user conut of subscription(%d) is %d", subsId1, len(users))
+}
+
+func TestMongoQuerySubscriptionAll(t *testing.T) {
+	data, err := MongoQuerySubscriptionAll()
+	if nil != err {
+		t.Error(err)
+	}
+	for _, detail := range data {
+		log.Printf("subscription(%d) has users(%v)", detail.Id, detail.UsersId)
+	}
+}
+
+func TestMongoSubscriptionDelUser(t *testing.T) {
+	err := MongoSubscriptionDelUser(subsId1, srcId)
+	if nil != err {
+		t.Error(err)
+	}
+}
+
+func TestMongoQuerySubscriptionAll2(t *testing.T) {
+	TestMongoQuerySubscriptionAll(t)
+}

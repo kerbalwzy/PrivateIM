@@ -174,7 +174,7 @@ type TempGroupChat struct {
 	UsersId []int64 `bson:"users_id"`
 }
 
-// Add a group's id into the groups_id of current user
+// Add a user's id into the group chat
 func MongoGroupChatAddUser(groupId, userId int64) error {
 	_, err := GroupChats.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": groupId},
@@ -229,6 +229,70 @@ func MongoGroupChatDelUser(groupId, userId int64) error {
 	if nil != err {
 		log.Printf("Error: remove user fail for groupChat(%d), error detail: %s", groupId, err.Error())
 		return err
+	}
+	return nil
+}
+
+type TempSubscription struct {
+	Id      int64   `bson:"_id"`
+	UsersId []int64 `bson:"users_id"`
+}
+
+// Add a user's into the subscription
+func MongoSubscriptionAddUser(subsId, userId int64) error {
+	_, err := Subscriptions.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": subsId},
+		bson.M{"$addToSet": bson.M{"users_id": userId}},
+		options.Update().SetUpsert(true))
+	if nil != err {
+		log.Printf("Error: add user fail for subscription(%d), error detail: %s", subsId, err.Error())
+		return err
+	}
+	return nil
+}
+
+// Query the user's id of the subscription
+func MongoQuerySubscriptionUsers(subsId int64) ([]int64, error) {
+	temp := new(TempSubscription)
+	err := Subscriptions.FindOne(getTimeOutCtx(3), bson.M{"_id": subsId}).Decode(temp)
+	if nil != err {
+		log.Printf("Error: query user fail for subscription(%d), error detail: %s", subsId, err.Error())
+		return nil, err
+	}
+	return temp.UsersId, nil
+}
+
+// Query the all subscription information
+func MongoQuerySubscriptionAll() ([]TempSubscription, error) {
+	ctx := getTimeOutCtx(30)
+	curs, err := Subscriptions.Find(ctx, bson.D{})
+	if nil != err {
+		log.Printf("Error: query all subscription fail")
+		return nil, err
+	}
+	defer curs.Close(ctx)
+	data := make([]TempSubscription, 0)
+	for curs.Next(ctx) {
+		temp := new(TempSubscription)
+		err := curs.Decode(temp)
+		if nil != err {
+			log.Printf("Error: query all subscription error, detail: %s", err.Error())
+			continue
+		}
+		data = append(data, *temp)
+
+	}
+	return data, nil
+}
+
+// Move a user's id out from a subscription
+func MongoSubscriptionDelUser(subsId, userId int64) error {
+	_, err := Subscriptions.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": subsId},
+		bson.M{"$pull": bson.M{"users_id": userId}},
+		options.Update().SetUpsert(true))
+	if nil != err {
+		log.Printf("Error: remove user fail for subscription(%d), error detail: %s", subsId, err.Error())
 	}
 	return nil
 }
