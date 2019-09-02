@@ -22,7 +22,8 @@ type MySQLData struct{}
 func (obj *MySQLData) NewOneUser(ctx context.Context,
 	params *pb.UserBasicInfo) (*pb.UserBasicInfo, error) {
 
-	if err := checkCtxCanceled(ctx); nil != err {
+	err := checkCtxCanceled(ctx)
+	if nil != err {
 		return nil, err
 	}
 	data, err := MySQLBind.InsertOneUser(params.Name, params.Email,
@@ -37,13 +38,14 @@ func (obj *MySQLData) NewOneUser(ctx context.Context,
 func (obj *MySQLData) GetUserById(ctx context.Context,
 	params *pb.QueryUserParams) (*pb.UserBasicInfo, error) {
 
-	if err := checkCtxCanceled(ctx); nil != err {
+	err := checkCtxCanceled(ctx)
+	if nil != err {
 		return nil, err
 	}
-	if params.FilterField != pb.QueryField_ById {
+	if params.FilterField != pb.QueryUserField_ById {
 		return nil, ParamsErr
 	}
-	data, err := MySQLBind.QueryUserById(params.Id)
+	data, err := MySQLBind.SelectUserById(params.Id)
 	if nil != err {
 		return nil, err
 	}
@@ -55,13 +57,14 @@ func (obj *MySQLData) GetUserById(ctx context.Context,
 func (obj *MySQLData) GetUserByEmail(ctx context.Context,
 	params *pb.QueryUserParams) (*pb.UserBasicInfo, error) {
 
-	if err := checkCtxCanceled(ctx); nil != err {
+	err := checkCtxCanceled(ctx)
+	if nil != err {
 		return nil, err
 	}
-	if params.FilterField != pb.QueryField_ByEmail {
+	if params.FilterField != pb.QueryUserField_ByEmail {
 		return nil, ParamsErr
 	}
-	data, err := MySQLBind.QueryUserByEmail(params.Email)
+	data, err := MySQLBind.SelectUserByEmail(params.Email)
 	if nil != err {
 		return nil, err
 	}
@@ -72,13 +75,14 @@ func (obj *MySQLData) GetUserByEmail(ctx context.Context,
 
 func (obj *MySQLData) GetUsersByName(ctx context.Context,
 	params *pb.QueryUserParams) (*pb.UserBasicInfoList, error) {
-	if err := checkCtxCanceled(ctx); nil != err {
+	err := checkCtxCanceled(ctx)
+	if nil != err {
 		return nil, err
 	}
-	if params.FilterField != pb.QueryField_ByName {
+	if params.FilterField != pb.QueryUserField_ByName {
 		return nil, ParamsErr
 	}
-	data, err := MySQLBind.QueryUsersByName(params.Name)
+	data, err := MySQLBind.SelectUsersByName(params.Name)
 	if nil != err {
 		return nil, err
 	}
@@ -88,6 +92,68 @@ func (obj *MySQLData) GetUsersByName(ctx context.Context,
 		userList.Users = append(userList.Users, user)
 	}
 	return userList, nil
+}
+
+// Updating the name, mobile, gender of the target user, which found by id.
+func (obj *MySQLData) PutUserBasicById(ctx context.Context,
+	params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+
+	if params.UpdateField != pb.UpdateUserField_NameMobileGender {
+		return nil, ParamsErr
+	}
+
+	data, err := MySQLBind.UpdateUserBasicById(params.Name, params.Mobile,
+		int(params.Gender), params.Id)
+	if nil != err {
+		return nil, err
+	}
+
+	user := initUserBasic(data)
+	return user, nil
+}
+
+func (obj *MySQLData) PutUserPasswordById(ctx context.Context,
+	params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+	if params.UpdateField != pb.UpdateUserField_Password {
+		return nil, ParamsErr
+	}
+
+	data, err := MySQLBind.UpdateUserPasswordById(params.Password, params.Id)
+	if nil != err {
+		return nil, err
+	}
+	user := initUserBasic(data)
+	return user, nil
+
+}
+
+func (obj *MySQLData) PutUserPasswordByEmail(ctx context.Context,
+	params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+	if params.UpdateField != pb.UpdateUserField_Password {
+		return nil, ParamsErr
+	}
+
+	data, err := MySQLBind.UpdateUserPasswordByEmail(params.Password, params.Email)
+	if nil != err {
+		return nil, err
+	}
+	user := initUserBasic(data)
+	return user, nil
 }
 
 // Check the client if canceled the calling or connection is time out
@@ -110,7 +176,7 @@ func initUserBasic(data *MySQLBind.TempUserBasic) *pb.UserBasicInfo {
 		Mobile:     data.Mobile,
 		Password:   data.Password,
 		Gender:     int32(data.Gender),
-		CreateTime: data.CreateTime.Format("2006-01-02 15:04:05")}
+		CreateTime: data.CreateTime.Format(conf.TimeDisplayFormat)}
 }
 
 // Start the gRPC server for MySQL data operation.

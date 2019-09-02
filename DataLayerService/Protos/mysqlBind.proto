@@ -10,19 +10,9 @@ service MySQLBindService {
     rpc GetUserByEmail (QueryUserParams) returns (UserBasicInfo);
     rpc GetUsersByName (QueryUserParams) returns (UserBasicInfoList);
 
-}
-
-enum QueryField {
-    ById = 0;
-    ByEmail = 1;
-    ByName = 2;
-}
-
-message QueryUserParams {
-    QueryField filter_field = 1;
-    int64 id = 2;
-    string email = 3;
-    string name = 4;
+    rpc PutUserBasicById (UpdateUserParams) returns (UserBasicInfo);
+    rpc PutUserPasswordById (UpdateUserParams) returns (UserBasicInfo);
+    rpc PutUserPasswordByEmail (UpdateUserParams) returns (UserBasicInfo);
 }
 
 message UserBasicInfo {
@@ -39,6 +29,40 @@ message UserBasicInfo {
 message UserBasicInfoList {
     repeated UserBasicInfo users = 1;
 }
+
+enum QueryUserField {
+    ById = 0;
+    ByEmail = 1;
+    ByName = 2;
+}
+
+message QueryUserParams {
+    QueryUserField filter_field = 1;
+    int64 id = 2;
+    string email = 3;
+    string name = 4;
+}
+
+enum UpdateUserField {
+    NameMobileGender = 0; // update the Name, Mobile, Gender at the same time
+    Password = 1;
+
+}
+
+message UpdateUserParams {
+    UpdateUserField update_field = 1;
+    int64 id = 2;
+    string email = 3;
+    string name = 4;
+    string mobile = 5;
+    string password = 6;
+    int32 gender = 7;
+}
+
+
+
+
+
 
 
 

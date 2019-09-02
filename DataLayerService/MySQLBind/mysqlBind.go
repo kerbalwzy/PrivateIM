@@ -46,9 +46,16 @@ const (
 
 	UserUpdateProfile = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? " +
 		"WHERE id = ?"
+
+	UserUpdatePasswordById = "UPDATE tb_user_basic SET password = ? WHERE id = ?"
+
+	UserUpdatePasswordByEmail = "UPDATE tb_user_basic SET password = ? WHERE email = ?"
 )
 
-var UserNotExitedError = errors.New("the user not existed")
+var (
+	TargetUserNotExitedErr = errors.New("the target user not existed")
+	NothingNeedUpdateErr   = errors.New("there nothing need be update")
+)
 
 // user basic information in `tb_user_basic` table
 type TempUserBasic struct {
@@ -106,26 +113,26 @@ func ScanUserFromRow(row *sql.Row) (*TempUserBasic, error) {
 		return nil, err
 	}
 	if user.Id == 0 {
-		return nil, UserNotExitedError
+		return nil, TargetUserNotExitedErr
 	}
 	return user, nil
 }
 
 // Get user all information in `tb_user_basic` table by id
-func QueryUserById(id int64) (*TempUserBasic, error) {
+func SelectUserById(id int64) (*TempUserBasic, error) {
 	row := MySQLClient.QueryRow(UserGetProfileById, id)
 	return ScanUserFromRow(row)
 }
 
 // Get user all information in `tb_user_basic` table by email
-func QueryUserByEmail(email string) (*TempUserBasic, error) {
+func SelectUserByEmail(email string) (*TempUserBasic, error) {
 	row := MySQLClient.QueryRow(UserGetProfileByEmail, email)
 	return ScanUserFromRow(row)
 
 }
 
 // Get users all information in `tb_user_basic` table by name
-func QueryUsersByName(name string) ([]*TempUserBasic, error) {
+func SelectUsersByName(name string) ([]*TempUserBasic, error) {
 	rows, err := MySQLClient.Query(UserGetProfileByName, name)
 	if nil != err {
 		return nil, err
@@ -143,33 +150,97 @@ func QueryUsersByName(name string) ([]*TempUserBasic, error) {
 	return users, nil
 }
 
-// Update name,mobile and gender of user basic by id
-func UpdateProfile(name, mobile string, gender int, userId int64) error {
+// Update the name, mobile, gender information of the target user.
+// If there are nothing need be update wil panic NothingNeedUpdateErr
+func UpdateUserBasicById(name, mobile string, gender int, userId int64) (*TempUserBasic, error) {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
-		return err
+		return nil, err
 	}
-	// update user profile
-	ret, err := tx.Exec(UserUpdateProfile, name, mobile, gender, userId)
+	// query the target user, get the raw data of the user
+	row := tx.QueryRow(UserGetProfileById, userId)
+	user, err := ScanUserFromRow(row)
 	if nil != err {
 		_ = tx.Rollback()
-		return err
+		return nil, err
 	}
-	aff, err := ret.RowsAffected()
-	if aff == 0 {
+	// check the data want be update if all equal the raw data of user
+	if user.Name == name && user.Mobile == mobile && user.Gender == gender {
 		_ = tx.Rollback()
-		return errors.New("not thing need to update")
+		return nil, NothingNeedUpdateErr
 	}
+
+	// update user basic information with new value
+	_, err = tx.Exec(UserUpdateProfile, name, mobile, gender, userId)
 	if nil != err {
 		_ = tx.Rollback()
-		return err
+		return nil, err
 	}
 	// commit Transaction
 	err = tx.Commit()
 	if nil != err {
 		_ = tx.Rollback()
+		return nil, err
 	}
-	return nil
+	// return the new information of the user
+	user.Name = name
+	user.Mobile = mobile
+	user.Gender = gender
+	return user, nil
+}
+
+// Update the password of the target user, which found by id
+func UpdateUserPasswordById(password string, userId int64) (*TempUserBasic, error) {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+	// query the target user, get the raw data of the user
+	row := tx.QueryRow(UserGetProfileById, userId)
+	user, err := ScanUserFromRow(row)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	// check the data want be update if all equal the raw data of user
+	if user.Password == password {
+		_ = tx.Rollback()
+		return nil, NothingNeedUpdateErr
+	}
+	_, err = tx.Exec(UserUpdatePasswordById, password, userId)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	user.Password = password
+	return user, nil
+}
+
+// Update the password of the target user, which found by email
+func UpdateUserPasswordByEmail(password, email string) (*TempUserBasic, error) {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+	// query the target user, get the raw data of the user
+	row := tx.QueryRow(UserGetProfileByEmail, email)
+	user, err := ScanUserFromRow(row)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	// check the data want be update if all equal the raw data of user
+	if user.Password == password {
+		_ = tx.Rollback()
+		return nil, NothingNeedUpdateErr
+	}
+	_, err = tx.Exec(UserUpdatePasswordByEmail, password, err)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	user.Password = password
+	return user, nil
 }
 
 // User's more information sql string
@@ -314,6 +385,17 @@ var (
 	ErrFriendRequestNotExisted   = errors.New("there have not a friend request you can accept")
 	ErrFriendBlacklistNoChange   = errors.New("the status of friend blacklist is not change")
 )
+
+// user relationship information in `tb_friend_relation` table
+type TempUserRelate struct {
+	Id         int64  `json:"id"`
+	SelfId     int64  `json:"self_id"`
+	FriendId   int64  `json:"friend_id"`
+	FriendNote string `json:"friend_note"`
+	IsAccept   bool   `json:"is_accept"`
+	IsBlack    bool   `json:"is_black"`
+	IsDelete   bool   `json:"is_delete"`
+}
 
 // Add one friend relation information of user
 func AddOneFriend(selfId, friendId int64, note string) error {
@@ -529,14 +611,14 @@ func DeleteOneFriend(selfId, friendId int64) error {
 }
 
 // Get all friends relation information of uer
-func GetUserFriendsRelates(userId int64) ([]*UserRelate, error) {
+func GetUserFriendsRelates(userId int64) ([]*TempUserRelate, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsRelate, userId)
 	if nil != err {
 		return nil, err
 	}
-	friends := make([]*UserRelate, 0)
+	friends := make([]*TempUserRelate, 0)
 	for rows.Next() {
-		relateP := new(UserRelate)
+		relateP := new(TempUserRelate)
 		err := rows.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
 			&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsBlack), &(relateP.IsDelete))
 		if nil != err {
@@ -547,16 +629,27 @@ func GetUserFriendsRelates(userId int64) ([]*UserRelate, error) {
 	return friends, nil
 }
 
+// user basic and relate information from `tb_user_basic` and `tb_friend_relation` table
+type TempFriendInformation struct {
+	FriendId int64  `json:"friend_id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Mobile   string `json:"mobile"`
+	Gender   int    `json:"gender"`
+	Note     string `json:"note"`
+	IsBlack  bool   `json:"is_black"`
+}
+
 // Get the friends basic and relate information of user
-func GetUserFriendsInfo(selfId int64) ([]*FriendInformation, error) {
+func GetUserFriendsInfo(selfId int64) ([]*TempFriendInformation, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsInfo, selfId)
 	if nil != err {
 		return nil, err
 	}
 
-	friendsInfo := make([]*FriendInformation, 0)
+	friendsInfo := make([]*TempFriendInformation, 0)
 	for rows.Next() {
-		temp := new(FriendInformation)
+		temp := new(TempFriendInformation)
 		_ = rows.Scan(&(temp.FriendId), &(temp.Name), &(temp.Email), &(temp.Mobile),
 			&(temp.Gender), &(temp.Note), &(temp.IsBlack))
 

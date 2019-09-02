@@ -12,8 +12,8 @@ var (
 	userId int64
 )
 
-func TestNewOneUser(t *testing.T) {
-	user, err := NewOneUser(name, email, mobile, password, gender)
+func TestSaveOneNewUser(t *testing.T) {
+	user, err := SaveOneNewUser(name, email, mobile, password, gender)
 	if nil != err {
 		t.Error("NewOneUser Error: ", err)
 	}

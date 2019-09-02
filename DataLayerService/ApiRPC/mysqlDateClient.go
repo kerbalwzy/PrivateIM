@@ -36,7 +36,7 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 	return ctx
 }
 
-func NewOneUser(name, email, mobile, password string,
+func SaveOneNewUser(name, email, mobile, password string,
 	gender int) (*pb.UserBasicInfo, error) {
 	client := getClient()
 	params := &pb.UserBasicInfo{
@@ -47,18 +47,18 @@ func NewOneUser(name, email, mobile, password string,
 
 func QueryUserById(id int64) (*pb.UserBasicInfo, error) {
 	client := getClient()
-	params := &pb.QueryUserParams{Id: id, FilterField: pb.QueryField_ById}
+	params := &pb.QueryUserParams{Id: id, FilterField: pb.QueryUserField_ById}
 	return client.GetUserById(getTimeOutCtx(3), params)
 }
 
 func QueryUserByEmail(email string) (*pb.UserBasicInfo, error) {
 	client := getClient()
-	params := &pb.QueryUserParams{Email: email, FilterField: pb.QueryField_ByEmail}
+	params := &pb.QueryUserParams{Email: email, FilterField: pb.QueryUserField_ByEmail}
 	return client.GetUserByEmail(getTimeOutCtx(3), params)
 }
 
 func QueryUsersByName(name string) (*pb.UserBasicInfoList, error) {
 	client := getClient()
-	params := &pb.QueryUserParams{Name: name, FilterField: pb.QueryField_ByName}
+	params := &pb.QueryUserParams{Name: name, FilterField: pb.QueryUserField_ByName}
 	return client.GetUsersByName(getTimeOutCtx(3), params)
 }

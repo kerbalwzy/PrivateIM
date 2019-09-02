@@ -24,95 +24,57 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type QueryField int32
+type QueryUserField int32
 
 const (
-	QueryField_ById    QueryField = 0
-	QueryField_ByEmail QueryField = 1
-	QueryField_ByName  QueryField = 2
+	QueryUserField_ById    QueryUserField = 0
+	QueryUserField_ByEmail QueryUserField = 1
+	QueryUserField_ByName  QueryUserField = 2
 )
 
-var QueryField_name = map[int32]string{
+var QueryUserField_name = map[int32]string{
 	0: "ById",
 	1: "ByEmail",
 	2: "ByName",
 }
 
-var QueryField_value = map[string]int32{
+var QueryUserField_value = map[string]int32{
 	"ById":    0,
 	"ByEmail": 1,
 	"ByName":  2,
 }
 
-func (x QueryField) String() string {
-	return proto.EnumName(QueryField_name, int32(x))
+func (x QueryUserField) String() string {
+	return proto.EnumName(QueryUserField_name, int32(x))
 }
 
-func (QueryField) EnumDescriptor() ([]byte, []int) {
+func (QueryUserField) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_d28f1fa67868a9e4, []int{0}
 }
 
-type QueryUserParams struct {
-	FilterField          QueryField `protobuf:"varint,1,opt,name=filter_field,json=filterField,proto3,enum=pb.QueryField" json:"filter_field,omitempty"`
-	Id                   int64      `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	Email                string     `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Name                 string     `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_unrecognized     []byte     `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+type UpdateUserField int32
+
+const (
+	UpdateUserField_NameMobileGender UpdateUserField = 0
+	UpdateUserField_Password         UpdateUserField = 1
+)
+
+var UpdateUserField_name = map[int32]string{
+	0: "NameMobileGender",
+	1: "Password",
 }
 
-func (m *QueryUserParams) Reset()         { *m = QueryUserParams{} }
-func (m *QueryUserParams) String() string { return proto.CompactTextString(m) }
-func (*QueryUserParams) ProtoMessage()    {}
-func (*QueryUserParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{0}
+var UpdateUserField_value = map[string]int32{
+	"NameMobileGender": 0,
+	"Password":         1,
 }
 
-func (m *QueryUserParams) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_QueryUserParams.Unmarshal(m, b)
-}
-func (m *QueryUserParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_QueryUserParams.Marshal(b, m, deterministic)
-}
-func (m *QueryUserParams) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryUserParams.Merge(m, src)
-}
-func (m *QueryUserParams) XXX_Size() int {
-	return xxx_messageInfo_QueryUserParams.Size(m)
-}
-func (m *QueryUserParams) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryUserParams.DiscardUnknown(m)
+func (x UpdateUserField) String() string {
+	return proto.EnumName(UpdateUserField_name, int32(x))
 }
 
-var xxx_messageInfo_QueryUserParams proto.InternalMessageInfo
-
-func (m *QueryUserParams) GetFilterField() QueryField {
-	if m != nil {
-		return m.FilterField
-	}
-	return QueryField_ById
-}
-
-func (m *QueryUserParams) GetId() int64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-func (m *QueryUserParams) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *QueryUserParams) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
+func (UpdateUserField) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{1}
 }
 
 type UserBasicInfo struct {
@@ -132,7 +94,7 @@ func (m *UserBasicInfo) Reset()         { *m = UserBasicInfo{} }
 func (m *UserBasicInfo) String() string { return proto.CompactTextString(m) }
 func (*UserBasicInfo) ProtoMessage()    {}
 func (*UserBasicInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{1}
+	return fileDescriptor_d28f1fa67868a9e4, []int{0}
 }
 
 func (m *UserBasicInfo) XXX_Unmarshal(b []byte) error {
@@ -213,7 +175,7 @@ func (m *UserBasicInfoList) Reset()         { *m = UserBasicInfoList{} }
 func (m *UserBasicInfoList) String() string { return proto.CompactTextString(m) }
 func (*UserBasicInfoList) ProtoMessage()    {}
 func (*UserBasicInfoList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{2}
+	return fileDescriptor_d28f1fa67868a9e4, []int{1}
 }
 
 func (m *UserBasicInfoList) XXX_Unmarshal(b []byte) error {
@@ -241,42 +203,201 @@ func (m *UserBasicInfoList) GetUsers() []*UserBasicInfo {
 	return nil
 }
 
+type QueryUserParams struct {
+	FilterField          QueryUserField `protobuf:"varint,1,opt,name=filter_field,json=filterField,proto3,enum=pb.QueryUserField" json:"filter_field,omitempty"`
+	Id                   int64          `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Email                string         `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Name                 string         `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *QueryUserParams) Reset()         { *m = QueryUserParams{} }
+func (m *QueryUserParams) String() string { return proto.CompactTextString(m) }
+func (*QueryUserParams) ProtoMessage()    {}
+func (*QueryUserParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{2}
+}
+
+func (m *QueryUserParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryUserParams.Unmarshal(m, b)
+}
+func (m *QueryUserParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryUserParams.Marshal(b, m, deterministic)
+}
+func (m *QueryUserParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryUserParams.Merge(m, src)
+}
+func (m *QueryUserParams) XXX_Size() int {
+	return xxx_messageInfo_QueryUserParams.Size(m)
+}
+func (m *QueryUserParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryUserParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryUserParams proto.InternalMessageInfo
+
+func (m *QueryUserParams) GetFilterField() QueryUserField {
+	if m != nil {
+		return m.FilterField
+	}
+	return QueryUserField_ById
+}
+
+func (m *QueryUserParams) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *QueryUserParams) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *QueryUserParams) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type UpdateUserParams struct {
+	UpdateField          UpdateUserField `protobuf:"varint,1,opt,name=update_field,json=updateField,proto3,enum=pb.UpdateUserField" json:"update_field,omitempty"`
+	Id                   int64           `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Email                string          `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Name                 string          `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Mobile               string          `protobuf:"bytes,5,opt,name=mobile,proto3" json:"mobile,omitempty"`
+	Password             string          `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
+	Gender               int32           `protobuf:"varint,7,opt,name=gender,proto3" json:"gender,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
+}
+
+func (m *UpdateUserParams) Reset()         { *m = UpdateUserParams{} }
+func (m *UpdateUserParams) String() string { return proto.CompactTextString(m) }
+func (*UpdateUserParams) ProtoMessage()    {}
+func (*UpdateUserParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{3}
+}
+
+func (m *UpdateUserParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateUserParams.Unmarshal(m, b)
+}
+func (m *UpdateUserParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateUserParams.Marshal(b, m, deterministic)
+}
+func (m *UpdateUserParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateUserParams.Merge(m, src)
+}
+func (m *UpdateUserParams) XXX_Size() int {
+	return xxx_messageInfo_UpdateUserParams.Size(m)
+}
+func (m *UpdateUserParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateUserParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateUserParams proto.InternalMessageInfo
+
+func (m *UpdateUserParams) GetUpdateField() UpdateUserField {
+	if m != nil {
+		return m.UpdateField
+	}
+	return UpdateUserField_NameMobileGender
+}
+
+func (m *UpdateUserParams) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *UpdateUserParams) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *UpdateUserParams) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *UpdateUserParams) GetMobile() string {
+	if m != nil {
+		return m.Mobile
+	}
+	return ""
+}
+
+func (m *UpdateUserParams) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func (m *UpdateUserParams) GetGender() int32 {
+	if m != nil {
+		return m.Gender
+	}
+	return 0
+}
+
 func init() {
-	proto.RegisterEnum("pb.QueryField", QueryField_name, QueryField_value)
-	proto.RegisterType((*QueryUserParams)(nil), "pb.QueryUserParams")
+	proto.RegisterEnum("pb.QueryUserField", QueryUserField_name, QueryUserField_value)
+	proto.RegisterEnum("pb.UpdateUserField", UpdateUserField_name, UpdateUserField_value)
 	proto.RegisterType((*UserBasicInfo)(nil), "pb.UserBasicInfo")
 	proto.RegisterType((*UserBasicInfoList)(nil), "pb.UserBasicInfoList")
+	proto.RegisterType((*QueryUserParams)(nil), "pb.QueryUserParams")
+	proto.RegisterType((*UpdateUserParams)(nil), "pb.UpdateUserParams")
 }
 
 func init() { proto.RegisterFile("mysqlBind.proto", fileDescriptor_d28f1fa67868a9e4) }
 
 var fileDescriptor_d28f1fa67868a9e4 = []byte{
-	// 393 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x4f, 0x6f, 0xd4, 0x30,
-	0x10, 0xc5, 0x71, 0xf6, 0x4f, 0xcb, 0x04, 0xb6, 0xdb, 0xe1, 0x8f, 0xac, 0x5e, 0x88, 0xf6, 0x42,
-	0xc4, 0x61, 0x11, 0x41, 0x48, 0x1c, 0x7a, 0x8a, 0x04, 0x68, 0xa5, 0x52, 0x68, 0x0a, 0xe7, 0xca,
-	0x59, 0xcf, 0x22, 0x4b, 0x71, 0x12, 0xec, 0x94, 0x2a, 0x17, 0x3e, 0x16, 0xdf, 0x8c, 0x3b, 0xb2,
-	0x13, 0x12, 0xaa, 0xed, 0x81, 0x5b, 0xde, 0xf3, 0xfc, 0xe6, 0x4d, 0xc6, 0x86, 0x23, 0xdd, 0xda,
-	0xef, 0x45, 0xaa, 0x4a, 0xb9, 0xae, 0x4d, 0xd5, 0x54, 0x18, 0xd4, 0xf9, 0xea, 0x27, 0x1c, 0x5d,
-	0x5c, 0x93, 0x69, 0xbf, 0x5a, 0x32, 0x9f, 0x85, 0x11, 0xda, 0xe2, 0x2b, 0x78, 0xb0, 0x53, 0x45,
-	0x43, 0xe6, 0x6a, 0xa7, 0xa8, 0x90, 0x9c, 0x45, 0x2c, 0x5e, 0x24, 0x8b, 0x75, 0x9d, 0xaf, 0x7d,
-	0xe9, 0x7b, 0xe7, 0x66, 0x61, 0x57, 0xe3, 0x05, 0x2e, 0x20, 0x50, 0x92, 0x07, 0x11, 0x8b, 0x27,
-	0x59, 0xa0, 0x24, 0x3e, 0x86, 0x19, 0x69, 0xa1, 0x0a, 0x3e, 0x89, 0x58, 0x7c, 0x3f, 0xeb, 0x04,
-	0x22, 0x4c, 0x4b, 0xa1, 0x89, 0x4f, 0xbd, 0xe9, 0xbf, 0x57, 0xbf, 0x18, 0x3c, 0x74, 0xd9, 0xa9,
-	0xb0, 0x6a, 0xbb, 0x29, 0x77, 0x55, 0xdf, 0x8b, 0x0d, 0xbd, 0xfe, 0x52, 0xc1, 0x48, 0xe1, 0x53,
-	0x98, 0xeb, 0x2a, 0x57, 0x05, 0xf5, 0x01, 0xbd, 0x1a, 0x73, 0xa7, 0xff, 0xe6, 0x9e, 0xc0, 0x61,
-	0x2d, 0xac, 0xbd, 0xa9, 0x8c, 0xe4, 0x33, 0x7f, 0x30, 0x68, 0xd7, 0xe9, 0x1b, 0x95, 0x92, 0x0c,
-	0x9f, 0x47, 0x2c, 0x9e, 0x65, 0xbd, 0xc2, 0x67, 0x10, 0x6e, 0x0d, 0x89, 0x86, 0xae, 0x1a, 0xa5,
-	0x89, 0x1f, 0x78, 0x0c, 0x3a, 0xeb, 0x8b, 0xd2, 0xb4, 0x3a, 0x85, 0xe3, 0x5b, 0x73, 0x9f, 0x29,
-	0xdb, 0xe0, 0x73, 0x98, 0x5d, 0x5b, 0x32, 0x96, 0xb3, 0x68, 0x12, 0x87, 0xc9, 0xb1, 0xdb, 0xd9,
-	0xad, 0xaa, 0xac, 0x3b, 0x7f, 0xf1, 0x12, 0x60, 0xdc, 0x25, 0x1e, 0xc2, 0x34, 0x6d, 0x37, 0x72,
-	0x79, 0x0f, 0x43, 0x38, 0x48, 0xdb, 0x77, 0x6e, 0xea, 0x25, 0x43, 0x80, 0x79, 0xda, 0x9e, 0x0b,
-	0x4d, 0xcb, 0x20, 0xf9, 0xcd, 0x60, 0xf9, 0xb1, 0xbd, 0xbc, 0x38, 0x73, 0xf7, 0x77, 0x49, 0xe6,
-	0x87, 0xda, 0x12, 0x26, 0x00, 0xe7, 0x74, 0xf3, 0xa9, 0x24, 0x97, 0x81, 0xfb, 0x69, 0x27, 0xfb,
-	0x16, 0xbe, 0x81, 0xf0, 0x03, 0x35, 0xde, 0x6b, 0x37, 0x12, 0x1f, 0x0d, 0xd7, 0x3a, 0xbe, 0x80,
-	0xbb, 0xb0, 0xb7, 0xb0, 0x18, 0x30, 0x3f, 0xdf, 0x7f, 0x93, 0xa7, 0x03, 0x69, 0xbb, 0xbf, 0xb9,
-	0x9b, 0x7c, 0xb2, 0x47, 0xba, 0x8d, 0xe6, 0x73, 0xff, 0x54, 0x5f, 0xff, 0x09, 0x00, 0x00, 0xff,
-	0xff, 0xc6, 0xb5, 0xc9, 0xb6, 0xbd, 0x02, 0x00, 0x00,
+	// 499 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x54, 0x4d, 0x6f, 0xd3, 0x40,
+	0x10, 0xed, 0x3a, 0xb1, 0x1b, 0xc6, 0x21, 0x71, 0x27, 0xa1, 0xb2, 0x7a, 0x21, 0xca, 0x85, 0xa8,
+	0x87, 0x1c, 0x52, 0x05, 0x21, 0x51, 0x21, 0x61, 0x09, 0xaa, 0x48, 0x6d, 0x49, 0x5d, 0x7a, 0xae,
+	0x9c, 0x78, 0x82, 0x56, 0xf2, 0x17, 0xbb, 0x0e, 0x95, 0xaf, 0xfc, 0x27, 0xf8, 0x1d, 0xfc, 0x24,
+	0xe4, 0xb5, 0x6b, 0x6c, 0xd2, 0x4a, 0x45, 0xdc, 0x32, 0x6f, 0xe6, 0x4d, 0xde, 0xbe, 0x37, 0x32,
+	0xf4, 0xc3, 0x4c, 0x7e, 0x0d, 0x1c, 0x1e, 0xf9, 0xd3, 0x44, 0xc4, 0x69, 0x8c, 0x5a, 0xb2, 0x1a,
+	0xff, 0x64, 0xf0, 0xfc, 0x46, 0x92, 0x70, 0x3c, 0xc9, 0xd7, 0x8b, 0x68, 0x13, 0x63, 0x0f, 0x34,
+	0xee, 0xdb, 0x6c, 0xc4, 0x26, 0x2d, 0x57, 0xe3, 0x3e, 0x22, 0xb4, 0x23, 0x2f, 0x24, 0x5b, 0x1b,
+	0xb1, 0xc9, 0x33, 0x57, 0xfd, 0xc6, 0x43, 0x30, 0xc2, 0x78, 0xc5, 0x03, 0xb2, 0x5b, 0x0a, 0x2d,
+	0x2b, 0x1c, 0x82, 0x4e, 0xa1, 0xc7, 0x03, 0xbb, 0xad, 0xe0, 0xa2, 0xc0, 0x23, 0xe8, 0x24, 0x9e,
+	0x94, 0x77, 0xb1, 0xf0, 0x6d, 0x5d, 0x35, 0xaa, 0x3a, 0xdf, 0xf4, 0x85, 0x22, 0x9f, 0x84, 0x6d,
+	0x8c, 0xd8, 0x44, 0x77, 0xcb, 0x0a, 0x5f, 0x82, 0xb9, 0x16, 0xe4, 0xa5, 0x74, 0x9b, 0xf2, 0x90,
+	0xec, 0x7d, 0x45, 0x83, 0x02, 0xfa, 0xcc, 0x43, 0x1a, 0x9f, 0xc2, 0x41, 0x43, 0xf7, 0x39, 0x97,
+	0x29, 0xbe, 0x02, 0x7d, 0x2b, 0x49, 0x48, 0x9b, 0x8d, 0x5a, 0x13, 0x73, 0x76, 0x30, 0x4d, 0x56,
+	0xd3, 0xc6, 0x94, 0x5b, 0xf4, 0xc7, 0xdf, 0x19, 0xf4, 0xaf, 0xb6, 0x24, 0xb2, 0xbc, 0xbb, 0xf4,
+	0x84, 0x17, 0x4a, 0x9c, 0x43, 0x77, 0xc3, 0x83, 0x94, 0xc4, 0xed, 0x86, 0x53, 0x50, 0x58, 0xd0,
+	0x9b, 0x61, 0xbe, 0xa3, 0x1a, 0xfd, 0x98, 0x77, 0x5c, 0xb3, 0x98, 0x53, 0x45, 0xe9, 0x97, 0x56,
+	0xf9, 0x55, 0x79, 0xd0, 0xaa, 0x7b, 0x70, 0xef, 0x62, 0xfb, 0x8f, 0x8b, 0xe3, 0x5f, 0x0c, 0xac,
+	0x9b, 0xc4, 0xf7, 0x52, 0xaa, 0xa9, 0x78, 0x0d, 0xdd, 0xad, 0xc2, 0x1a, 0x2a, 0x06, 0xea, 0x25,
+	0xd5, 0x6c, 0x29, 0xa3, 0x18, 0xfc, 0x4f, 0x19, 0xb5, 0x30, 0xf5, 0x46, 0x98, 0xf5, 0xd8, 0x8c,
+	0x47, 0x63, 0xdb, 0xaf, 0xc7, 0x76, 0x7c, 0x02, 0xbd, 0xa6, 0x57, 0xd8, 0x81, 0xb6, 0x93, 0x2d,
+	0x7c, 0x6b, 0x0f, 0x4d, 0xd8, 0x77, 0xb2, 0x0f, 0xb9, 0x0c, 0x8b, 0x21, 0x80, 0xe1, 0x64, 0x97,
+	0x5e, 0x48, 0x96, 0x76, 0x3c, 0x87, 0xfe, 0x5f, 0x4f, 0xc3, 0x21, 0x58, 0x79, 0xf3, 0x42, 0x29,
+	0x39, 0x53, 0xbb, 0xad, 0x3d, 0xec, 0x42, 0x67, 0x59, 0x2a, 0xb0, 0xd8, 0xec, 0x47, 0x0b, 0xac,
+	0x8b, 0xec, 0xfa, 0xea, 0x3c, 0x3f, 0xe9, 0x6b, 0x12, 0xdf, 0xf8, 0x9a, 0x70, 0x06, 0x70, 0x49,
+	0x77, 0x9f, 0x22, 0xb5, 0x0b, 0x77, 0x0f, 0xe0, 0x68, 0x17, 0xc2, 0x39, 0x98, 0x67, 0x94, 0x2a,
+	0x2c, 0x5b, 0xf8, 0x38, 0x68, 0x24, 0x5e, 0xc4, 0xf2, 0x10, 0xed, 0x0d, 0xf4, 0x2a, 0x9a, 0x7a,
+	0xd6, 0x93, 0x99, 0xa7, 0x15, 0x53, 0x16, 0x26, 0x3c, 0xcc, 0x7c, 0xb1, 0xc3, 0x54, 0x47, 0xfe,
+	0x16, 0xac, 0xe5, 0x36, 0xad, 0x70, 0xa5, 0x79, 0xd8, 0xbc, 0x8f, 0xc7, 0xff, 0xfa, 0x1d, 0x0c,
+	0x4a, 0xf2, 0xbd, 0x93, 0xff, 0xc6, 0x7f, 0x0f, 0x87, 0x3b, 0xfc, 0xe2, 0xf1, 0x4f, 0x5d, 0xb1,
+	0x32, 0xd4, 0xd7, 0xe7, 0xe4, 0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x19, 0x09, 0x8b, 0x05, 0x90,
+	0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -295,6 +416,9 @@ type MySQLBindServiceClient interface {
 	GetUserById(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
 	GetUserByEmail(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
 	GetUsersByName(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfoList, error)
+	PutUserBasicById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
+	PutUserPasswordById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
+	PutUserPasswordByEmail(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
 }
 
 type mySQLBindServiceClient struct {
@@ -341,12 +465,42 @@ func (c *mySQLBindServiceClient) GetUsersByName(ctx context.Context, in *QueryUs
 	return out, nil
 }
 
+func (c *mySQLBindServiceClient) PutUserBasicById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
+	out := new(UserBasicInfo)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserBasicById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutUserPasswordById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
+	out := new(UserBasicInfo)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserPasswordById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutUserPasswordByEmail(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
+	out := new(UserBasicInfo)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserPasswordByEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MySQLBindServiceServer is the server API for MySQLBindService service.
 type MySQLBindServiceServer interface {
 	NewOneUser(context.Context, *UserBasicInfo) (*UserBasicInfo, error)
 	GetUserById(context.Context, *QueryUserParams) (*UserBasicInfo, error)
 	GetUserByEmail(context.Context, *QueryUserParams) (*UserBasicInfo, error)
 	GetUsersByName(context.Context, *QueryUserParams) (*UserBasicInfoList, error)
+	PutUserBasicById(context.Context, *UpdateUserParams) (*UserBasicInfo, error)
+	PutUserPasswordById(context.Context, *UpdateUserParams) (*UserBasicInfo, error)
+	PutUserPasswordByEmail(context.Context, *UpdateUserParams) (*UserBasicInfo, error)
 }
 
 // UnimplementedMySQLBindServiceServer can be embedded to have forward compatible implementations.
@@ -364,6 +518,15 @@ func (*UnimplementedMySQLBindServiceServer) GetUserByEmail(ctx context.Context, 
 }
 func (*UnimplementedMySQLBindServiceServer) GetUsersByName(ctx context.Context, req *QueryUserParams) (*UserBasicInfoList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsersByName not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutUserBasicById(ctx context.Context, req *UpdateUserParams) (*UserBasicInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserBasicById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutUserPasswordById(ctx context.Context, req *UpdateUserParams) (*UserBasicInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserPasswordById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutUserPasswordByEmail(ctx context.Context, req *UpdateUserParams) (*UserBasicInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserPasswordByEmail not implemented")
 }
 
 func RegisterMySQLBindServiceServer(s *grpc.Server, srv MySQLBindServiceServer) {
@@ -442,6 +605,60 @@ func _MySQLBindService_GetUsersByName_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MySQLBindService_PutUserBasicById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutUserBasicById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutUserBasicById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutUserBasicById(ctx, req.(*UpdateUserParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutUserPasswordById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutUserPasswordById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutUserPasswordById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutUserPasswordById(ctx, req.(*UpdateUserParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutUserPasswordByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutUserPasswordByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutUserPasswordByEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutUserPasswordByEmail(ctx, req.(*UpdateUserParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _MySQLBindService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.MySQLBindService",
 	HandlerType: (*MySQLBindServiceServer)(nil),
@@ -461,6 +678,18 @@ var _MySQLBindService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUsersByName",
 			Handler:    _MySQLBindService_GetUsersByName_Handler,
+		},
+		{
+			MethodName: "PutUserBasicById",
+			Handler:    _MySQLBindService_PutUserBasicById_Handler,
+		},
+		{
+			MethodName: "PutUserPasswordById",
+			Handler:    _MySQLBindService_PutUserPasswordById_Handler,
+		},
+		{
+			MethodName: "PutUserPasswordByEmail",
+			Handler:    _MySQLBindService_PutUserPasswordByEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
