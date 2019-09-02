@@ -29,11 +29,12 @@ func (obj *NodePool) Get(id int64) (*Node, bool) {
 
 }
 
-// Delete a client node from ClientPool
+// Delete a client node from ClientPool, and close the connection of the node.
 func (obj *NodePool) Del(node *Node) {
 	obj.wt.Lock()
 	delete(obj.clients, node.Id)
 	obj.wt.Unlock()
+	_ = node.conn.Close()
 
 }
 
@@ -47,54 +48,73 @@ func NewNodePool() *NodePool {
 	return nodePool
 }
 
-// client node
+// The connection node of the client for receiving and sending messages.
+// The "Id" of the node saved the user's id which using the client, the "conn" is
+// used to send or receive data, the "messageQueue" saved the message those need
+// send to the client, the "Friends" saved the id of user's friends, the "BlackList"
+// saved the id of user who is marked black by the user.
 type Node struct {
-	Id           int64 // userId
-	conn         *websocket.Conn
-	messageQueue chan DataLayer.Message
+	Id          int64 // userId
+	conn        *websocket.Conn
+	messageChan chan []byte
+	Friends     sync.Map
+	BlackList   sync.Map
 }
 
-// Send message loop, send message to client.
-// If fail will remove the node from ClientPool,
-// and move the message into `WaitSendChan`.
+// Sending the message to the client which the node marked.
+// Continuously try to get messages from the "messageChan" of the node and send them
+// to the client immediately. If send fail, moving the message into "WaitSendChan",
+// closing the connection and removing from node pool.
 func (obj *Node) SendLoop() {
 	defer func() {
 		ClientPool.Del(obj)
-		_ = obj.conn.Close()
 	}()
-	for {
-		select {
-		case message := <-obj.messageQueue:
-			err := obj.conn.WriteMessage(websocket.TextMessage, message.ToJson())
-			if err != nil {
-				log.Println(err.Error())
-				WaitSendChan <- message
-				return
-			}
+	for message := range obj.messageChan {
+		log.Printf("SendMessage: send data to client(user_id=%d)", obj.Id)
+		err := obj.conn.WriteMessage(websocket.TextMessage, message)
+		if nil != err {
+			log.Printf("Error: send data fail to client(user_id=%d), error detail: %s", obj.Id, err.Error())
+			WaitSendChan <- [2]interface{}{obj.Id, message}
+			return
 		}
 	}
 }
 
-// Recv message loop, recv message from client
-// If recv error, will remove the node from ClientPool.
-// Send the message to target user by Dispatch function,
-// when dispatch error, it will also send back the error information to client
+// Receiving message from the client which the node marked.
+// Continuously try to receive data from the "conn" of the node, if having error
+// happened when receiving, will close the connection and remove from node pool.
+// The data will be handed over to the "Chat Dispatch" function for subsequent processing
 func (obj *Node) RecvLoop() {
 	defer func() {
 		ClientPool.Del(obj)
-		_ = obj.conn.Close()
 	}()
 	for {
 		_, data, err := obj.conn.ReadMessage()
+		log.Printf("RecvMessage: receive data from client(user_id=%d)", obj.Id)
 		if err != nil {
-			log.Println(err.Error())
+			log.Printf("Error: recevie data fail from client(user_id=%d), error detail: %s", obj.Id, err.Error())
 			return
 		}
-		// dispatch the chat message from ordinary user
-		ChatDispatch(obj.Id, data)
+		ChatMessageDispatch(obj.Id, data)
 	}
 }
 
-func NewNode(userId int64, conn *websocket.Conn) (*Node, error) {
-	return nil, nil
+//Create a new node instance for the connection
+func NewNode(userId int64, conn *websocket.Conn) *Node {
+	node := &Node{
+		Id: userId, conn: conn,
+		messageChan: make(chan []byte),
+		Friends:     sync.Map{},
+		BlackList:   sync.Map{}}
+	if friends, err := DataLayer.MongoQueryFriendsId(userId); nil == err {
+		for _, id := range friends {
+			node.Friends.Store(id, struct{}{})
+		}
+	}
+	if blackList, err := DataLayer.MongoQueryBlackList(userId); nil == err {
+		for _, id := range blackList {
+			node.BlackList.Store(id, struct{}{})
+		}
+	}
+	return node
 }

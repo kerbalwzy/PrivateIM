@@ -21,7 +21,7 @@ message AuthToken {
 }
 
 message TokenCheckResult {
-    bool ok = 1;
+    int64 user_id = 1;
 }
 
 

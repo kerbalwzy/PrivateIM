@@ -1,4 +1,4 @@
-package DataLayer
+package MongoBind
 
 import (
 	"context"
@@ -19,11 +19,9 @@ var (
 	MongoClient *mongo.Client
 	MsgCenterDB *mongo.Database
 
-	WaitSendMsgColl  *mongo.Collection
-	UserFriendsColl  *mongo.Collection
-	UserBlackColl    *mongo.Collection
-	UserGroupChat    *mongo.Collection
-	UserSubscription *mongo.Collection
+	WaitSendMsgColl *mongo.Collection
+	UserFriendsColl *mongo.Collection
+	UserBlackColl   *mongo.Collection
 
 	GroupChats    *mongo.Collection
 	Subscriptions *mongo.Collection
@@ -49,6 +47,7 @@ func init() {
 
 }
 
+// Return a context instance with deadline
 func getTimeOutCtx(expire time.Duration) context.Context {
 	ctx, _ := context.WithTimeout(context.Background(), expire*time.Second)
 	return ctx

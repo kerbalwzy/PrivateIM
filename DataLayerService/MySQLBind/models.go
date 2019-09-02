@@ -1,27 +1,16 @@
-package DataLayer
+package MySQLBind
 
 import (
 	"crypto/hmac"
 	"crypto/md5"
 	"encoding/hex"
-	"time"
 )
 
 const (
 	PasswordSalt = "fasdfasf87tr3h87sf23386t123!@e23BLfishf"
 )
 
-// user basic information in `tb_user_basic` table
-type UserBasic struct {
-	Id         int64     `json:"id"`
-	Name       string    `json:"name" `
-	Mobile     string    `json:"mobile"`
-	Email      string    `json:"email"`
-	Gender     int       `json:"gender"`
-	CreateTime time.Time `json:"create_time" time_format:"2006-01-02 15:04:05"`
 
-	password string
-}
 
 // get a password hash vale with salts
 func GetPasswordHash(password string, salts ...string) string {
@@ -47,12 +36,7 @@ func (user *UserBasic) CheckPassword(password string) bool {
 	return user.password == GetPasswordHash(password, user.Email, PasswordSalt)
 }
 
-// user more information in `tb_user_more` table
-type UserMore struct {
-	UserId int64  `json:"user_id"`
-	Avatar string `json:"avatar"`
-	QrCode string `json:"qr_code"`
-}
+
 
 // user relationship information in `tb_friend_relation` table
 type UserRelate struct {

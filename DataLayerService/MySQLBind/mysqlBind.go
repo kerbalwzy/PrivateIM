@@ -1,13 +1,16 @@
-package DataLayer
+package MySQLBind
 
 import (
 	"database/sql"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
 	_ "github.com/go-sql-driver/mysql"
 )
+
+const UserDbMySQLURI = "root:mysql@tcp(10.211.55.4:3306)/IMUserCenter?charset=utf8&parseTime=true"
 
 var (
 	MySQLClient   = new(sql.DB)
@@ -27,11 +30,9 @@ func init() {
 
 }
 
-// user basic information sql strings
+// User's basic information sql strings
 const (
-	UserDbMySQLURI = "root:mysql@tcp(10.211.55.4:3306)/IMUserCenter?charset=utf8&parseTime=true"
-
-	UserNewOne = "INSERT INTO tb_user_basic (id, name, email, password)VALUES (?, ?, ?, ?);"
+	UserNewOne = "INSERT INTO tb_user_basic (id, name, email, password, gender)VALUES (?, ?, ?, ?, ?);"
 
 	UserGetProfileBasic = "SELECT id, name, mobile, email, gender, create_time, password FROM tb_user_basic "
 
@@ -44,50 +45,57 @@ const (
 	UserUpdateProfile = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
 )
 
-// scan user from the row
-func ScanUserFromRow(rowP *sql.Row, userP *UserBasic) error {
-	err := rowP.Scan(&(userP.Id), &(userP.Name), &(userP.Mobile), &(userP.Email), &(userP.Gender),
-		&(userP.CreateTime), &(userP.password))
-	if nil != err {
-		return err
-	}
-	if userP.Id == 0 {
-		return errors.New("get user profile fail")
-	}
-	return nil
+var UserNotExitedError = errors.New("the user not existed")
+
+// user basic information in `tb_user_basic` table
+type TempUserBasic struct {
+	Id         int64     `json:"id"`
+	Name       string    `json:"name" `
+	Mobile     string    `json:"mobile"`
+	Email      string    `json:"email"`
+	Password   string    `json:"password"`
+	Gender     int       `json:"gender"`
+	CreateTime time.Time `json:"create_time" time_format:"2006-01-02 15:04:05"`
 }
 
-// Get user all information in `tb_user_basic` table by ID
-func MySQLGetUserById(userP *UserBasic) error {
-	rowP := MySQLClient.QueryRow(UserGetProfileById, userP.Id)
-	err := ScanUserFromRow(rowP, userP)
+// Scan user information from the row
+func ScanUserFromRow(row *sql.Row) (*TempUserBasic, error) {
+	user := new(TempUserBasic)
+	err := row.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email),
+		&(user.Gender), &(user.CreateTime), &(user.Password))
 	if nil != err {
-		return err
+		return nil, err
 	}
-	return nil
+	if user.Id == 0 {
+		return nil, UserNotExitedError
+	}
+	return user, nil
+}
+
+// Get user all information in `tb_user_basic` table by id
+func QueryUserById(id int64) (*TempUserBasic, error) {
+	row := MySQLClient.QueryRow(UserGetProfileById, id)
+	return ScanUserFromRow(row)
 }
 
 // Get user all information in `tb_user_basic` table by email
-func MySQLGetUserByEmail(userP *UserBasic) error {
-	rowP := MySQLClient.QueryRow(UserGetProfileByEmail, userP.Email)
-	err := ScanUserFromRow(rowP, userP)
-	if nil != err {
-		return err
-	}
-	return nil
+func QueryUserByEmail(email string) (*TempUserBasic, error) {
+	row := MySQLClient.QueryRow(UserGetProfileByEmail, email)
+	return ScanUserFromRow(row)
+
 }
 
 // Get users all information in `tb_user_basic` table by name
-func MySQLGetUserByName(name string) ([]*UserBasic, error) {
+func QueryUsersByName(name string) ([]*TempUserBasic, error) {
 	rows, err := MySQLClient.Query(UserGetProfileByName, name)
 	if nil != err {
 		return nil, err
 	}
-	users := make([]*UserBasic, 0)
+	users := make([]*TempUserBasic, 0)
 	for rows.Next() {
-		user := &UserBasic{}
+		user := new(TempUserBasic)
 		err := rows.Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
-			&(user.CreateTime), &(user.password))
+			&(user.CreateTime), &(user.Password))
 		if nil != err {
 			continue
 		}
@@ -98,39 +106,41 @@ func MySQLGetUserByName(name string) ([]*UserBasic, error) {
 
 // Save user with id, name, email,password to database.
 // If successful, get full information of user from database and update to user.
-func MySQLUserSignUp(user *UserBasic) error {
+func InsertOneUser(name, email, password string, gender int) (*TempUserBasic, error) {
 	// start a Transaction
 	tx, err := MySQLClient.Begin()
 	if nil != err {
-		return err
+		return nil, err
 	}
 
 	// try to insert user data into database
 	id := SnowFlakeNode.Generate()
-	_, err = tx.Exec(UserNewOne, id, user.Name, user.Email, user.password)
+	_, err = tx.Exec(UserNewOne, id, name, email, password, gender)
 	if nil != err {
 		_ = tx.Rollback()
-		return err
+		return nil, err
 	}
-
+	user := new(TempUserBasic)
 	// try to get full information of user from database, and update to user.
-	err = tx.QueryRow(UserGetProfileById, id).Scan(&(user.Id), &(user.Name), &(user.Mobile), &(user.Email), &(user.Gender),
-		&(user.CreateTime), &(user.password))
+	err = tx.QueryRow(UserGetProfileById, id).Scan(&(user.Id), &(user.Name),
+		&(user.Mobile), &(user.Email), &(user.Gender), &(user.CreateTime),
+		&(user.Password))
 	if nil != err {
 		_ = tx.Rollback()
-		return err
+		return nil, err
 	}
 
 	// commit Transaction
 	err = tx.Commit()
 	if nil != err {
 		_ = tx.Rollback()
+		return nil, err
 	}
-	return nil
+	return user, nil
 }
 
 // Update name,mobile and gender of user basic by id
-func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
+func UpdateProfile(name, mobile string, gender int, userId int64) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -158,7 +168,7 @@ func MySQLUpdateProfile(name, mobile string, gender int, userId int64) error {
 	return nil
 }
 
-// user more information sql string
+// User's more information sql string
 const (
 	UserGetAvatar = "SELECT avatar FROM tb_user_more WHERE user_id = ?"
 
@@ -171,8 +181,15 @@ const (
 	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id, qr_code) VALUES (?, ?)  ON DUPLICATE KEY UPDATE qr_code=?;"
 )
 
+// user more information in `tb_user_more` table
+type UserMore struct {
+	UserId int64  `json:"user_id"`
+	Avatar string `json:"avatar"`
+	QrCode string `json:"qr_code"`
+}
+
 // Get user avatar name by user id
-func MySQLGetUserAvatar(userId int64, avatarP *string) error {
+func GetUserAvatar(userId int64, avatarP *string) error {
 	row := MySQLClient.QueryRow(UserGetAvatar, userId)
 	err := row.Scan(avatarP)
 
@@ -187,7 +204,7 @@ func MySQLGetUserAvatar(userId int64, avatarP *string) error {
 }
 
 // Insert or Update avatar hash name into database
-func MySQLPutUserAvatar(userId int64, hashName string) error {
+func PutUserAvatar(userId int64, hashName string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -207,7 +224,7 @@ func MySQLPutUserAvatar(userId int64, hashName string) error {
 }
 
 // Get the count of avatar hash name in tb_user_more table
-func MySQLAvatarHashNameCount(hashName string) int {
+func AvatarHashNameCount(hashName string) int {
 	row := MySQLClient.QueryRow(UserAvatarHashNameCount, hashName)
 	count := new(int)
 	err := row.Scan(count)
@@ -218,7 +235,7 @@ func MySQLAvatarHashNameCount(hashName string) int {
 }
 
 // Get user QRCode name by user id
-func MySQLGetUserQRCode(userId int64, hashNameP *string) error {
+func GetUserQRCode(userId int64, hashNameP *string) error {
 	row := MySQLClient.QueryRow(UserGetQRCode, userId)
 	err := row.Scan(hashNameP)
 
@@ -233,7 +250,7 @@ func MySQLGetUserQRCode(userId int64, hashNameP *string) error {
 }
 
 // Insert or Update QRCode hash name into database
-func MySQLPutUserQRCode(userId int64, hashName string) error {
+func PutUserQRCode(userId int64, hashName string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -251,7 +268,7 @@ func MySQLPutUserQRCode(userId int64, hashName string) error {
 	return nil
 }
 
-// user relationship information sql strings
+// User's relationship information sql strings
 const (
 	UserGetFriendsRelate = `SELECT id, src_id, dst_id, note, is_accept, is_black, is_delete FROM tb_friend_relation 
 WHERE src_id = ?`
@@ -295,7 +312,7 @@ var (
 )
 
 // Add one friend relation information of user
-func MySQLAddOneFriend(selfId, friendId int64, note string) error {
+func AddOneFriend(selfId, friendId int64, note string) error {
 	// open a Transaction
 	tx, err := MySQLClient.Begin()
 	if nil != err {
@@ -340,7 +357,7 @@ func MySQLAddOneFriend(selfId, friendId int64, note string) error {
 }
 
 // Update one friend note
-func MySQLModifyNoteOfFriend(selfId, friendId int64, note string) error {
+func ModifyNoteOfFriend(selfId, friendId int64, note string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -365,7 +382,7 @@ func MySQLModifyNoteOfFriend(selfId, friendId int64, note string) error {
 }
 
 // Handle a friend request, chose accept or not
-func MySQLAcceptOneFriend(selfId, friendId int64, note string, isAccept bool) error {
+func AcceptOneFriend(selfId, friendId int64, note string, isAccept bool) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -425,7 +442,7 @@ func MySQLAcceptOneFriend(selfId, friendId int64, note string, isAccept bool) er
 }
 
 // Move friend to blacklist in or out
-func MySQLManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
+func ManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -460,7 +477,7 @@ func MySQLManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
 }
 
 // Delete friend relationship record
-func MySQLDeleteOneFriend(selfId, friendId int64) error {
+func DeleteOneFriend(selfId, friendId int64) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -508,7 +525,7 @@ func MySQLDeleteOneFriend(selfId, friendId int64) error {
 }
 
 // Get all friends relation information of uer
-func MySQLGetUserFriendsRelates(userId int64) ([]*UserRelate, error) {
+func GetUserFriendsRelates(userId int64) ([]*UserRelate, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsRelate, userId)
 	if nil != err {
 		return nil, err
@@ -527,12 +544,12 @@ func MySQLGetUserFriendsRelates(userId int64) ([]*UserRelate, error) {
 }
 
 // Get the friends basic and relate information of user
-func MySQLGetUserFriendsInfo(selfId int64) ([]*FriendInformation, error) {
+func GetUserFriendsInfo(selfId int64) ([]*FriendInformation, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsInfo, selfId)
 	if nil != err {
 		return nil, err
 	}
-	
+
 	friendsInfo := make([]*FriendInformation, 0)
 	for rows.Next() {
 		temp := new(FriendInformation)

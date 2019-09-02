@@ -1,4 +1,4 @@
-package DataLayer
+package MongoBind
 
 import (
 	"log"

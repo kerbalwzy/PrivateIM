@@ -5,63 +5,64 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
 
-	//"../ApiRPC"
+	"../ApiRPC"
 	"../DataLayer"
 )
 
+// WebSocket upgrade worker
 var UpGrader = &websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		//authToken := r.URL.Query().Get("authToken")
-		//if authToken == "" {
-		//	return false
-		//}
-		//ok, _ := ApiRPC.CheckAuthToken(authToken)
-		//return ok
-		return true
-	},
-}
-// ClientPool to save the client node
+	CheckOrigin: func(r *http.Request) bool { return true }}
+
+// Saving all node for every client connection.
 var ClientPool = NewNodePool()
 
-// WaitSendChan to save the message which want send to offline user
-// this chan has buffer, and the cap is 10000
-var WaitSendChan = make(chan DataLayer.Message, 10000)
+// Saving the message which want sent to offline user.
+// This chan has buffer, and the cap is 10000. Every element is an array,
+// which saved the target user's id and bytes data of the message.
+var WaitSendChan = make(chan [2]interface{}, 10000)
 
-/*
-Handle WebSocket upgrade request, create a connection node for the client and save it in ClientPool.
-Before upgrading, check token by send it to UserCenter through gRPC call, if the result is false,
-the upgrade request will be fail and close, else it will create a new connection node for the client,
-and save it in ClientPool. After saved the new node, will start the "SendLoop" and "RecvLoop" of it.
-Then try to find if there are messages which other users send to him when the client's user offline,
-if existed, send them to the client at now.
-*/
+// Handle WebSocket upgrade request, create a connection node for the client
+// and save it into ClientPool. Before upgrading, check token by send it to
+// UserCenter through gRPC call, if the result is false, the upgrade request
+// will be fail and close, else it will create a new connection node for the
+// client, and save it in ClientPool. After saved the new node, will start
+// the "SendLoop" and "RecvLoop" of it. Then try to query the messages which
+// other users sent to him when the client's user is offline, and send them.
 func BeginChat(w http.ResponseWriter, r *http.Request) {
+	// check the token by gRPC call , try to get the user's id.
+	token := r.URL.Query().Get("authToken")
+	userId, err := ApiRPC.CheckAuthToken(token)
+	if nil != err {
+		log.Printf("Error: check auth token fail for client(%s)", r.RemoteAddr)
+		w.WriteHeader(400)
+		_, _ = w.Write([]byte("authToken authentication fail: " + err.Error()))
+		return
+	}
 	conn, err := UpGrader.Upgrade(w, r, nil)
 	if nil != err {
 		log.Println(err.Error())
 		w.WriteHeader(400)
-		_, _ = w.Write([]byte("upgrade connection fail"))
+		_, _ = w.Write([]byte("upgrade connection fail: " + err.Error()))
 		return
 	}
-	id := r.URL.Query().Get("id")
 
-	userId, err := strconv.ParseInt(id, 10, 64)
-	if nil != err {
-		log.Println(err.Error())
-		w.WriteHeader(400)
-		_, _ = w.Write([]byte("parse id to int64 error"))
-		return
+	// new a node for the client connection and add it into ClientPool, and then
+	// turn on the send and recv loop of the node.
+	theNode := NewNode(userId, conn)
+	ClientPool.Add(theNode)
+	go theNode.SendLoop()
+	go theNode.RecvLoop()
+
+	// query and send `WaitSendMessage` for this user and send them.
+	if messages, err := DataLayer.MongoQueryWaitSendMessage(userId); nil == err {
+		for _, message := range messages {
+			theNode.messageChan <- message
+		}
 	}
-	newNode := &Node{Id: userId, conn: conn, messageQueue: make(chan DataLayer.Message)}
-	ClientPool.Add(newNode)
-
-	go newNode.SendLoop()
-	go newNode.RecvLoop()
 
 }
 
@@ -69,8 +70,8 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 // It only support NormalMessage and GroupMessage as present.
 // If the `TypeId` of message is not allow
 // it will send a error information to user client.
-func ChatDispatch(srcId int64, data []byte) {
-	message := &DataLayer.ChatMessage{}
+func ChatMessageDispatch(srcId int64, data []byte) {
+	message := ChatMessage{}
 	err := json.Unmarshal(data, message)
 
 	// send back the error message to sender
@@ -80,13 +81,14 @@ func ChatDispatch(srcId int64, data []byte) {
 	}
 	// check the SrcId, prevent users from sending messages by counterfeiting others
 	if srcId != message.SrcId {
-		log.Printf("Disguise:user(%d) try to send message as user(%d)", srcId, message.SrcId)
+		log.Printf("Disguise:user(%d) try to send message as user(%d)",
+			srcId, message.SrcId)
 		err := errors.New("SrcId required equal to your own userId")
 		SendErrorMessage(srcId, 400, err)
 	}
 	message.SetCreateTime()
 	switch message.TypeId {
-	case DataLayer.NormalMessage:
+	case NormalMessage:
 		SendNormalMessage(message)
 	default:
 		err := errors.New("unsupported message type id")
@@ -97,33 +99,43 @@ func ChatDispatch(srcId int64, data []byte) {
 // Send error message to target user client,
 // if the user is not online, the message will be discarded
 func SendErrorMessage(dstId int64, code int, err error) {
-	message := &DataLayer.ErrorMessage{
-		BasicMessage: DataLayer.BasicMessage{
-			TypeId:     DataLayer.DebugMessage,
-			SrcId:      DataLayer.SystemId,
+	message := ErrorMessage{
+		BasicMessage: BasicMessage{
+			TypeId:     DebugMessage,
+			SrcId:      SystemId,
 			DstId:      dstId,
 			CreateTime: time.Now().Unix(),
 		},
 		Code: code, Error: err.Error()}
 	if node, ok := ClientPool.Get(dstId); ok {
-		log.Printf("ErrorMessage:send to user(%d) {code: %d, error: %s}", message.DstId, message.Code, message.Error)
-		node.messageQueue <- message
+		log.Printf("ErrorMessage:send to user(%d) {code: %d, error: %s}",
+			message.DstId, message.Code, message.Error)
+		node.messageChan <- message.ToJson()
 	}
 }
 
 // Send normal message to target user client, if the user is not online,
 // it will record the message as a WaitSendMessage into database
-func SendNormalMessage(message DataLayer.Message) {
+func SendNormalMessage(message ChatMessage) {
 	dstId := message.GetDstId()
-	log.Printf("NormalMessage:user(%d) send a message to user(%d)", message.GetSrcId(), dstId)
+	log.Printf("NormalMessage:user(%d) send a message to user(%d)",
+		message.GetSrcId(), dstId)
 	node, ok := ClientPool.Get(dstId)
 	if ok {
-		node.messageQueue <- message
+		node.messageChan <- message.ToJson()
 	} else {
 		//
-		WaitSendChan <- message
+		WaitSendChan <- [2]interface{}{message.GetDstId(), message}
 	}
 
+}
+
+// Check the user existence by DstId
+func CheckDstIdExistence(message Message) bool {
+	dstId := message.GetDstId()
+	log.Printf("WaitSendMessage:SrdId(%d) check DisId(%d) return %t, ",
+		message.GetSrcId(), dstId, true)
+	return true
 }
 
 // Record the message for offline user.
@@ -133,22 +145,11 @@ func SendNormalMessage(message DataLayer.Message) {
 // it would not be save.
 func SaveWaitSendMessage() {
 	for message := range WaitSendChan {
-		if message.GetTypeId() == DataLayer.DebugMessage {
-			continue
-		}
-		if !CheckDstIdExistence(message) {
-			continue
-		}
+		dstId := message[0].(int64)
+		messageData := message[1].([]byte)
 
 	}
 
-}
-
-// Check the user existence by DstId
-func CheckDstIdExistence(message DataLayer.Message) bool {
-	dstId := message.GetDstId()
-	log.Printf("WaitSendMessage:SrdId(%d) check DisId(%d) return %t, ", message.GetSrcId(), dstId, true)
-	return true
 }
 
 /*

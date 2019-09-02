@@ -25,13 +25,15 @@ func init() {
 	AuthClient = NewUserCenterClient(conn)
 }
 
-// check auth token by call UserCenter gRPC server
-func CheckAuthToken(token string) (bool, error) {
+// Check auth token by call UserCenter gRPC server
+func CheckAuthToken(token string) (int64, error) {
 	authToken := &AuthToken{Token: token, ClientInfo: MyClientInfo}
-	checkResult, err := AuthClient.CheckAuthToken(context.Background(), authToken)
+	ctx := context.Background()
+	context.WithValue(ctx, "client_profile", MyClientInfo)
+	result, err := AuthClient.CheckAuthToken(ctx, authToken)
 	if nil != err {
 		log.Println(err)
-		return false, err
+		return 0, err
 	}
-	return checkResult.Ok, nil
+	return result.UserId, nil
 }
