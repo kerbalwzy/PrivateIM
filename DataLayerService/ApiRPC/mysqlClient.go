@@ -7,11 +7,8 @@ import (
 
 	"google.golang.org/grpc"
 
+	conf "../Config"
 	pb "../Protos"
-)
-
-const (
-	MySQLDataServerAddr = "localhost:23331"
 )
 
 var (
@@ -19,7 +16,7 @@ var (
 )
 
 func init() {
-	conn, err := grpc.Dial(MySQLDataServerAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(conf.MySQLDataRPCServerAddress, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -39,6 +36,15 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 	return ctx
 }
 
+func NewOneUser(name, email, mobile, password string,
+	gender int) (*pb.UserBasicInfo, error) {
+	client := getClient()
+	params := &pb.UserBasicInfo{
+		Name: name, Email: email, Mobile: mobile,
+		Password: password, Gender: int32(gender)}
+	return client.NewOneUser(getTimeOutCtx(3), params)
+}
+
 func QueryUserById(id int64) (*pb.UserBasicInfo, error) {
 	client := getClient()
 	params := &pb.QueryUserParams{Id: id, FilterField: pb.QueryField_ById}
@@ -55,13 +61,4 @@ func QueryUsersByName(name string) (*pb.UserBasicInfoList, error) {
 	client := getClient()
 	params := &pb.QueryUserParams{Name: name, FilterField: pb.QueryField_ByName}
 	return client.GetUsersByName(getTimeOutCtx(3), params)
-}
-
-func NewOneUser(name, email, mobile, password string,
-	gender int) (*pb.UserBasicInfo, error) {
-	client := getClient()
-	params := &pb.UserBasicInfo{
-		Name: name, Email: email, Mobile: mobile,
-		Password: password, Gender: int32(gender)}
-	return client.NewOneUser(getTimeOutCtx(3), params)
 }

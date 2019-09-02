@@ -8,9 +8,9 @@ import (
 
 	"github.com/bwmarrin/snowflake"
 	_ "github.com/go-sql-driver/mysql"
-)
 
-const UserDbMySQLURI = "root:mysql@tcp(10.211.55.4:3306)/IMUserCenter?charset=utf8&parseTime=true"
+	conf "../Config"
+)
 
 var (
 	MySQLClient   = new(sql.DB)
@@ -19,7 +19,7 @@ var (
 
 func init() {
 	var err error
-	MySQLClient, err = sql.Open("mysql", UserDbMySQLURI)
+	MySQLClient, err = sql.Open("mysql", conf.UserDbMySQLURI)
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -32,9 +32,11 @@ func init() {
 
 // User's basic information sql strings
 const (
-	UserNewOne = "INSERT INTO tb_user_basic (id, name, email, password, gender)VALUES (?, ?, ?, ?, ?);"
+	UserNewOne = "INSERT INTO tb_user_basic (id, name, email, mobile, password, " +
+		"gender) VALUES (?, ?, ?, ?, ?, ?);"
 
-	UserGetProfileBasic = "SELECT id, name, mobile, email, gender, create_time, password FROM tb_user_basic "
+	UserGetProfileBasic = "SELECT id, name, mobile, email, gender, create_time, " +
+		"password FROM tb_user_basic "
 
 	UserGetProfileById = UserGetProfileBasic + "WHERE id = ?"
 
@@ -42,7 +44,8 @@ const (
 
 	UserGetProfileByName = UserGetProfileBasic + "WHERE name = ?"
 
-	UserUpdateProfile = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? WHERE id = ?"
+	UserUpdateProfile = "UPDATE tb_user_basic SET name=?, mobile=?, gender=? " +
+		"WHERE id = ?"
 )
 
 var UserNotExitedError = errors.New("the user not existed")
@@ -56,6 +59,42 @@ type TempUserBasic struct {
 	Password   string    `json:"password"`
 	Gender     int       `json:"gender"`
 	CreateTime time.Time `json:"create_time" time_format:"2006-01-02 15:04:05"`
+}
+
+// Save user with id, name, email,password to database.
+// If successful, get full information of user from database and update to user.
+func InsertOneUser(name, email, mobile, password string, gender int) (
+	*TempUserBasic, error) {
+	// start a Transaction
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+
+	// try to insert user data into database
+	id := SnowFlakeNode.Generate()
+	_, err = tx.Exec(UserNewOne, id, name, email, mobile, password, gender)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	user := new(TempUserBasic)
+	// try to get full information of user from database, and update to user.
+	err = tx.QueryRow(UserGetProfileById, id).Scan(&(user.Id), &(user.Name),
+		&(user.Mobile), &(user.Email), &(user.Gender), &(user.CreateTime),
+		&(user.Password))
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// commit Transaction
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	return user, nil
 }
 
 // Scan user information from the row
@@ -102,41 +141,6 @@ func QueryUsersByName(name string) ([]*TempUserBasic, error) {
 		users = append(users, user)
 	}
 	return users, nil
-}
-
-// Save user with id, name, email,password to database.
-// If successful, get full information of user from database and update to user.
-func InsertOneUser(name, email, password string, gender int) (*TempUserBasic, error) {
-	// start a Transaction
-	tx, err := MySQLClient.Begin()
-	if nil != err {
-		return nil, err
-	}
-
-	// try to insert user data into database
-	id := SnowFlakeNode.Generate()
-	_, err = tx.Exec(UserNewOne, id, name, email, password, gender)
-	if nil != err {
-		_ = tx.Rollback()
-		return nil, err
-	}
-	user := new(TempUserBasic)
-	// try to get full information of user from database, and update to user.
-	err = tx.QueryRow(UserGetProfileById, id).Scan(&(user.Id), &(user.Name),
-		&(user.Mobile), &(user.Email), &(user.Gender), &(user.CreateTime),
-		&(user.Password))
-	if nil != err {
-		_ = tx.Rollback()
-		return nil, err
-	}
-
-	// commit Transaction
-	err = tx.Commit()
-	if nil != err {
-		_ = tx.Rollback()
-		return nil, err
-	}
-	return user, nil
 }
 
 // Update name,mobile and gender of user basic by id

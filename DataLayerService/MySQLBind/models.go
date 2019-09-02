@@ -26,15 +26,15 @@ func GetPasswordHash(password string, salts ...string) string {
 }
 
 // set password for user by MD5 hash value
-func (user *UserBasic) SetPassword(password string) string {
-	user.password = GetPasswordHash(password, user.Email, PasswordSalt)
-	return user.password
-}
-
-// check password for user
-func (user *UserBasic) CheckPassword(password string) bool {
-	return user.password == GetPasswordHash(password, user.Email, PasswordSalt)
-}
+//func (user *UserBasic) SetPassword(password string) string {
+//	user.password = GetPasswordHash(password, user.Email, PasswordSalt)
+//	return user.password
+//}
+//
+//// check password for user
+//func (user *UserBasic) CheckPassword(password string) bool {
+//	return user.password == GetPasswordHash(password, user.Email, PasswordSalt)
+//}
 
 
 
