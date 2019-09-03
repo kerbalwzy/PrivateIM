@@ -152,13 +152,13 @@ func SelectUsersByName(name string) ([]*TempUserBasic, error) {
 
 // Update the name, mobile, gender information of the target user.
 // If there are nothing need be update wil panic NothingNeedUpdateErr
-func UpdateUserBasicById(name, mobile string, gender int, userId int64) (*TempUserBasic, error) {
+func UpdateUserBasicById(name, mobile string, gender int, id int64) (*TempUserBasic, error) {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return nil, err
 	}
 	// query the target user, get the raw data of the user
-	row := tx.QueryRow(UserGetProfileById, userId)
+	row := tx.QueryRow(UserGetProfileById, id)
 	user, err := ScanUserFromRow(row)
 	if nil != err {
 		_ = tx.Rollback()
@@ -171,7 +171,7 @@ func UpdateUserBasicById(name, mobile string, gender int, userId int64) (*TempUs
 	}
 
 	// update user basic information with new value
-	_, err = tx.Exec(UserUpdateProfile, name, mobile, gender, userId)
+	_, err = tx.Exec(UserUpdateProfile, name, mobile, gender, id)
 	if nil != err {
 		_ = tx.Rollback()
 		return nil, err
@@ -190,13 +190,13 @@ func UpdateUserBasicById(name, mobile string, gender int, userId int64) (*TempUs
 }
 
 // Update the password of the target user, which found by id
-func UpdateUserPasswordById(password string, userId int64) (*TempUserBasic, error) {
+func UpdateUserPasswordById(password string, id int64) (*TempUserBasic, error) {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return nil, err
 	}
 	// query the target user, get the raw data of the user
-	row := tx.QueryRow(UserGetProfileById, userId)
+	row := tx.QueryRow(UserGetProfileById, id)
 	user, err := ScanUserFromRow(row)
 	if nil != err {
 		_ = tx.Rollback()
@@ -207,7 +207,13 @@ func UpdateUserPasswordById(password string, userId int64) (*TempUserBasic, erro
 		_ = tx.Rollback()
 		return nil, NothingNeedUpdateErr
 	}
-	_, err = tx.Exec(UserUpdatePasswordById, password, userId)
+	_, err = tx.Exec(UserUpdatePasswordById, password, id)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	// commit the change
+	err = tx.Commit()
 	if nil != err {
 		_ = tx.Rollback()
 		return nil, err
@@ -234,7 +240,15 @@ func UpdateUserPasswordByEmail(password, email string) (*TempUserBasic, error) {
 		_ = tx.Rollback()
 		return nil, NothingNeedUpdateErr
 	}
-	_, err = tx.Exec(UserUpdatePasswordByEmail, password, err)
+
+	_, err = tx.Exec(UserUpdatePasswordByEmail, password, email)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// commit the change
+	err = tx.Commit()
 	if nil != err {
 		_ = tx.Rollback()
 		return nil, err
@@ -249,7 +263,7 @@ const (
 
 	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id, avatar) VALUES (?, ?)  ON DUPLICATE KEY UPDATE avatar=?;"
 
-	UserAvatarHashNameCount = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
+	UserCountOfAvatar = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
 
 	UserGetQRCode = "SELECT qr_code FROM tb_user_more WHERE user_id = ?"
 
@@ -263,28 +277,31 @@ type UserMore struct {
 	QrCode string `json:"qr_code"`
 }
 
-// Get user avatar name by user id
-func GetUserAvatar(userId int64, avatarP *string) error {
-	row := MySQLClient.QueryRow(UserGetAvatar, userId)
-	err := row.Scan(avatarP)
+// Get the name of the avatar picture which belong the user who found by id.
+// It would return an empty string as value if not found.
+func SelectUserAvatarById(id int64) (string, error) {
+	avatarPicName := new(string)
+	row := MySQLClient.QueryRow(UserGetAvatar, id)
+	err := row.Scan(avatarPicName)
 
 	// if not found, it dose not need to abort en error, but return.
 	if err == sql.ErrNoRows {
-		return nil
+		return "", nil
 	}
 	if nil != err {
-		return err
+		return "", err
 	}
-	return nil
+	return *avatarPicName, nil
 }
 
-// Insert or Update avatar hash name into database
-func PutUserAvatar(userId int64, hashName string) error {
+// Update the name of avatar picture for the user who found by id, if the user not found,
+// it would insert one row data new.
+func UpdateUserAvatarById(id int64, avatar string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
 	}
-	_, err = tx.Exec(UserInsertOrUpdateAvatar, userId, hashName, hashName)
+	_, err = tx.Exec(UserInsertOrUpdateAvatar, id, avatar, avatar)
 	if nil != err {
 		_ = tx.Rollback()
 		return err
@@ -298,39 +315,42 @@ func PutUserAvatar(userId int64, hashName string) error {
 	return nil
 }
 
-// Get the count of avatar hash name in tb_user_more table
-func AvatarHashNameCount(hashName string) int {
-	row := MySQLClient.QueryRow(UserAvatarHashNameCount, hashName)
+// Get the count of target avatar picture name in table.
+func SelectConutOfAvatar(avatar string) (int, error) {
+	row := MySQLClient.QueryRow(UserCountOfAvatar, avatar)
 	count := new(int)
 	err := row.Scan(count)
 	if nil != err {
-		return 0
+		return 0, err
 	}
-	return *count
+	return *count, nil
 }
 
-// Get user QRCode name by user id
-func GetUserQRCode(userId int64, hashNameP *string) error {
-	row := MySQLClient.QueryRow(UserGetQRCode, userId)
-	err := row.Scan(hashNameP)
+// Get the name of the QRCode picture which belong the user who found by id.
+// It would return an empty string if no data found.
+func SelectUserQRCodeById(id int64) (string, error) {
+	qrPicName := new(string)
+	row := MySQLClient.QueryRow(UserGetQRCode, id)
+	err := row.Scan(qrPicName)
 
 	// if not found, it dose not need to abort en error, but return.
 	if err == sql.ErrNoRows {
-		return nil
+		return "", nil
 	}
 	if nil != err {
-		return err
+		return "", err
 	}
-	return nil
+	return *qrPicName, nil
 }
 
-// Insert or Update QRCode hash name into database
-func PutUserQRCode(userId int64, hashName string) error {
+// Update the name of  QRCode picture for the user who found by id, if the user not found,
+// it would insert one row data new.
+func UpdateUserQRCode(id int64, qrCode string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
 	}
-	_, err = tx.Exec(UserInsertOrUpdateQRCode, userId, hashName, hashName)
+	_, err = tx.Exec(UserInsertOrUpdateQRCode, id, qrCode, qrCode)
 	if nil != err {
 		_ = tx.Rollback()
 		return err

@@ -13,8 +13,14 @@ service MySQLBindService {
     rpc PutUserBasicById (UpdateUserParams) returns (UserBasicInfo);
     rpc PutUserPasswordById (UpdateUserParams) returns (UserBasicInfo);
     rpc PutUserPasswordByEmail (UpdateUserParams) returns (UserBasicInfo);
+
+    rpc GetUserAvatarById (UserAvatar) returns (UserAvatar);
+    rpc PutUserAvatarById (UserAvatar) returns (UserAvatar);
+    rpc GetUserQRCodeById (UserQRCode) returns (UserQRCode);
+    rpc PutUserQRCodeById (UserQRCode) returns (UserQRCode);
 }
 
+// messages for operate the user basic information
 message UserBasicInfo {
     int64 id = 1;
     string name = 2;
@@ -57,6 +63,17 @@ message UpdateUserParams {
     string mobile = 5;
     string password = 6;
     int32 gender = 7;
+}
+
+// message for operate the user more information
+message UserAvatar {
+    int64 id = 1;
+    string avatar = 2;
+}
+
+message UserQRCode {
+    int64 id = 1;
+    string qr_code = 2;
 }
 
 

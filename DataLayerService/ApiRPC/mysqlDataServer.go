@@ -156,6 +156,63 @@ func (obj *MySQLData) PutUserPasswordByEmail(ctx context.Context,
 	return user, nil
 }
 
+func (obj *MySQLData) GetUserAvatarById(ctx context.Context,
+	params *pb.UserAvatar) (*pb.UserAvatar, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+	params.Avatar, err = MySQLBind.SelectUserAvatarById(params.Id)
+	if nil != err {
+		return nil, err
+	}
+
+	return params, nil
+}
+
+func (obj *MySQLData) PutUserAvatarById(ctx context.Context,
+	params *pb.UserAvatar) (*pb.UserAvatar, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+	err = MySQLBind.UpdateUserAvatarById(params.Id, params.Avatar)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
+}
+
+func (obj *MySQLData) GetUserQRCodeById(ctx context.Context,
+	params *pb.UserQRCode) (*pb.UserQRCode, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+	params.QrCode, err = MySQLBind.SelectUserQRCodeById(params.Id)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
+}
+
+func (obj *MySQLData) PutUserQRCodeById(ctx context.Context,
+	params *pb.UserQRCode) (*pb.UserQRCode, error) {
+
+	err := checkCtxCanceled(ctx)
+	if nil != err {
+		return nil, err
+	}
+	err = MySQLBind.UpdateUserQRCode(params.Id, params.QrCode)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
+}
+
 // Check the client if canceled the calling or connection is time out
 func checkCtxCanceled(ctx context.Context) error {
 	if ctx.Err() == context.Canceled {

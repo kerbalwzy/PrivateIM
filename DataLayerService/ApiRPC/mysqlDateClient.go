@@ -45,20 +45,65 @@ func SaveOneNewUser(name, email, mobile, password string,
 	return client.NewOneUser(getTimeOutCtx(3), params)
 }
 
-func QueryUserById(id int64) (*pb.UserBasicInfo, error) {
+func GetUserById(id int64) (*pb.UserBasicInfo, error) {
 	client := getClient()
 	params := &pb.QueryUserParams{Id: id, FilterField: pb.QueryUserField_ById}
 	return client.GetUserById(getTimeOutCtx(3), params)
 }
 
-func QueryUserByEmail(email string) (*pb.UserBasicInfo, error) {
+func GetUserByEmail(email string) (*pb.UserBasicInfo, error) {
 	client := getClient()
 	params := &pb.QueryUserParams{Email: email, FilterField: pb.QueryUserField_ByEmail}
 	return client.GetUserByEmail(getTimeOutCtx(3), params)
 }
 
-func QueryUsersByName(name string) (*pb.UserBasicInfoList, error) {
+func GetUsersByName(name string) (*pb.UserBasicInfoList, error) {
 	client := getClient()
 	params := &pb.QueryUserParams{Name: name, FilterField: pb.QueryUserField_ByName}
 	return client.GetUsersByName(getTimeOutCtx(3), params)
+}
+
+func PutUserBasicById(name, mobile string, gender int, id int64) (*pb.UserBasicInfo, error) {
+	client := getClient()
+	params := &pb.UpdateUserParams{Id: id, Name: name, Mobile: mobile,
+		Gender: int32(gender), UpdateField: pb.UpdateUserField_NameMobileGender}
+	return client.PutUserBasicById(getTimeOutCtx(3), params)
+}
+
+func PutUserPasswordById(password string, id int64) (*pb.UserBasicInfo, error) {
+	client := getClient()
+	params := &pb.UpdateUserParams{Password: password, Id: id,
+		UpdateField: pb.UpdateUserField_Password}
+	return client.PutUserPasswordById(getTimeOutCtx(3), params)
+}
+
+func PutUserPasswordByEmail(password, email string) (*pb.UserBasicInfo, error) {
+	client := getClient()
+	params := &pb.UpdateUserParams{Password: password, Email: email,
+		UpdateField: pb.UpdateUserField_Password}
+	return client.PutUserPasswordByEmail(getTimeOutCtx(3), params)
+}
+
+func GetUserAvatarById(id int64) (*pb.UserAvatar, error) {
+	client := getClient()
+	params := &pb.UserAvatar{Id: id}
+	return client.GetUserAvatarById(getTimeOutCtx(3), params)
+}
+
+func PutUserAvatarById(avatar string, id int64) (*pb.UserAvatar, error) {
+	client := getClient()
+	params := &pb.UserAvatar{Avatar: avatar, Id: id}
+	return client.PutUserAvatarById(getTimeOutCtx(3), params)
+}
+
+func GetUserQRCodeById(id int64) (*pb.UserQRCode, error) {
+	client := getClient()
+	params := &pb.UserQRCode{Id: id}
+	return client.GetUserQRCodeById(getTimeOutCtx(3), params)
+}
+
+func PutUserQRCodeById(qrCode string, id int64) (*pb.UserQRCode, error) {
+	client := getClient()
+	params := &pb.UserQRCode{QrCode: qrCode, Id: id}
+	return client.PutUserQRCodeById(getTimeOutCtx(3), params)
 }
