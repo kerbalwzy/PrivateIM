@@ -261,13 +261,15 @@ func UpdateUserPasswordByEmail(password, email string) (*TempUserBasic, error) {
 const (
 	UserGetAvatar = "SELECT avatar FROM tb_user_more WHERE user_id = ?"
 
-	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id, avatar) VALUES (?, ?)  ON DUPLICATE KEY UPDATE avatar=?;"
+	UserInsertOrUpdateAvatar = "INSERT INTO tb_user_more (user_id, avatar) VALUES (?, ?)" +
+		" ON DUPLICATE KEY UPDATE avatar=?;"
 
 	UserCountOfAvatar = "SELECT COUNT(user_id) FROM tb_user_more WHERE avatar=?"
 
 	UserGetQRCode = "SELECT qr_code FROM tb_user_more WHERE user_id = ?"
 
-	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id, qr_code) VALUES (?, ?)  ON DUPLICATE KEY UPDATE qr_code=?;"
+	UserInsertOrUpdateQRCode = "INSERT INTO tb_user_more (user_id, qr_code) VALUES (?, ?)" +
+		" ON DUPLICATE KEY UPDATE qr_code=?;"
 )
 
 // user more information in `tb_user_more` table
@@ -365,32 +367,35 @@ func UpdateUserQRCode(id int64, qrCode string) error {
 
 // User's relationship information sql strings
 const (
-	UserGetFriendsRelate = `SELECT id, src_id, dst_id, note, is_accept, is_black, is_delete FROM tb_friend_relation 
-WHERE src_id = ?`
+	UserGetFriendsRelate = "SELECT src_id, dst_id, note, is_accept, is_black, is_delete FROM" +
+		" tb_friend_relation WHERE src_id = ?"
 
 	UserCheckTargetFriendExisted = "SELECT id FROM tb_user_basic WHERE id = ?"
 
-	UserCheckBlackList = `SELECT is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?`
+	UserCheckBlackList = "SELECT is_black FROM tb_friend_relation WHERE src_id = ?" +
+		" AND dst_id = ?"
 
-	UserCheckFriendshipAlreadyInEffect = "SELECT is_accept FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?"
+	UserCheckFriendshipAlreadyInEffect = "SELECT is_accept FROM tb_friend_relation WHERE" +
+		" src_id = ? AND dst_id = ?"
 
-	UserAddOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, note) VALUES(?,?,?,?) 
-ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE, is_black=FALSE, is_delete = FALSE`
+	UserAddOneFriend = "INSERT INTO tb_friend_relation(id, src_id, dst_id, note) VALUES" +
+		"(?,?,?,?)ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE, is_black=FALSE, " +
+		"is_delete = FALSE"
 
-	UserCheckFriendRequest = `SELECT id from tb_friend_relation WHERE src_id =? AND dst_id = ?`
+	UserCheckFriendRequest = "SELECT id from tb_friend_relation WHERE src_id =? AND dst_id = ?"
 
-	UserAcceptOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, is_accept) VALUES(?,?,?,?) 
-ON DUPLICATE KEY UPDATE is_accept = TRUE, is_black = FALSE, is_delete = FALSE `
+	UserAcceptOneFriend = "INSERT INTO tb_friend_relation(id, src_id, dst_id, is_accept) VALUES(?,?,?,?) " +
+		"ON DUPLICATE KEY UPDATE is_accept = TRUE, is_black = FALSE, is_delete = FALSE"
 
-	UserCheckBlacklist = `SELECT id, is_black FROM tb_friend_relation WHERE src_id = ? AND dst_id = ?`
+	UserCheckBlacklist = "SELECT id, is_black FROM tb_friend_relation WHERE src_id = ?" +
+		" AND dst_id = ?"
 
-	UserBlackOneFriend = `INSERT INTO tb_friend_relation(id, src_id, dst_id, is_black) VALUES(?,?,?,?) 
-ON DUPLICATE KEY UPDATE is_black = ? `
+	UserBlackOneFriend = "INSERT INTO tb_friend_relation(id, src_id, dst_id, is_black) " +
+		"VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE is_black = ? "
 
-	UserNoteOneFriend = `UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?`
+	UserNoteOneFriend = "UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?"
 
-	UserDeleteOneFriend = `UPDATE tb_friend_relation SET is_accept = FALSE, is_black = FALSE, is_delete=TRUE 
-WHERE src_id=? AND dst_id = ?`
+	UserDeleteOneFriend = "UPDATE tb_friend_relation SET is_accept = FALSE, is_black = FALSE, is_delete=TRUE WHERE src_id=? AND dst_id = ?"
 
 	UserGetFriendsInfo = `SELECT id, name, email, mobile, gender, note, is_black FROM tb_user_basic as basic, 
 (SELECT dst_id, note, is_black from tb_friend_relation where src_id= ? and is_delete = FALSE and is_accept=TRUE) 
@@ -408,7 +413,6 @@ var (
 
 // user relationship information in `tb_friend_relation` table
 type TempUserRelate struct {
-	Id         int64  `json:"id"`
 	SelfId     int64  `json:"self_id"`
 	FriendId   int64  `json:"friend_id"`
 	FriendNote string `json:"friend_note"`
@@ -417,21 +421,20 @@ type TempUserRelate struct {
 	IsDelete   bool   `json:"is_delete"`
 }
 
-// Add one friend relation information of user
-func AddOneFriend(selfId, friendId int64, note string) error {
-	// open a Transaction
+// It would check that if the target user existed, if the self is in target user's blacklist,
+// if the friendship is already in effect before insert new row
+func InsertOneNewFriend(selfId, friendId int64, note string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
 	}
-	// check the target user if existed
+
 	row := tx.QueryRow(UserCheckTargetFriendExisted, friendId)
 	err = row.Scan(&friendId)
 	if nil != err {
 		_ = tx.Rollback()
 		return ErrTargetUserNotExisted
 	}
-	// check the self if existed in target user's black list
 	isBlack := new(bool)
 	row = tx.QueryRow(UserCheckBlackList, friendId, selfId)
 	_ = row.Scan(isBlack)
@@ -439,7 +442,6 @@ func AddOneFriend(selfId, friendId int64, note string) error {
 		_ = tx.Rollback()
 		return ErrInBlackList
 	}
-	// check the friendship is already in effect
 	isAccept := new(bool)
 	row = tx.QueryRow(UserCheckFriendshipAlreadyInEffect, selfId, friendId)
 	_ = row.Scan(isAccept)
@@ -462,8 +464,8 @@ func AddOneFriend(selfId, friendId int64, note string) error {
 	return nil
 }
 
-// Update one friend note
-func ModifyNoteOfFriend(selfId, friendId int64, note string) error {
+// Update the friend note
+func UpdateOneFriendNote(selfId, friendId int64, note string) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -488,7 +490,7 @@ func ModifyNoteOfFriend(selfId, friendId int64, note string) error {
 }
 
 // Handle a friend request, chose accept or not
-func AcceptOneFriend(selfId, friendId int64, note string, isAccept bool) error {
+func UpdateAcceptNewFriend(selfId, friendId int64, note string, isAccept bool) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -547,8 +549,8 @@ func AcceptOneFriend(selfId, friendId int64, note string, isAccept bool) error {
 	return nil
 }
 
-// Move friend to blacklist in or out
-func ManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
+// Put or remove friends from the blacklist
+func UpdateFriendBlacklist(selfId, friendId int64, isBlack bool) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return err
@@ -582,7 +584,7 @@ func ManageFriendBlacklist(selfId, friendId int64, isBlack bool) error {
 	return nil
 }
 
-// Delete friend relationship record
+// Delete one row friendship data
 func DeleteOneFriend(selfId, friendId int64) error {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
@@ -630,8 +632,8 @@ func DeleteOneFriend(selfId, friendId int64) error {
 
 }
 
-// Get all friends relation information of uer
-func GetUserFriendsRelates(userId int64) ([]*TempUserRelate, error) {
+// Get all friends relation information of user
+func SelectFriendsRelates(userId int64) ([]*TempUserRelate, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsRelate, userId)
 	if nil != err {
 		return nil, err
@@ -639,8 +641,8 @@ func GetUserFriendsRelates(userId int64) ([]*TempUserRelate, error) {
 	friends := make([]*TempUserRelate, 0)
 	for rows.Next() {
 		relateP := new(TempUserRelate)
-		err := rows.Scan(&(relateP.Id), &(relateP.SelfId), &(relateP.FriendId),
-			&(relateP.FriendNote), &(relateP.IsAccept), &(relateP.IsBlack), &(relateP.IsDelete))
+		err := rows.Scan(&(relateP.SelfId), &(relateP.FriendId), &(relateP.FriendNote),
+			&(relateP.IsAccept), &(relateP.IsBlack), &(relateP.IsDelete))
 		if nil != err {
 			continue
 		}
@@ -660,8 +662,8 @@ type TempFriendInformation struct {
 	IsBlack  bool   `json:"is_black"`
 }
 
-// Get the friends basic and relate information of user
-func GetUserFriendsInfo(selfId int64) ([]*TempFriendInformation, error) {
+// Get all friends basic and relate information of the user
+func SelectFriendsInfo(selfId int64) ([]*TempFriendInformation, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsInfo, selfId)
 	if nil != err {
 		return nil, err
