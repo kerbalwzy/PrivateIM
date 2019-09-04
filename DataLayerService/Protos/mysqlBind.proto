@@ -18,6 +18,14 @@ service MySQLBindService {
     rpc PutUserAvatarById (UserAvatar) returns (UserAvatar);
     rpc GetUserQRCodeById (UserQRCode) returns (UserQRCode);
     rpc PutUserQRCodeById (UserQRCode) returns (UserQRCode);
+
+    rpc AddOneNewFriend (Friendship) returns (Friendship);
+    rpc PutOneFriendNote (Friendship) returns (Friendship);
+    rpc AcceptOneNewFriend (Friendship) returns (Friendship);
+    rpc PutFriendBlacklist (Friendship) returns (Friendship);
+    rpc DeleteOneFriend (Friendship) returns (Friendship);
+    rpc GetFriendshipInfo (QueryFriendsParams) returns (FriendshipList);
+    rpc GetFriendsBasicInfo (QueryFriendsParams) returns (FriendsBasicInfoList);
 }
 
 // messages for operate the user basic information
@@ -33,7 +41,7 @@ message UserBasicInfo {
 }
 
 message UserBasicInfoList {
-    repeated UserBasicInfo users = 1;
+    repeated UserBasicInfo data = 1;
 }
 
 enum QueryUserField {
@@ -74,6 +82,37 @@ message UserAvatar {
 message UserQRCode {
     int64 id = 1;
     string qr_code = 2;
+}
+
+// messages for operate the user's friendship information
+message Friendship {
+    int64 self_id = 1;
+    int64 friend_id = 2;
+    string friend_note = 3;
+    bool is_accept = 4;
+    bool is_black = 5;
+    bool is_delete = 6;
+}
+
+message FriendshipList {
+    repeated Friendship data = 1;
+}
+
+message QueryFriendsParams {
+    int64 self_id = 1;
+}
+
+message FriendsBasicInfo {
+    int64 friend_id = 1;
+    string name = 2;
+    string email = 3;
+    int32 gender = 4;
+    string note = 5;
+    bool is_black = 6;
+}
+
+message FriendsBasicInfoList {
+    repeated FriendsBasicInfo data = 1;
 }
 
 

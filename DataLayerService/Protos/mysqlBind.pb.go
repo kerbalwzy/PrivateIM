@@ -166,7 +166,7 @@ func (m *UserBasicInfo) GetCreateTime() string {
 }
 
 type UserBasicInfoList struct {
-	Users                []*UserBasicInfo `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	Data                 []*UserBasicInfo `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -197,9 +197,9 @@ func (m *UserBasicInfoList) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_UserBasicInfoList proto.InternalMessageInfo
 
-func (m *UserBasicInfoList) GetUsers() []*UserBasicInfo {
+func (m *UserBasicInfoList) GetData() []*UserBasicInfo {
 	if m != nil {
-		return m.Users
+		return m.Data
 	}
 	return nil
 }
@@ -449,6 +449,282 @@ func (m *UserQRCode) GetQrCode() string {
 	return ""
 }
 
+// messages for operate the user's friendship information
+type Friendship struct {
+	SelfId               int64    `protobuf:"varint,1,opt,name=self_id,json=selfId,proto3" json:"self_id,omitempty"`
+	FriendId             int64    `protobuf:"varint,2,opt,name=friend_id,json=friendId,proto3" json:"friend_id,omitempty"`
+	FriendNote           string   `protobuf:"bytes,3,opt,name=friend_note,json=friendNote,proto3" json:"friend_note,omitempty"`
+	IsAccept             bool     `protobuf:"varint,4,opt,name=is_accept,json=isAccept,proto3" json:"is_accept,omitempty"`
+	IsBlack              bool     `protobuf:"varint,5,opt,name=is_black,json=isBlack,proto3" json:"is_black,omitempty"`
+	IsDelete             bool     `protobuf:"varint,6,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Friendship) Reset()         { *m = Friendship{} }
+func (m *Friendship) String() string { return proto.CompactTextString(m) }
+func (*Friendship) ProtoMessage()    {}
+func (*Friendship) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{6}
+}
+
+func (m *Friendship) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Friendship.Unmarshal(m, b)
+}
+func (m *Friendship) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Friendship.Marshal(b, m, deterministic)
+}
+func (m *Friendship) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Friendship.Merge(m, src)
+}
+func (m *Friendship) XXX_Size() int {
+	return xxx_messageInfo_Friendship.Size(m)
+}
+func (m *Friendship) XXX_DiscardUnknown() {
+	xxx_messageInfo_Friendship.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Friendship proto.InternalMessageInfo
+
+func (m *Friendship) GetSelfId() int64 {
+	if m != nil {
+		return m.SelfId
+	}
+	return 0
+}
+
+func (m *Friendship) GetFriendId() int64 {
+	if m != nil {
+		return m.FriendId
+	}
+	return 0
+}
+
+func (m *Friendship) GetFriendNote() string {
+	if m != nil {
+		return m.FriendNote
+	}
+	return ""
+}
+
+func (m *Friendship) GetIsAccept() bool {
+	if m != nil {
+		return m.IsAccept
+	}
+	return false
+}
+
+func (m *Friendship) GetIsBlack() bool {
+	if m != nil {
+		return m.IsBlack
+	}
+	return false
+}
+
+func (m *Friendship) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type FriendshipList struct {
+	Data                 []*Friendship `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
+	XXX_unrecognized     []byte        `json:"-"`
+	XXX_sizecache        int32         `json:"-"`
+}
+
+func (m *FriendshipList) Reset()         { *m = FriendshipList{} }
+func (m *FriendshipList) String() string { return proto.CompactTextString(m) }
+func (*FriendshipList) ProtoMessage()    {}
+func (*FriendshipList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{7}
+}
+
+func (m *FriendshipList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendshipList.Unmarshal(m, b)
+}
+func (m *FriendshipList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendshipList.Marshal(b, m, deterministic)
+}
+func (m *FriendshipList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendshipList.Merge(m, src)
+}
+func (m *FriendshipList) XXX_Size() int {
+	return xxx_messageInfo_FriendshipList.Size(m)
+}
+func (m *FriendshipList) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendshipList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FriendshipList proto.InternalMessageInfo
+
+func (m *FriendshipList) GetData() []*Friendship {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type QueryFriendsParams struct {
+	SelfId               int64    `protobuf:"varint,1,opt,name=self_id,json=selfId,proto3" json:"self_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *QueryFriendsParams) Reset()         { *m = QueryFriendsParams{} }
+func (m *QueryFriendsParams) String() string { return proto.CompactTextString(m) }
+func (*QueryFriendsParams) ProtoMessage()    {}
+func (*QueryFriendsParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{8}
+}
+
+func (m *QueryFriendsParams) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_QueryFriendsParams.Unmarshal(m, b)
+}
+func (m *QueryFriendsParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_QueryFriendsParams.Marshal(b, m, deterministic)
+}
+func (m *QueryFriendsParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryFriendsParams.Merge(m, src)
+}
+func (m *QueryFriendsParams) XXX_Size() int {
+	return xxx_messageInfo_QueryFriendsParams.Size(m)
+}
+func (m *QueryFriendsParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryFriendsParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryFriendsParams proto.InternalMessageInfo
+
+func (m *QueryFriendsParams) GetSelfId() int64 {
+	if m != nil {
+		return m.SelfId
+	}
+	return 0
+}
+
+type FriendsBasicInfo struct {
+	FriendId             int64    `protobuf:"varint,1,opt,name=friend_id,json=friendId,proto3" json:"friend_id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Email                string   `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Gender               int32    `protobuf:"varint,4,opt,name=gender,proto3" json:"gender,omitempty"`
+	Note                 string   `protobuf:"bytes,5,opt,name=note,proto3" json:"note,omitempty"`
+	IsBlack              bool     `protobuf:"varint,6,opt,name=is_black,json=isBlack,proto3" json:"is_black,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *FriendsBasicInfo) Reset()         { *m = FriendsBasicInfo{} }
+func (m *FriendsBasicInfo) String() string { return proto.CompactTextString(m) }
+func (*FriendsBasicInfo) ProtoMessage()    {}
+func (*FriendsBasicInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{9}
+}
+
+func (m *FriendsBasicInfo) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendsBasicInfo.Unmarshal(m, b)
+}
+func (m *FriendsBasicInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendsBasicInfo.Marshal(b, m, deterministic)
+}
+func (m *FriendsBasicInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendsBasicInfo.Merge(m, src)
+}
+func (m *FriendsBasicInfo) XXX_Size() int {
+	return xxx_messageInfo_FriendsBasicInfo.Size(m)
+}
+func (m *FriendsBasicInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendsBasicInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FriendsBasicInfo proto.InternalMessageInfo
+
+func (m *FriendsBasicInfo) GetFriendId() int64 {
+	if m != nil {
+		return m.FriendId
+	}
+	return 0
+}
+
+func (m *FriendsBasicInfo) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *FriendsBasicInfo) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *FriendsBasicInfo) GetGender() int32 {
+	if m != nil {
+		return m.Gender
+	}
+	return 0
+}
+
+func (m *FriendsBasicInfo) GetNote() string {
+	if m != nil {
+		return m.Note
+	}
+	return ""
+}
+
+func (m *FriendsBasicInfo) GetIsBlack() bool {
+	if m != nil {
+		return m.IsBlack
+	}
+	return false
+}
+
+type FriendsBasicInfoList struct {
+	Data                 []*FriendsBasicInfo `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
+	XXX_unrecognized     []byte              `json:"-"`
+	XXX_sizecache        int32               `json:"-"`
+}
+
+func (m *FriendsBasicInfoList) Reset()         { *m = FriendsBasicInfoList{} }
+func (m *FriendsBasicInfoList) String() string { return proto.CompactTextString(m) }
+func (*FriendsBasicInfoList) ProtoMessage()    {}
+func (*FriendsBasicInfoList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{10}
+}
+
+func (m *FriendsBasicInfoList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendsBasicInfoList.Unmarshal(m, b)
+}
+func (m *FriendsBasicInfoList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendsBasicInfoList.Marshal(b, m, deterministic)
+}
+func (m *FriendsBasicInfoList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendsBasicInfoList.Merge(m, src)
+}
+func (m *FriendsBasicInfoList) XXX_Size() int {
+	return xxx_messageInfo_FriendsBasicInfoList.Size(m)
+}
+func (m *FriendsBasicInfoList) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendsBasicInfoList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FriendsBasicInfoList proto.InternalMessageInfo
+
+func (m *FriendsBasicInfoList) GetData() []*FriendsBasicInfo {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("pb.QueryUserField", QueryUserField_name, QueryUserField_value)
 	proto.RegisterEnum("pb.UpdateUserField", UpdateUserField_name, UpdateUserField_value)
@@ -458,49 +734,71 @@ func init() {
 	proto.RegisterType((*UpdateUserParams)(nil), "pb.UpdateUserParams")
 	proto.RegisterType((*UserAvatar)(nil), "pb.UserAvatar")
 	proto.RegisterType((*UserQRCode)(nil), "pb.UserQRCode")
+	proto.RegisterType((*Friendship)(nil), "pb.Friendship")
+	proto.RegisterType((*FriendshipList)(nil), "pb.FriendshipList")
+	proto.RegisterType((*QueryFriendsParams)(nil), "pb.QueryFriendsParams")
+	proto.RegisterType((*FriendsBasicInfo)(nil), "pb.FriendsBasicInfo")
+	proto.RegisterType((*FriendsBasicInfoList)(nil), "pb.FriendsBasicInfoList")
 }
 
 func init() { proto.RegisterFile("mysqlBind.proto", fileDescriptor_d28f1fa67868a9e4) }
 
 var fileDescriptor_d28f1fa67868a9e4 = []byte{
-	// 580 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x54, 0xc1, 0x6e, 0xda, 0x40,
-	0x10, 0x8d, 0x0d, 0x36, 0xe9, 0x40, 0xc1, 0x2c, 0x94, 0x5a, 0x5c, 0x8a, 0x7c, 0x29, 0xca, 0x81,
-	0x03, 0x94, 0xaa, 0x52, 0xa3, 0x4a, 0xa1, 0x6a, 0x23, 0xa4, 0x24, 0x05, 0xa7, 0x39, 0xa3, 0x05,
-	0x0f, 0xd5, 0x4a, 0x18, 0xc3, 0xda, 0x24, 0xf2, 0xb5, 0xb7, 0xfe, 0x50, 0xbf, 0xa3, 0x9f, 0x54,
-	0x79, 0xd7, 0xb8, 0x36, 0x4e, 0x24, 0xa2, 0xde, 0x98, 0x37, 0xf3, 0x76, 0x66, 0xde, 0x3c, 0x03,
-	0x35, 0x37, 0xf4, 0xb7, 0xab, 0x11, 0x5b, 0x3b, 0xbd, 0x0d, 0xf7, 0x02, 0x8f, 0xa8, 0x9b, 0xb9,
-	0xf5, 0x5b, 0x81, 0x97, 0x77, 0x3e, 0xf2, 0x11, 0xf5, 0xd9, 0x62, 0xbc, 0x5e, 0x7a, 0xa4, 0x0a,
-	0x2a, 0x73, 0x4c, 0xa5, 0xa3, 0x74, 0x0b, 0xb6, 0xca, 0x1c, 0x42, 0xa0, 0xb8, 0xa6, 0x2e, 0x9a,
-	0x6a, 0x47, 0xe9, 0xbe, 0xb0, 0xc5, 0x6f, 0xd2, 0x02, 0xdd, 0xf5, 0xe6, 0x6c, 0x85, 0x66, 0x41,
-	0xa0, 0x71, 0x44, 0x9a, 0xa0, 0xa1, 0x4b, 0xd9, 0xca, 0x2c, 0x0a, 0x58, 0x06, 0xa4, 0x0d, 0xa7,
-	0x1b, 0xea, 0xfb, 0x0f, 0x1e, 0x77, 0x4c, 0x4d, 0x24, 0x92, 0x38, 0x7a, 0xe9, 0x07, 0xae, 0x1d,
-	0xe4, 0xa6, 0xde, 0x51, 0xba, 0x9a, 0x1d, 0x47, 0xe4, 0x0d, 0x94, 0x17, 0x1c, 0x69, 0x80, 0xb3,
-	0x80, 0xb9, 0x68, 0x96, 0x04, 0x0d, 0x24, 0xf4, 0x9d, 0xb9, 0x68, 0x9d, 0x43, 0x3d, 0x33, 0xf7,
-	0x15, 0xf3, 0x03, 0xf2, 0x16, 0xb4, 0x9d, 0x8f, 0xdc, 0x37, 0x95, 0x4e, 0xa1, 0x5b, 0xee, 0xd7,
-	0x7b, 0x9b, 0x79, 0x2f, 0x53, 0x65, 0xcb, 0xbc, 0xf5, 0x53, 0x81, 0xda, 0x74, 0x87, 0x3c, 0x8c,
-	0xb2, 0x13, 0xca, 0xa9, 0xeb, 0x93, 0x21, 0x54, 0x96, 0x6c, 0x15, 0x20, 0x9f, 0x2d, 0x19, 0xae,
-	0xa4, 0x04, 0xd5, 0x3e, 0x89, 0xde, 0x48, 0x4a, 0xbf, 0x46, 0x19, 0xbb, 0x2c, 0xeb, 0x44, 0x10,
-	0xeb, 0xa5, 0x26, 0x7a, 0x25, 0x1a, 0x14, 0xd2, 0x1a, 0xec, 0x55, 0x2c, 0xfe, 0x53, 0xd1, 0xfa,
-	0xa3, 0x80, 0x71, 0xb7, 0x71, 0x68, 0x80, 0xa9, 0x29, 0xde, 0x43, 0x65, 0x27, 0xb0, 0xcc, 0x14,
-	0x0d, 0xb1, 0x49, 0x52, 0x1b, 0x8f, 0x21, 0x0b, 0xff, 0x73, 0x8c, 0xd4, 0x31, 0xb5, 0xcc, 0x31,
-	0xd3, 0x67, 0xd3, 0x9f, 0x3c, 0x5b, 0x29, 0x7d, 0x36, 0xeb, 0x1d, 0x40, 0x34, 0xdf, 0xc5, 0x3d,
-	0x0d, 0x28, 0xcf, 0x59, 0xa9, 0x05, 0x3a, 0x15, 0x99, 0xd8, 0x4c, 0x71, 0x64, 0x0d, 0x25, 0x6b,
-	0x6a, 0x7f, 0xf6, 0x1c, 0xcc, 0xb1, 0x5e, 0x43, 0x69, 0xcb, 0x67, 0x0b, 0xcf, 0xd9, 0x7b, 0x50,
-	0xdf, 0xf2, 0xa8, 0xf0, 0x6c, 0x00, 0xd5, 0xec, 0x61, 0xc8, 0x29, 0x14, 0x47, 0xe1, 0xd8, 0x31,
-	0x4e, 0x48, 0x19, 0x4a, 0xa3, 0xf0, 0x4b, 0xb4, 0xb3, 0xa1, 0x10, 0x00, 0x7d, 0x14, 0xde, 0x50,
-	0x17, 0x0d, 0xf5, 0x6c, 0x08, 0xb5, 0x03, 0x1d, 0x49, 0x13, 0x8c, 0x28, 0x79, 0x2d, 0xd6, 0xbe,
-	0x14, 0x8b, 0x18, 0x27, 0xa4, 0x02, 0xa7, 0x93, 0x78, 0x5d, 0x43, 0xe9, 0xff, 0xd2, 0xc0, 0xb8,
-	0x0e, 0x6f, 0xa7, 0x57, 0xd1, 0xf7, 0x73, 0x8b, 0xfc, 0x9e, 0x2d, 0x90, 0xf4, 0x01, 0x6e, 0xf0,
-	0xe1, 0xdb, 0x5a, 0xbc, 0x45, 0xf2, 0x6e, 0x6b, 0xe7, 0x21, 0x32, 0x84, 0xf2, 0x25, 0x06, 0x02,
-	0x0b, 0xc7, 0x0e, 0x69, 0x64, 0xec, 0x25, 0x3d, 0xf0, 0x18, 0xed, 0x03, 0x54, 0x13, 0x9a, 0x58,
-	0xeb, 0x68, 0xe6, 0x79, 0xc2, 0xf4, 0xa5, 0x08, 0x8f, 0x33, 0x5f, 0xe5, 0x98, 0xe2, 0x8b, 0xfa,
-	0x08, 0xc6, 0x64, 0x17, 0x24, 0xb8, 0x98, 0xb9, 0x99, 0x35, 0xe3, 0xd3, 0xad, 0x3f, 0x41, 0x23,
-	0x26, 0xef, 0x95, 0x7c, 0x1e, 0xff, 0x02, 0x5a, 0x39, 0xbe, 0x5c, 0xfe, 0xe8, 0x27, 0x06, 0x50,
-	0x8f, 0xb7, 0x97, 0x9e, 0x14, 0x03, 0x54, 0xf7, 0x75, 0x12, 0x6b, 0x1f, 0xc4, 0x11, 0x29, 0xee,
-	0xfb, 0x3c, 0x52, 0xdc, 0x49, 0xfa, 0x38, 0x4b, 0x92, 0x58, 0xfb, 0x20, 0x4e, 0x75, 0x3a, 0x9e,
-	0x34, 0xd7, 0xc5, 0xdf, 0xf7, 0xe0, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x42, 0x64, 0xd0, 0x59,
-	0xd1, 0x05, 0x00, 0x00,
+	// 857 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xdb, 0x6e, 0x23, 0x45,
+	0x10, 0xdd, 0x71, 0xec, 0xf1, 0x6c, 0x39, 0xd8, 0x93, 0x8e, 0x09, 0x83, 0x79, 0x20, 0x1a, 0x09,
+	0xc9, 0x5a, 0x89, 0x48, 0xeb, 0x24, 0x08, 0x01, 0x02, 0x62, 0x20, 0x91, 0xa5, 0xdd, 0xc4, 0x99,
+	0x65, 0x9f, 0xad, 0xb6, 0xbb, 0x0d, 0x2d, 0xe6, 0xe2, 0xcc, 0x8c, 0x37, 0xf2, 0x2b, 0x7f, 0xc1,
+	0x1b, 0x5f, 0x81, 0xf8, 0x0c, 0x3e, 0x09, 0x75, 0x75, 0x7b, 0x6e, 0xb6, 0x95, 0xb5, 0xf6, 0xcd,
+	0x75, 0x39, 0x35, 0xd5, 0xa7, 0x4e, 0x95, 0x0c, 0x9d, 0x60, 0x95, 0x3c, 0xf8, 0x43, 0x11, 0xb2,
+	0xb3, 0x45, 0x1c, 0xa5, 0x11, 0xa9, 0x2d, 0xa6, 0xee, 0x3f, 0x06, 0x7c, 0xf4, 0x36, 0xe1, 0xf1,
+	0x90, 0x26, 0x62, 0x36, 0x0a, 0xe7, 0x11, 0x69, 0x43, 0x4d, 0x30, 0xc7, 0x38, 0x35, 0xfa, 0x07,
+	0x5e, 0x4d, 0x30, 0x42, 0xa0, 0x1e, 0xd2, 0x80, 0x3b, 0xb5, 0x53, 0xa3, 0xff, 0xdc, 0xc3, 0xdf,
+	0xe4, 0x04, 0xcc, 0x20, 0x9a, 0x0a, 0x9f, 0x3b, 0x07, 0xe8, 0xd5, 0x16, 0xe9, 0x42, 0x83, 0x07,
+	0x54, 0xf8, 0x4e, 0x1d, 0xdd, 0xca, 0x20, 0x3d, 0xb0, 0x16, 0x34, 0x49, 0x1e, 0xa3, 0x98, 0x39,
+	0x0d, 0x0c, 0x64, 0xb6, 0xac, 0xf4, 0x1b, 0x0f, 0x19, 0x8f, 0x1d, 0xf3, 0xd4, 0xe8, 0x37, 0x3c,
+	0x6d, 0x91, 0xcf, 0xa1, 0x35, 0x8b, 0x39, 0x4d, 0xf9, 0x24, 0x15, 0x01, 0x77, 0x9a, 0x08, 0x03,
+	0xe5, 0xfa, 0x55, 0x04, 0xdc, 0xfd, 0x06, 0x8e, 0x4a, 0x7d, 0xbf, 0x12, 0x49, 0x4a, 0xbe, 0x80,
+	0x3a, 0xa3, 0x29, 0x75, 0x8c, 0xd3, 0x83, 0x7e, 0x6b, 0x70, 0x74, 0xb6, 0x98, 0x9e, 0x95, 0x92,
+	0x3c, 0x0c, 0xbb, 0x7f, 0x1a, 0xd0, 0xb9, 0x5f, 0xf2, 0x78, 0x25, 0x83, 0x63, 0x1a, 0xd3, 0x20,
+	0x21, 0x97, 0x70, 0x38, 0x17, 0x7e, 0xca, 0xe3, 0xc9, 0x5c, 0x70, 0x5f, 0x11, 0xd0, 0x1e, 0x10,
+	0x59, 0x22, 0x4b, 0xbd, 0x96, 0x11, 0xaf, 0xa5, 0xf2, 0xd0, 0xd0, 0x6c, 0xd5, 0x32, 0xb6, 0x32,
+	0x06, 0x0e, 0x8a, 0x0c, 0xac, 0x39, 0xac, 0xe7, 0x1c, 0xba, 0xff, 0x19, 0x60, 0xbf, 0x5d, 0x30,
+	0x9a, 0xf2, 0x42, 0x17, 0x5f, 0xc1, 0xe1, 0x12, 0x7d, 0xa5, 0x2e, 0x8e, 0xf1, 0x21, 0x59, 0xae,
+	0x6e, 0x43, 0x25, 0x7e, 0x60, 0x1b, 0x85, 0x51, 0x36, 0x4a, 0xa3, 0x2c, 0x0e, 0xcd, 0xdc, 0x39,
+	0xb4, 0x66, 0x71, 0x68, 0xee, 0x05, 0x80, 0xec, 0xef, 0xea, 0x1d, 0x4d, 0x69, 0xbc, 0x21, 0xa4,
+	0x13, 0x30, 0x29, 0x46, 0xb4, 0x94, 0xb4, 0xe5, 0x5e, 0x2a, 0xd4, 0xbd, 0xf7, 0x53, 0xc4, 0xf8,
+	0x06, 0xea, 0x13, 0x68, 0x3e, 0xc4, 0x93, 0x59, 0xc4, 0xd6, 0x0a, 0x34, 0x1f, 0x62, 0x99, 0xe8,
+	0xfe, 0x6b, 0x00, 0x5c, 0xc7, 0x82, 0x87, 0x2c, 0xf9, 0x5d, 0x2c, 0x64, 0x5e, 0xc2, 0xfd, 0xf9,
+	0x24, 0x03, 0x9b, 0xd2, 0x1c, 0x31, 0xf2, 0x19, 0x3c, 0x9f, 0x63, 0xda, 0x24, 0x63, 0xc8, 0x52,
+	0x8e, 0x11, 0x93, 0x32, 0xd3, 0xc1, 0x30, 0x4a, 0xd7, 0x6a, 0x06, 0xe5, 0xba, 0x8d, 0x52, 0x2e,
+	0xd1, 0x22, 0x99, 0xd0, 0xd9, 0x8c, 0x2f, 0x52, 0xe4, 0xcd, 0xf2, 0x2c, 0x91, 0x5c, 0xa1, 0x4d,
+	0x3e, 0x05, 0x4b, 0x24, 0x93, 0xa9, 0x4f, 0x67, 0x7f, 0x20, 0x7b, 0x96, 0xd7, 0x14, 0xc9, 0x50,
+	0x9a, 0x1a, 0xc7, 0xb8, 0xcf, 0x53, 0x8e, 0xfc, 0x21, 0xee, 0x67, 0xb4, 0xdd, 0x0b, 0x68, 0xe7,
+	0x9d, 0xa3, 0x70, 0xdd, 0x92, 0x70, 0xdb, 0x72, 0xde, 0x79, 0x86, 0x56, 0xed, 0x97, 0x40, 0x50,
+	0x89, 0x3a, 0xa0, 0x15, 0xb3, 0xeb, 0xdd, 0xee, 0xdf, 0x06, 0xd8, 0x3a, 0x35, 0x5f, 0xee, 0x12,
+	0x19, 0x46, 0x85, 0x8c, 0x6d, 0x9b, 0xbe, 0x5d, 0x48, 0xb9, 0x00, 0xea, 0xa5, 0xad, 0x95, 0x15,
+	0x24, 0x8f, 0x0d, 0x5d, 0x41, 0x32, 0x58, 0x24, 0xc9, 0x2c, 0x91, 0xe4, 0xfe, 0x08, 0xdd, 0x6a,
+	0x87, 0xc8, 0x46, 0xbf, 0xc4, 0x46, 0xb7, 0xc0, 0x46, 0x65, 0x93, 0x5f, 0x9c, 0x43, 0xbb, 0xbc,
+	0x9d, 0xc4, 0x82, 0xfa, 0x70, 0x35, 0x62, 0xf6, 0x33, 0xd2, 0x82, 0xe6, 0x70, 0xf5, 0x8b, 0xec,
+	0xd7, 0x36, 0x08, 0x80, 0x39, 0x5c, 0xdd, 0xd2, 0x80, 0xdb, 0xb5, 0x17, 0x97, 0xd0, 0xa9, 0x2c,
+	0x13, 0xe9, 0x82, 0x2d, 0x83, 0xaf, 0x51, 0xfb, 0x37, 0xf8, 0x18, 0xfb, 0x19, 0x39, 0x04, 0x6b,
+	0xac, 0x35, 0x6f, 0x1b, 0x83, 0xbf, 0x2c, 0xb0, 0x5f, 0xaf, 0xde, 0xdc, 0xbf, 0x92, 0x27, 0xf4,
+	0x0d, 0x8f, 0xdf, 0x89, 0x19, 0x27, 0x03, 0x80, 0x5b, 0xfe, 0x78, 0x17, 0x62, 0x2d, 0xb2, 0x79,
+	0x71, 0x7a, 0x9b, 0x2e, 0x72, 0x09, 0xad, 0x1b, 0x9e, 0xa2, 0x6f, 0x35, 0x62, 0xe4, 0xb8, 0x74,
+	0x63, 0xd4, 0x58, 0xb7, 0xc1, 0xbe, 0x86, 0x76, 0x06, 0xc3, 0x67, 0xbd, 0x37, 0xf2, 0xbb, 0x0c,
+	0x99, 0x28, 0x12, 0xb6, 0x23, 0x3f, 0xde, 0x40, 0xe2, 0x34, 0xbe, 0x05, 0x7b, 0xbc, 0x4c, 0x33,
+	0x3f, 0xf6, 0xdc, 0x2d, 0x5f, 0xa4, 0xdd, 0x9f, 0xfe, 0x1e, 0x8e, 0x35, 0x78, 0xcd, 0xe4, 0x7e,
+	0xf8, 0x2b, 0x38, 0xd9, 0xc0, 0xab, 0xc7, 0xbf, 0x77, 0x89, 0x73, 0x38, 0xd2, 0xaf, 0x57, 0x87,
+	0x09, 0x1b, 0x68, 0xaf, 0xf3, 0x94, 0xaf, 0x57, 0xb1, 0x25, 0x48, 0x7f, 0x77, 0x3f, 0x90, 0xfe,
+	0x92, 0x3a, 0x66, 0x65, 0x90, 0xf2, 0xf5, 0x2a, 0x76, 0xe1, 0x4b, 0x7b, 0x80, 0x5e, 0x42, 0xe7,
+	0x8a, 0xb1, 0xbb, 0x90, 0xdf, 0xf2, 0x47, 0xb5, 0x1a, 0xa4, 0x72, 0x34, 0x7a, 0x15, 0x9b, 0x0c,
+	0x70, 0x8c, 0x77, 0x21, 0xbf, 0xce, 0xaf, 0xdb, 0x53, 0x98, 0x0b, 0x20, 0xea, 0xd4, 0xed, 0xf5,
+	0xa5, 0x0b, 0x20, 0xe3, 0x65, 0xaa, 0x1c, 0xb8, 0xe8, 0xbe, 0x94, 0xd1, 0x53, 0xa8, 0x97, 0xd0,
+	0x51, 0xe7, 0x31, 0x6b, 0xf1, 0x49, 0xc8, 0x0f, 0xc8, 0x77, 0xee, 0xc0, 0x71, 0x9f, 0x64, 0xd2,
+	0x2e, 0x1d, 0xca, 0x1e, 0x29, 0x83, 0x51, 0xda, 0x37, 0x70, 0x9c, 0x17, 0xc8, 0x15, 0xb3, 0xab,
+	0x84, 0xb3, 0xed, 0x12, 0xc9, 0x42, 0x53, 0x13, 0xff, 0x51, 0x9d, 0xff, 0x1f, 0x00, 0x00, 0xff,
+	0xff, 0x6d, 0x8a, 0x30, 0x40, 0x64, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -526,6 +824,13 @@ type MySQLBindServiceClient interface {
 	PutUserAvatarById(ctx context.Context, in *UserAvatar, opts ...grpc.CallOption) (*UserAvatar, error)
 	GetUserQRCodeById(ctx context.Context, in *UserQRCode, opts ...grpc.CallOption) (*UserQRCode, error)
 	PutUserQRCodeById(ctx context.Context, in *UserQRCode, opts ...grpc.CallOption) (*UserQRCode, error)
+	AddOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
+	PutOneFriendNote(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
+	AcceptOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
+	PutFriendBlacklist(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
+	DeleteOneFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
+	GetFriendshipInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendshipList, error)
+	GetFriendsBasicInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendsBasicInfoList, error)
 }
 
 type mySQLBindServiceClient struct {
@@ -635,6 +940,69 @@ func (c *mySQLBindServiceClient) PutUserQRCodeById(ctx context.Context, in *User
 	return out, nil
 }
 
+func (c *mySQLBindServiceClient) AddOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
+	out := new(Friendship)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/AddOneNewFriend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneFriendNote(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
+	out := new(Friendship)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneFriendNote", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) AcceptOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
+	out := new(Friendship)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/AcceptOneNewFriend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutFriendBlacklist(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
+	out := new(Friendship)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutFriendBlacklist", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) DeleteOneFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
+	out := new(Friendship)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneFriend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetFriendshipInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendshipList, error) {
+	out := new(FriendshipList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetFriendshipInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetFriendsBasicInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendsBasicInfoList, error) {
+	out := new(FriendsBasicInfoList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetFriendsBasicInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MySQLBindServiceServer is the server API for MySQLBindService service.
 type MySQLBindServiceServer interface {
 	NewOneUser(context.Context, *UserBasicInfo) (*UserBasicInfo, error)
@@ -648,6 +1016,13 @@ type MySQLBindServiceServer interface {
 	PutUserAvatarById(context.Context, *UserAvatar) (*UserAvatar, error)
 	GetUserQRCodeById(context.Context, *UserQRCode) (*UserQRCode, error)
 	PutUserQRCodeById(context.Context, *UserQRCode) (*UserQRCode, error)
+	AddOneNewFriend(context.Context, *Friendship) (*Friendship, error)
+	PutOneFriendNote(context.Context, *Friendship) (*Friendship, error)
+	AcceptOneNewFriend(context.Context, *Friendship) (*Friendship, error)
+	PutFriendBlacklist(context.Context, *Friendship) (*Friendship, error)
+	DeleteOneFriend(context.Context, *Friendship) (*Friendship, error)
+	GetFriendshipInfo(context.Context, *QueryFriendsParams) (*FriendshipList, error)
+	GetFriendsBasicInfo(context.Context, *QueryFriendsParams) (*FriendsBasicInfoList, error)
 }
 
 // UnimplementedMySQLBindServiceServer can be embedded to have forward compatible implementations.
@@ -686,6 +1061,27 @@ func (*UnimplementedMySQLBindServiceServer) GetUserQRCodeById(ctx context.Contex
 }
 func (*UnimplementedMySQLBindServiceServer) PutUserQRCodeById(ctx context.Context, req *UserQRCode) (*UserQRCode, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutUserQRCodeById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) AddOneNewFriend(ctx context.Context, req *Friendship) (*Friendship, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddOneNewFriend not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneFriendNote(ctx context.Context, req *Friendship) (*Friendship, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneFriendNote not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) AcceptOneNewFriend(ctx context.Context, req *Friendship) (*Friendship, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptOneNewFriend not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutFriendBlacklist(ctx context.Context, req *Friendship) (*Friendship, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutFriendBlacklist not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) DeleteOneFriend(ctx context.Context, req *Friendship) (*Friendship, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneFriend not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetFriendshipInfo(ctx context.Context, req *QueryFriendsParams) (*FriendshipList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriendshipInfo not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetFriendsBasicInfo(ctx context.Context, req *QueryFriendsParams) (*FriendsBasicInfoList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriendsBasicInfo not implemented")
 }
 
 func RegisterMySQLBindServiceServer(s *grpc.Server, srv MySQLBindServiceServer) {
@@ -890,6 +1286,132 @@ func _MySQLBindService_PutUserQRCodeById_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MySQLBindService_AddOneNewFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Friendship)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).AddOneNewFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/AddOneNewFriend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).AddOneNewFriend(ctx, req.(*Friendship))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneFriendNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Friendship)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneFriendNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneFriendNote",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneFriendNote(ctx, req.(*Friendship))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_AcceptOneNewFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Friendship)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).AcceptOneNewFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/AcceptOneNewFriend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).AcceptOneNewFriend(ctx, req.(*Friendship))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutFriendBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Friendship)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutFriendBlacklist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutFriendBlacklist",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutFriendBlacklist(ctx, req.(*Friendship))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_DeleteOneFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Friendship)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).DeleteOneFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/DeleteOneFriend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).DeleteOneFriend(ctx, req.(*Friendship))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetFriendshipInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryFriendsParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetFriendshipInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetFriendshipInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetFriendshipInfo(ctx, req.(*QueryFriendsParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetFriendsBasicInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryFriendsParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetFriendsBasicInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetFriendsBasicInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetFriendsBasicInfo(ctx, req.(*QueryFriendsParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _MySQLBindService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.MySQLBindService",
 	HandlerType: (*MySQLBindServiceServer)(nil),
@@ -937,6 +1459,34 @@ var _MySQLBindService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PutUserQRCodeById",
 			Handler:    _MySQLBindService_PutUserQRCodeById_Handler,
+		},
+		{
+			MethodName: "AddOneNewFriend",
+			Handler:    _MySQLBindService_AddOneNewFriend_Handler,
+		},
+		{
+			MethodName: "PutOneFriendNote",
+			Handler:    _MySQLBindService_PutOneFriendNote_Handler,
+		},
+		{
+			MethodName: "AcceptOneNewFriend",
+			Handler:    _MySQLBindService_AcceptOneNewFriend_Handler,
+		},
+		{
+			MethodName: "PutFriendBlacklist",
+			Handler:    _MySQLBindService_PutFriendBlacklist_Handler,
+		},
+		{
+			MethodName: "DeleteOneFriend",
+			Handler:    _MySQLBindService_DeleteOneFriend_Handler,
+		},
+		{
+			MethodName: "GetFriendshipInfo",
+			Handler:    _MySQLBindService_GetFriendshipInfo_Handler,
+		},
+		{
+			MethodName: "GetFriendsBasicInfo",
+			Handler:    _MySQLBindService_GetFriendsBasicInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
