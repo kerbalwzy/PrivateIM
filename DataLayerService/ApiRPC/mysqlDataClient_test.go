@@ -1,7 +1,5 @@
 package ApiRPC
 
-import "testing"
-
 var (
 	name     = "testName"
 	email    = "testEmail@tt.com"
@@ -119,53 +117,53 @@ var (
 	qrCodePicName = "testQRCodePicName"
 )
 
-func TestPutUserAvatarById(t *testing.T) {
-	user, err := GetUserByEmail(email)
-	if nil != err {
-		t.Error("PutUserAvatarById fail ", err)
-	}
-	data, err := PutUserAvatarById(avatarPicName, user.Id)
-	if nil != err {
-		t.Error("PutUserAvatarById fail: ", err)
-	}
-	if data.Avatar != avatarPicName {
-		t.Error("PutUserAvatarById fail: the value after update not equal the raw value")
-	}
-	t.Logf("PutUserAvatarById success: the name of the avatar picture is: %s", data.Avatar)
-
-	userId = user.Id
-}
-
-func TestGetUserAvatarById(t *testing.T) {
-	data, err := GetUserAvatarById(userId)
-	if nil != err {
-		t.Error("GetUserAvatarById fail: ", err)
-	}
-	if data.Avatar != avatarPicName {
-		t.Error("GetUserAvatarById fail: the value queried is not equal to raw value")
-	}
-	t.Logf("GetUserAvatarById success: the name of the avatar picture is: %s", data.Avatar)
-}
-
-func TestPutUserQRCodeById(t *testing.T) {
-	data, err := PutUserQRCodeById(qrCodePicName, userId)
-	if nil != err {
-		t.Error("PutUserQRCodeById fail: ", err)
-	}
-	if data.QrCode != qrCodePicName {
-		t.Error("PutUserQRCodeById fail: the value after update not equal the raw value")
-	}
-	t.Logf("PutUserQRCodeById success: the name of the qrCode picture is: %s", data.QrCode)
-}
-
-func TestGetUserQRCodeById(t *testing.T) {
-	data, err := GetUserQRCodeById(userId)
-	if nil != err {
-		t.Error("GetUserQRCodeById fail: ", err)
-	}
-	if data.QrCode != qrCodePicName {
-		t.Error("GetUserQRCodeById fail: the value queried is not equal to raw value")
-	}
-	t.Logf("GetUserQRCodeById success: the name of the qrCode picture is: %s", data.QrCode)
-
-}
+//func TestPutUserAvatarById(t *testing.T) {
+//	user, err := GetUserByEmail(email)
+//	if nil != err {
+//		t.Error("PutUserAvatarById fail ", err)
+//	}
+//	data, err := PutUserAvatarById(avatarPicName, user.Id)
+//	if nil != err {
+//		t.Error("PutUserAvatarById fail: ", err)
+//	}
+//	if data.Avatar != avatarPicName {
+//		t.Error("PutUserAvatarById fail: the value after update not equal the raw value")
+//	}
+//	t.Logf("PutUserAvatarById success: the name of the avatar picture is: %s", data.Avatar)
+//
+//	userId = user.Id
+//}
+//
+//func TestGetUserAvatarById(t *testing.T) {
+//	data, err := GetUserAvatarById(userId)
+//	if nil != err {
+//		t.Error("GetUserAvatarById fail: ", err)
+//	}
+//	if data.Avatar != avatarPicName {
+//		t.Error("GetUserAvatarById fail: the value queried is not equal to raw value")
+//	}
+//	t.Logf("GetUserAvatarById success: the name of the avatar picture is: %s", data.Avatar)
+//}
+//
+//func TestPutUserQRCodeById(t *testing.T) {
+//	data, err := PutUserQRCodeById(qrCodePicName, userId)
+//	if nil != err {
+//		t.Error("PutUserQRCodeById fail: ", err)
+//	}
+//	if data.QrCode != qrCodePicName {
+//		t.Error("PutUserQRCodeById fail: the value after update not equal the raw value")
+//	}
+//	t.Logf("PutUserQRCodeById success: the name of the qrCode picture is: %s", data.QrCode)
+//}
+//
+//func TestGetUserQRCodeById(t *testing.T) {
+//	data, err := GetUserQRCodeById(userId)
+//	if nil != err {
+//		t.Error("GetUserQRCodeById fail: ", err)
+//	}
+//	if data.QrCode != qrCodePicName {
+//		t.Error("GetUserQRCodeById fail: the value queried is not equal to raw value")
+//	}
+//	t.Logf("GetUserQRCodeById success: the name of the qrCode picture is: %s", data.QrCode)
+//
+//}
