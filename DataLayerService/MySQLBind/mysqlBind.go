@@ -378,22 +378,22 @@ const (
 	UserCheckFriendshipAlreadyInEffect = "SELECT is_accept FROM tb_friend_relation WHERE" +
 		" src_id = ? AND dst_id = ?"
 
-	UserAddOneFriend = "INSERT INTO tb_friend_relation(id, src_id, dst_id, note) VALUES" +
-		"(?,?,?,?)ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE, is_black=FALSE, " +
+	UserAddOneFriend = "INSERT INTO tb_friend_relation(src_id, dst_id, note) VALUES" +
+		"(?,?,?)ON DUPLICATE KEY UPDATE note = ?,is_accept = FALSE, is_black=FALSE, " +
 		"is_delete = FALSE"
 
-	UserCheckFriendRequest = "SELECT id from tb_friend_relation WHERE src_id =? AND dst_id = ?"
+	UserNoteOneFriend = "UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?"
 
-	UserAcceptOneFriend = "INSERT INTO tb_friend_relation(id, src_id, dst_id, is_accept) VALUES(?,?,?,?) " +
+	UserCheckFriendRequest = "SELECT COUNT(dst_id) from tb_friend_relation WHERE src_id =? AND dst_id = ?"
+
+	UserAcceptOneFriend = "INSERT INTO tb_friend_relation(src_id, dst_id, is_accept) VALUES(?,?,?) " +
 		"ON DUPLICATE KEY UPDATE is_accept = TRUE, is_black = FALSE, is_delete = FALSE"
 
-	UserCheckBlacklist = "SELECT id, is_black FROM tb_friend_relation WHERE src_id = ?" +
+	UserCheckBlacklist = "SELECT is_black FROM tb_friend_relation WHERE src_id = ?" +
 		" AND dst_id = ?"
 
-	UserBlackOneFriend = "INSERT INTO tb_friend_relation(id, src_id, dst_id, is_black) " +
-		"VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE is_black = ? "
-
-	UserNoteOneFriend = "UPDATE tb_friend_relation SET note = ? WHERE src_id = ? AND dst_id = ?"
+	UserBlackOneFriend = "INSERT INTO tb_friend_relation(src_id, dst_id, is_black) " +
+		"VALUES(?,?,?) ON DUPLICATE KEY UPDATE is_black = ? "
 
 	UserDeleteOneFriend = "UPDATE tb_friend_relation SET is_accept = FALSE, is_black = FALSE, is_delete=TRUE WHERE src_id=? AND dst_id = ?"
 
@@ -449,9 +449,9 @@ func InsertOneNewFriend(selfId, friendId int64, note string) error {
 		_ = tx.Rollback()
 		return ErrFriendshipAlreadyInEffect
 	}
+
 	// every thing ok, add a friendship record
-	relateId := SnowFlakeNode.Generate()
-	_, err = tx.Exec(UserAddOneFriend, relateId, selfId, friendId, note, note)
+	_, err = tx.Exec(UserAddOneFriend, selfId, friendId, note, note)
 	if nil != err {
 		_ = tx.Rollback()
 		return err
@@ -498,13 +498,11 @@ func UpdateAcceptNewFriend(selfId, friendId int64, note string, isAccept bool) e
 
 	// check the friend request if existed
 	row := tx.QueryRow(UserCheckFriendRequest, friendId, selfId)
-	friendRecordId := new(int64)
-	if err := row.Scan(friendRecordId); nil != err {
+	count := new(int)
+	if err := row.Scan(&count); nil != err || *count == 0 {
 		_ = tx.Rollback()
 		return ErrFriendRequestNotExisted
 	}
-
-	selfRecordId := SnowFlakeNode.Generate()
 
 	// check the friendship if already in effect
 	isEffect := new(bool)
@@ -518,30 +516,34 @@ func UpdateAcceptNewFriend(selfId, friendId int64, note string, isAccept bool) e
 	// accept or refuse the friendship request
 	if isAccept {
 		// add a friend relationship record for self
-		_, err = tx.Exec(UserAcceptOneFriend, selfRecordId, selfId, friendId, isAccept)
+		_, err = tx.Exec(UserAcceptOneFriend, selfId, friendId, isAccept)
 		if nil != err {
 			_ = tx.Rollback()
 			return err
 		}
 		// change the friend relationship record of requester, make the `is_accept` also be true
-		_, err = tx.Exec(UserAcceptOneFriend, friendRecordId, friendId, selfId, isAccept)
+		_, err = tx.Exec(UserAcceptOneFriend, friendId, selfId, isAccept)
 		if nil != err {
 			_ = tx.Rollback()
 			return err
 		}
 
 	} else {
-		// refuse the friend request, also need add one record for self, make the requester in blacklist
-		_, err = tx.Exec(UserBlackOneFriend, selfRecordId, selfId, friendId, !isAccept, !isAccept)
+		// when refuse the friend request, make the requester in self's blacklist
+		isBlack := !isAccept
+		_, err = tx.Exec(UserBlackOneFriend, selfId, friendId, isBlack, isBlack)
 		if nil != err {
 			_ = tx.Rollback()
 			return err
 		}
 	}
+
+	// if the user give a note for the requester, execute it, if fail, don't need rollback
 	if note != "" {
-		// change the note for friend, if fail not need rollback
 		_, _ = tx.Exec(UserNoteOneFriend, note, selfId, friendId)
 	}
+
+	// commit all changes
 	if err := tx.Commit(); nil != err {
 		_ = tx.Rollback()
 		return err
@@ -555,24 +557,20 @@ func UpdateFriendBlacklist(selfId, friendId int64, isBlack bool) error {
 	if nil != err {
 		return err
 	}
-	// check the friendship data if recorded by self
-	relateId := new(int64)
+	// check the friendship if existed and the blackMark if don't need change
 	blackRecord := new(bool)
 	row := tx.QueryRow(UserCheckBlacklist, selfId, friendId)
-	_ = row.Scan(relateId, blackRecord)
-
-	// if the friend blacklist status if not change, don't continue
-	if *relateId != 0 && *blackRecord == isBlack {
+	if err = row.Scan(blackRecord); nil != err || *blackRecord == isBlack {
 		_ = tx.Rollback()
-		return ErrFriendBlacklistNoChange
-	}
-
-	if *relateId == 0 {
-		*relateId = SnowFlakeNode.Generate().Int64()
+		if nil != err {
+			return ErrFriendRequestNotExisted
+		} else {
+			return ErrFriendBlacklistNoChange
+		}
 	}
 
 	// move friend to blacklist in or out
-	_, err = tx.Exec(UserBlackOneFriend, relateId, selfId, friendId, isBlack, isBlack)
+	_, err = tx.Exec(UserBlackOneFriend, selfId, friendId, isBlack, isBlack)
 	if nil != err {
 		_ = tx.Rollback()
 		return err
@@ -662,7 +660,8 @@ type TempFriendInformation struct {
 	IsBlack  bool   `json:"is_black"`
 }
 
-// Get all friends basic and relate information of the user
+// Get information about users'effective friends. Which `isAccept` is true and
+// `isDelete` is false in friendship record data.
 func SelectFriendsInfo(selfId int64) ([]*TempFriendInformation, error) {
 	rows, err := MySQLClient.Query(UserGetFriendsInfo, selfId)
 	if nil != err {

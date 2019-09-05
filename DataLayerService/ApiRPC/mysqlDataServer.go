@@ -1,15 +1,14 @@
 package ApiRPC
 
 import (
+	conf "../Config"
+	"../MySQLBind"
+	pb "../Protos"
 	"context"
 	"errors"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-
-	conf "../Config"
-	"../MySQLBind"
-	pb "../Protos"
 )
 
 var (
@@ -19,6 +18,7 @@ var (
 
 type MySQLData struct{}
 
+// Functions for operate the basic information of the user
 func (obj *MySQLData) NewOneUser(ctx context.Context,
 	params *pb.UserBasicInfo) (*pb.UserBasicInfo, error) {
 
@@ -134,8 +134,8 @@ func (obj *MySQLData) PutUserPasswordByEmail(ctx context.Context,
 
 // Translate the user information from TempUserBasic to UserBasicInfo
 // Using the different struct between MySQLBind and gRPCpb for reduce
-// the degree of coupling. Because the CreateTime saved as CCT time zone,
-// it not need to translate the time zone.
+// the degree of coupling. Because the CreateTime saved as CCT time zone
+// in MySQL, it not need to translate the time zone.
 func initUserBasic(data *MySQLBind.TempUserBasic) *pb.UserBasicInfo {
 	return &pb.UserBasicInfo{
 		Id:         data.Id,
@@ -147,6 +147,7 @@ func initUserBasic(data *MySQLBind.TempUserBasic) *pb.UserBasicInfo {
 		CreateTime: data.CreateTime.Format(conf.TimeDisplayFormat)}
 }
 
+// Functions for operate avatar and qrCode file name of the user
 func (obj *MySQLData) GetUserAvatarById(ctx context.Context,
 	params *pb.UserAvatar) (*pb.UserAvatar, error) {
 
@@ -190,39 +191,107 @@ func (obj *MySQLData) PutUserQRCodeById(ctx context.Context,
 	return params, nil
 }
 
+// Functions for operate friendship record data between the user.
 func (obj *MySQLData) AddOneNewFriend(ctx context.Context,
 	params *pb.Friendship) (*pb.Friendship, error) {
-	panic("implement me")
+
+	err := MySQLBind.InsertOneNewFriend(params.SelfId, params.FriendId,
+		params.FriendNote)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
+
 }
 
 func (obj *MySQLData) PutOneFriendNote(ctx context.Context,
 	params *pb.Friendship) (*pb.Friendship, error) {
-	panic("implement me")
+
+	err := MySQLBind.UpdateOneFriendNote(params.SelfId, params.FriendId,
+		params.FriendNote)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
+
 }
 
 func (obj *MySQLData) AcceptOneNewFriend(ctx context.Context,
 	params *pb.Friendship) (*pb.Friendship, error) {
-	panic("implement me")
+
+	err := MySQLBind.UpdateAcceptNewFriend(params.SelfId, params.FriendId,
+		params.FriendNote, params.IsAccept)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
 }
 
 func (obj *MySQLData) PutFriendBlacklist(ctx context.Context,
 	params *pb.Friendship) (*pb.Friendship, error) {
-	panic("implement me")
+
+	err := MySQLBind.UpdateFriendBlacklist(params.SelfId, params.FriendId,
+		params.IsBlack)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
 }
 
 func (obj *MySQLData) DeleteOneFriend(ctx context.Context,
 	params *pb.Friendship) (*pb.Friendship, error) {
-	panic("implement me")
+
+	err := MySQLBind.DeleteOneFriend(params.SelfId, params.FriendId)
+	if nil != err {
+		return nil, err
+	}
+	return params, nil
 }
 
 func (obj *MySQLData) GetFriendshipInfo(ctx context.Context,
 	params *pb.QueryFriendsParams) (*pb.FriendshipList, error) {
-	panic("implement me")
+
+	dataList, err := MySQLBind.SelectFriendsRelates(params.SelfId)
+	if nil != err {
+		return nil, err
+	}
+
+	friendshipList := new(pb.FriendshipList)
+	for _, data := range dataList {
+		temp := &pb.Friendship{
+			SelfId:     data.SelfId,
+			FriendId:   data.FriendId,
+			FriendNote: data.FriendNote,
+			IsAccept:   data.IsAccept,
+			IsBlack:    data.IsBlack,
+			IsDelete:   data.IsDelete}
+
+		friendshipList.Data = append(friendshipList.Data, temp)
+	}
+	return friendshipList, nil
 }
 
 func (obj *MySQLData) GetFriendsBasicInfo(ctx context.Context,
 	params *pb.QueryFriendsParams) (*pb.FriendsBasicInfoList, error) {
-	panic("implement me")
+
+	dataList, err := MySQLBind.SelectFriendsInfo(params.SelfId)
+	if nil != err {
+		return nil, err
+	}
+
+	result := new(pb.FriendsBasicInfoList)
+	for _, data := range dataList {
+		temp := &pb.FriendsBasicInfo{
+			FriendId: data.FriendId,
+			Name:     data.Name,
+			Email:    data.Email,
+			Mobile:   data.Mobile,
+			Gender:   int32(data.Gender),
+			Note:     data.Note,
+			IsBlack:  data.IsBlack}
+		result.Data = append(result.Data, temp)
+	}
+	return result, nil
 }
 
 // Check the client if canceled the calling or connection is time out

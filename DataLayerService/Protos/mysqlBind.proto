@@ -106,9 +106,10 @@ message FriendsBasicInfo {
     int64 friend_id = 1;
     string name = 2;
     string email = 3;
-    int32 gender = 4;
-    string note = 5;
-    bool is_black = 6;
+    string mobile = 4;
+    int32 gender = 5;
+    string note = 6;
+    bool is_black = 7;
 }
 
 message FriendsBasicInfoList {

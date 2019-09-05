@@ -36,6 +36,7 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 	return ctx
 }
 
+// Functions for operate the basic information of the user
 func SaveOneNewUser(name, email, mobile, password string,
 	gender int) (*pb.UserBasicInfo, error) {
 	client := getClient()
@@ -57,6 +58,7 @@ func GetUserByEmail(email string) (*pb.UserBasicInfo, error) {
 	return client.GetUserByEmail(getTimeOutCtx(3), params)
 }
 
+// The detail data is saved in `pb.UserBasicInfoList.Data`
 func GetUsersByName(name string) (*pb.UserBasicInfoList, error) {
 	client := getClient()
 	params := &pb.QueryUserParams{Name: name, FilterField: pb.QueryUserField_ByName}
@@ -84,6 +86,7 @@ func PutUserPasswordByEmail(password, email string) (*pb.UserBasicInfo, error) {
 	return client.PutUserPasswordByEmail(getTimeOutCtx(3), params)
 }
 
+// Functions for operate avatar and qrCode file name of the user
 func GetUserAvatarById(id int64) (*pb.UserAvatar, error) {
 	client := getClient()
 	params := &pb.UserAvatar{Id: id}
@@ -106,4 +109,55 @@ func PutUserQRCodeById(qrCode string, id int64) (*pb.UserQRCode, error) {
 	client := getClient()
 	params := &pb.UserQRCode{QrCode: qrCode, Id: id}
 	return client.PutUserQRCodeById(getTimeOutCtx(3), params)
+}
+
+// Functions for operate friendship record data between the user.
+func AddOneNewFriend(selfId, friendId int64) (*pb.Friendship, error) {
+	client := getClient()
+	params := &pb.Friendship{SelfId: selfId, FriendId: friendId}
+	return client.AddOneNewFriend(getTimeOutCtx(3), params)
+}
+
+func PutOneFriendNote(selfId, friendId int64, note string) (*pb.Friendship, error) {
+	client := getClient()
+	params := &pb.Friendship{SelfId: selfId, FriendId: friendId, FriendNote: note}
+	return client.PutOneFriendNote(getTimeOutCtx(3), params)
+}
+
+func AcceptOneNewFriend(selfId, friendId int64, note string, isAccept bool) (
+	*pb.Friendship, error) {
+
+	client := getClient()
+	params := &pb.Friendship{
+		SelfId:     selfId,
+		FriendId:   friendId,
+		FriendNote: note,
+		IsAccept:   isAccept}
+	return client.AcceptOneNewFriend(getTimeOutCtx(3), params)
+}
+
+func PutFriendBlacklist(selfId, friendId int64, isBlack bool) (*pb.Friendship, error) {
+	client := getClient()
+	params := &pb.Friendship{SelfId: selfId, FriendId: friendId, IsBlack: isBlack}
+	return client.PutFriendBlacklist(getTimeOutCtx(3), params)
+}
+
+func DeleteOneFriend(selfId, friendId int64) (*pb.Friendship, error) {
+	client := getClient()
+	params := &pb.Friendship{SelfId: selfId, FriendId: friendId}
+	return client.DeleteOneFriend(getTimeOutCtx(3), params)
+}
+
+// The detail data is saved in `pb.FriendshipList.Data`
+func GetFriendshipInfo(selfId int64) (*pb.FriendshipList, error) {
+	client := getClient()
+	params := &pb.QueryFriendsParams{SelfId: selfId}
+	return client.GetFriendshipInfo(getTimeOutCtx(3), params)
+}
+
+// The detail data is saved in `pb.FriendBasicInfoList.Data`
+func GetFriendsBasicInfo(selfId int64) (*pb.FriendsBasicInfoList, error) {
+	client := getClient()
+	params := &pb.QueryFriendsParams{SelfId: selfId}
+	return client.GetFriendsBasicInfo(getTimeOutCtx(3), params)
 }
