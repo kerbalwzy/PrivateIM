@@ -2,6 +2,10 @@ package ApiRPC
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"google.golang.org/grpc/credentials"
+	"io/ioutil"
 	"log"
 	"time"
 
@@ -16,7 +20,29 @@ var (
 )
 
 func init() {
-	conn, err := grpc.Dial(conf.MySQLDataRPCServerAddress, grpc.WithInsecure())
+	// Add CA TSL authentication data
+	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAClientPem, conf.DataLayerSrvCAClientKey)
+	if err != nil {
+		log.Fatalf("tls.LoadX509KeyPair err: %v", err)
+	}
+
+	certPool := x509.NewCertPool()
+	ca, err := ioutil.ReadFile(conf.DataLayerSrvCAPem)
+	if err != nil {
+		log.Fatalf("ioutil.ReadFile err: %v", err)
+	}
+
+	if ok := certPool.AppendCertsFromPEM(ca); !ok {
+		log.Fatalf("certPool.AppendCertsFromPEM err")
+	}
+
+	c := credentials.NewTLS(&tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ServerName:   "PrivateIM",
+		RootCAs:      certPool,
+	})
+
+	conn, err := grpc.Dial(conf.MySQLDataRPCServerAddress, grpc.WithTransportCredentials(c))
 	if err != nil {
 		log.Fatal(err.Error())
 	}

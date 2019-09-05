@@ -5,8 +5,12 @@ import (
 	"../MySQLBind"
 	pb "../Protos"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"io/ioutil"
 	"log"
 	"net"
 )
@@ -303,12 +307,29 @@ func checkCtxCanceled(ctx context.Context) error {
 }
 
 // Start the gRPC server for MySQL data operation.
-// Using CA TSL authentication
 func StartMySQLgRPCServer() {
-	listener, err := net.Listen("tcp", conf.MySQLDataRPCServerAddress)
-	if nil != err {
-		log.Fatal(err)
+	// using CA TSL authentication
+	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAServerPem, conf.DataLayerSrvCAServerKey)
+	if err != nil {
+		log.Fatalf("tls.LoadX509KeyPair err: %v", err)
 	}
+
+	certPool := x509.NewCertPool()
+	ca, err := ioutil.ReadFile(conf.DataLayerSrvCAPem)
+	if err != nil {
+		log.Fatalf("ioutil.ReadFile err: %v", err)
+	}
+
+	if ok := certPool.AppendCertsFromPEM(ca); !ok {
+		log.Fatalf("certPool.AppendCertsFromPEM err")
+	}
+
+	c := credentials.NewTLS(&tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    certPool,
+	})
+	caOption := grpc.Creds(c)
 
 	// new an interceptor, similar to middleware
 	var interceptor grpc.UnaryServerInterceptor
@@ -324,10 +345,16 @@ func StartMySQLgRPCServer() {
 	}
 	// add the interceptor for every Unary-Unary handler
 	unaryOption := grpc.UnaryInterceptor(interceptor)
-	server := grpc.NewServer(unaryOption)
+
+	server := grpc.NewServer(unaryOption, caOption)
 
 	pb.RegisterMySQLBindServiceServer(server, &MySQLData{})
+
 	log.Println(":::Start MySQL Data Layer gRPC Server")
+	listener, err := net.Listen("tcp", conf.MySQLDataRPCServerAddress)
+	if nil != err {
+		log.Fatalf("Start gRPC server error: %s", err.Error())
+	}
 	err = server.Serve(listener)
 	if nil != err {
 		log.Fatal(err)
