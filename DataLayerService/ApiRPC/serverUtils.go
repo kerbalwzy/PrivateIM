@@ -45,6 +45,10 @@ func getCAOption() grpc.ServerOption {
 	return grpc.Creds(c)
 }
 
+func recordLog() {
+
+}
+
 // new an interceptor, function similar to middleware
 func getUnaryInterceptorOption() grpc.ServerOption {
 	var interceptor grpc.UnaryServerInterceptor

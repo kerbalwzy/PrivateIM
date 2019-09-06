@@ -1,15 +1,13 @@
 package ApiRPC
 
 import (
-	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"google.golang.org/grpc/credentials"
 	"io/ioutil"
 	"log"
-	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	conf "../Config"
 	pb "../Protos"
@@ -54,12 +52,6 @@ func init() {
 // Build this function because connection pools may need to be used in the future.
 func getMySQLDataClient() pb.MySQLBindServiceClient {
 	return mysqlDataClient
-}
-
-// Return a context instance with deadline
-func getTimeOutCtx(expire time.Duration) context.Context {
-	ctx, _ := context.WithTimeout(context.Background(), expire*time.Second)
-	return ctx
 }
 
 // Functions for operate the basic information of the user
