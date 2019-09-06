@@ -5,12 +5,8 @@ import (
 	"../MySQLBind"
 	pb "../Protos"
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"io/ioutil"
 	"log"
 	"net"
 )
@@ -23,8 +19,7 @@ var (
 type MySQLData struct{}
 
 // Functions for operate the basic information of the user
-func (obj *MySQLData) NewOneUser(ctx context.Context,
-	params *pb.UserBasicInfo) (*pb.UserBasicInfo, error) {
+func (obj *MySQLData) NewOneUser(ctx context.Context, params *pb.UserBasicInfo) (*pb.UserBasicInfo, error) {
 
 	data, err := MySQLBind.InsertOneUser(params.Name, params.Email,
 		params.Mobile, params.Password, int(params.Gender))
@@ -35,8 +30,7 @@ func (obj *MySQLData) NewOneUser(ctx context.Context,
 	return user, nil
 }
 
-func (obj *MySQLData) GetUserById(ctx context.Context,
-	params *pb.QueryUserParams) (*pb.UserBasicInfo, error) {
+func (obj *MySQLData) GetUserById(ctx context.Context, params *pb.QueryUserParams) (*pb.UserBasicInfo, error) {
 
 	if params.FilterField != pb.QueryUserField_ById {
 		return nil, ParamsErr
@@ -50,8 +44,7 @@ func (obj *MySQLData) GetUserById(ctx context.Context,
 
 }
 
-func (obj *MySQLData) GetUserByEmail(ctx context.Context,
-	params *pb.QueryUserParams) (*pb.UserBasicInfo, error) {
+func (obj *MySQLData) GetUserByEmail(ctx context.Context, params *pb.QueryUserParams) (*pb.UserBasicInfo, error) {
 
 	if params.FilterField != pb.QueryUserField_ByEmail {
 		return nil, ParamsErr
@@ -65,8 +58,7 @@ func (obj *MySQLData) GetUserByEmail(ctx context.Context,
 
 }
 
-func (obj *MySQLData) GetUsersByName(ctx context.Context,
-	params *pb.QueryUserParams) (*pb.UserBasicInfoList, error) {
+func (obj *MySQLData) GetUsersByName(ctx context.Context, params *pb.QueryUserParams) (*pb.UserBasicInfoList, error) {
 
 	if params.FilterField != pb.QueryUserField_ByName {
 		return nil, ParamsErr
@@ -84,8 +76,7 @@ func (obj *MySQLData) GetUsersByName(ctx context.Context,
 }
 
 // Updating the name, mobile, gender of the target user, which found by id.
-func (obj *MySQLData) PutUserBasicById(ctx context.Context,
-	params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
+func (obj *MySQLData) PutUserBasicById(ctx context.Context, params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
 
 	if params.UpdateField != pb.UpdateUserField_NameMobileGender {
 		return nil, ParamsErr
@@ -101,8 +92,8 @@ func (obj *MySQLData) PutUserBasicById(ctx context.Context,
 	return user, nil
 }
 
-func (obj *MySQLData) PutUserPasswordById(ctx context.Context,
-	params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
+func (obj *MySQLData) PutUserPasswordById(ctx context.Context, params *pb.UpdateUserParams) (
+	*pb.UserBasicInfo, error) {
 
 	if params.UpdateField != pb.UpdateUserField_Password {
 		return nil, ParamsErr
@@ -117,8 +108,8 @@ func (obj *MySQLData) PutUserPasswordById(ctx context.Context,
 
 }
 
-func (obj *MySQLData) PutUserPasswordByEmail(ctx context.Context,
-	params *pb.UpdateUserParams) (*pb.UserBasicInfo, error) {
+func (obj *MySQLData) PutUserPasswordByEmail(ctx context.Context, params *pb.UpdateUserParams) (
+	*pb.UserBasicInfo, error) {
 
 	err := checkCtxCanceled(ctx)
 	if nil != err {
@@ -152,8 +143,7 @@ func initUserBasic(data *MySQLBind.TempUserBasic) *pb.UserBasicInfo {
 }
 
 // Functions for operate avatar and qrCode file name of the user
-func (obj *MySQLData) GetUserAvatarById(ctx context.Context,
-	params *pb.UserAvatar) (*pb.UserAvatar, error) {
+func (obj *MySQLData) GetUserAvatarById(ctx context.Context, params *pb.UserAvatar) (*pb.UserAvatar, error) {
 
 	var err error
 	params.Avatar, err = MySQLBind.SelectUserAvatarById(params.Id)
@@ -164,8 +154,7 @@ func (obj *MySQLData) GetUserAvatarById(ctx context.Context,
 	return params, nil
 }
 
-func (obj *MySQLData) PutUserAvatarById(ctx context.Context,
-	params *pb.UserAvatar) (*pb.UserAvatar, error) {
+func (obj *MySQLData) PutUserAvatarById(ctx context.Context, params *pb.UserAvatar) (*pb.UserAvatar, error) {
 
 	err := MySQLBind.UpdateUserAvatarById(params.Id, params.Avatar)
 	if nil != err {
@@ -174,8 +163,7 @@ func (obj *MySQLData) PutUserAvatarById(ctx context.Context,
 	return params, nil
 }
 
-func (obj *MySQLData) GetUserQRCodeById(ctx context.Context,
-	params *pb.UserQRCode) (*pb.UserQRCode, error) {
+func (obj *MySQLData) GetUserQRCodeById(ctx context.Context, params *pb.UserQRCode) (*pb.UserQRCode, error) {
 
 	var err error
 	params.QrCode, err = MySQLBind.SelectUserQRCodeById(params.Id)
@@ -185,8 +173,7 @@ func (obj *MySQLData) GetUserQRCodeById(ctx context.Context,
 	return params, nil
 }
 
-func (obj *MySQLData) PutUserQRCodeById(ctx context.Context,
-	params *pb.UserQRCode) (*pb.UserQRCode, error) {
+func (obj *MySQLData) PutUserQRCodeById(ctx context.Context, params *pb.UserQRCode) (*pb.UserQRCode, error) {
 
 	err := MySQLBind.UpdateUserQRCode(params.Id, params.QrCode)
 	if nil != err {
@@ -196,8 +183,7 @@ func (obj *MySQLData) PutUserQRCodeById(ctx context.Context,
 }
 
 // Functions for operate friendship record data between the user.
-func (obj *MySQLData) AddOneNewFriend(ctx context.Context,
-	params *pb.Friendship) (*pb.Friendship, error) {
+func (obj *MySQLData) AddOneNewFriend(ctx context.Context, params *pb.Friendship) (*pb.Friendship, error) {
 
 	err := MySQLBind.InsertOneNewFriend(params.SelfId, params.FriendId,
 		params.FriendNote)
@@ -208,8 +194,7 @@ func (obj *MySQLData) AddOneNewFriend(ctx context.Context,
 
 }
 
-func (obj *MySQLData) PutOneFriendNote(ctx context.Context,
-	params *pb.Friendship) (*pb.Friendship, error) {
+func (obj *MySQLData) PutOneFriendNote(ctx context.Context, params *pb.Friendship) (*pb.Friendship, error) {
 
 	err := MySQLBind.UpdateOneFriendNote(params.SelfId, params.FriendId,
 		params.FriendNote)
@@ -220,8 +205,7 @@ func (obj *MySQLData) PutOneFriendNote(ctx context.Context,
 
 }
 
-func (obj *MySQLData) AcceptOneNewFriend(ctx context.Context,
-	params *pb.Friendship) (*pb.Friendship, error) {
+func (obj *MySQLData) AcceptOneNewFriend(ctx context.Context, params *pb.Friendship) (*pb.Friendship, error) {
 
 	err := MySQLBind.UpdateAcceptNewFriend(params.SelfId, params.FriendId,
 		params.FriendNote, params.IsAccept)
@@ -231,8 +215,7 @@ func (obj *MySQLData) AcceptOneNewFriend(ctx context.Context,
 	return params, nil
 }
 
-func (obj *MySQLData) PutFriendBlacklist(ctx context.Context,
-	params *pb.Friendship) (*pb.Friendship, error) {
+func (obj *MySQLData) PutFriendBlacklist(ctx context.Context, params *pb.Friendship) (*pb.Friendship, error) {
 
 	err := MySQLBind.UpdateFriendBlacklist(params.SelfId, params.FriendId,
 		params.IsBlack)
@@ -242,8 +225,7 @@ func (obj *MySQLData) PutFriendBlacklist(ctx context.Context,
 	return params, nil
 }
 
-func (obj *MySQLData) DeleteOneFriend(ctx context.Context,
-	params *pb.Friendship) (*pb.Friendship, error) {
+func (obj *MySQLData) DeleteOneFriend(ctx context.Context, params *pb.Friendship) (*pb.Friendship, error) {
 
 	err := MySQLBind.DeleteOneFriend(params.SelfId, params.FriendId)
 	if nil != err {
@@ -252,8 +234,8 @@ func (obj *MySQLData) DeleteOneFriend(ctx context.Context,
 	return params, nil
 }
 
-func (obj *MySQLData) GetFriendshipInfo(ctx context.Context,
-	params *pb.QueryFriendsParams) (*pb.FriendshipList, error) {
+func (obj *MySQLData) GetFriendshipInfo(ctx context.Context, params *pb.QueryFriendsParams) (
+	*pb.FriendshipList, error) {
 
 	dataList, err := MySQLBind.SelectFriendsRelates(params.SelfId)
 	if nil != err {
@@ -275,8 +257,8 @@ func (obj *MySQLData) GetFriendshipInfo(ctx context.Context,
 	return friendshipList, nil
 }
 
-func (obj *MySQLData) GetFriendsBasicInfo(ctx context.Context,
-	params *pb.QueryFriendsParams) (*pb.FriendsBasicInfoList, error) {
+func (obj *MySQLData) GetFriendsBasicInfo(ctx context.Context, params *pb.QueryFriendsParams) (
+	*pb.FriendsBasicInfoList, error) {
 
 	dataList, err := MySQLBind.SelectFriendsInfo(params.SelfId)
 	if nil != err {
@@ -298,53 +280,13 @@ func (obj *MySQLData) GetFriendsBasicInfo(ctx context.Context,
 	return result, nil
 }
 
-// Check the client if canceled the calling or connection is time out
-func checkCtxCanceled(ctx context.Context) error {
-	if ctx.Err() == context.Canceled {
-		return CtxCanceledErr
-	}
-	return nil
-}
-
 // Start the gRPC server for MySQL data operation.
-func StartMySQLgRPCServer() {
+func StartMySQLDataRPCServer() {
 	// using CA TSL authentication
-	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAServerPem, conf.DataLayerSrvCAServerKey)
-	if err != nil {
-		log.Fatalf("tls.LoadX509KeyPair err: %v", err)
-	}
+	caOption := getCAOption()
 
-	certPool := x509.NewCertPool()
-	ca, err := ioutil.ReadFile(conf.DataLayerSrvCAPem)
-	if err != nil {
-		log.Fatalf("ioutil.ReadFile err: %v", err)
-	}
-
-	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		log.Fatalf("certPool.AppendCertsFromPEM err")
-	}
-
-	c := credentials.NewTLS(&tls.Config{
-		Certificates: []tls.Certificate{cert},
-		ClientAuth:   tls.RequireAndVerifyClientCert,
-		ClientCAs:    certPool,
-	})
-	caOption := grpc.Creds(c)
-
-	// new an interceptor, similar to middleware
-	var interceptor grpc.UnaryServerInterceptor
-	interceptor = func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-
-		// check the call if canceled by client or time out before every handler
-		err = checkCtxCanceled(ctx)
-		if err != nil {
-			return
-		}
-		// continue the handel
-		return handler(ctx, req)
-	}
-	// add the interceptor for every Unary-Unary handler
-	unaryOption := grpc.UnaryInterceptor(interceptor)
+	// get an interceptor server option for Unary-Unary handler
+	unaryOption := getUnaryInterceptorOption()
 
 	server := grpc.NewServer(unaryOption, caOption)
 
