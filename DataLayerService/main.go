@@ -1,9 +1,8 @@
 package main
 
-import (
-	"./ApiRPC"
-)
+import "./ApiRPC"
 
 func main() {
-	ApiRPC.StartMySQLgRPCServer()
+	//ApiRPC.StartMySQLDataRPCServer()
+	ApiRPC.StartMongoDataRPCServer()
 }

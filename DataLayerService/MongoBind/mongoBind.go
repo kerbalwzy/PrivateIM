@@ -9,27 +9,26 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-)
 
-const (
-	MongoDBURI = "mongodb://localhost:27017"
+	conf "../Config"
 )
 
 var (
 	MongoClient *mongo.Client
 	MsgCenterDB *mongo.Database
 
-	WaitSendMsgColl *mongo.Collection
-	UserFriendsColl *mongo.Collection
-	UserBlackColl   *mongo.Collection
+	DelayedMessageColl *mongo.Collection
+	UserFriendsColl    *mongo.Collection
+	UserBlackColl      *mongo.Collection
 
-	GroupChats    *mongo.Collection
-	Subscriptions *mongo.Collection
+	GroupChatsColl    *mongo.Collection
+	SubscriptionsColl *mongo.Collection
 )
 
 func init() {
 	var err error
-	MongoClient, err = mongo.Connect(getTimeOutCtx(10), options.Client().ApplyURI(MongoDBURI))
+	MongoClient, err = mongo.Connect(getTimeOutCtx(10),
+		options.Client().ApplyURI(conf.MsgDbMongoURI))
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -37,13 +36,15 @@ func init() {
 	if nil != err {
 		log.Fatal(err)
 	}
+
 	MsgCenterDB = MongoClient.Database("MsgCenter")
-	WaitSendMsgColl = MsgCenterDB.Collection("WaitSendMsg")
+
+	DelayedMessageColl = MsgCenterDB.Collection("DelayedMessage")
 	UserFriendsColl = MsgCenterDB.Collection("UserFriends")
 	UserBlackColl = MsgCenterDB.Collection("UserBlackList")
 
-	GroupChats = MsgCenterDB.Collection("GroupChats")
-	Subscriptions = MsgCenterDB.Collection("Subscriptions")
+	GroupChatsColl = MsgCenterDB.Collection("GroupChats")
+	SubscriptionsColl = MsgCenterDB.Collection("Subscriptions")
 
 }
 
@@ -53,32 +54,33 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 	return ctx
 }
 
-type TempWaitSendMsg struct {
+// Id is for user's id
+type TempDelayedMessage struct {
 	Id      int64    `bson:"_id"`
 	Message [][]byte `bson:"message"`
 }
 
 //Save the message which sent failed because the target user is offline.
-func MongoSaveWaitSendMessage(id int64, data []byte) error {
-	_, err := WaitSendMsgColl.UpdateOne(getTimeOutCtx(3),
+func MongoSaveDelayedMessage(id int64, data []byte) error {
+	_, err := DelayedMessageColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": id},
 		bson.M{"$push": bson.M{"message": data}},
 		options.Update().SetUpsert(true))
 	if nil != err {
-		log.Printf("Error: save WaitSendMessage fail for user(%d), error detail: %s", id, err.Error())
+		log.Printf("Error: save DelayedMessage fail for user(%d), error detail: %s", id, err.Error())
 		return err
 	} else {
-		log.Printf("WaitSendMessage: save an message for user(%d)", id)
+		log.Printf("DelayedMessage: save an message for user(%d)", id)
 		return nil
 	}
 }
 
 // Query the messages should be sent to current user.
-func MongoQueryWaitSendMessage(id int64) ([][]byte, error) {
-	temp := new(TempWaitSendMsg)
-	err := WaitSendMsgColl.FindOneAndDelete(getTimeOutCtx(3), bson.M{"_id": id}).Decode(temp)
+func MongoQueryDelayedMessage(id int64) ([][]byte, error) {
+	temp := new(TempDelayedMessage)
+	err := DelayedMessageColl.FindOneAndDelete(getTimeOutCtx(3), bson.M{"_id": id}).Decode(temp)
 	if nil != err {
-		log.Printf("Error: query WaitSendMessage fail for user(%d), error detail: %s", id, err.Error())
+		log.Printf("Error: query DelayedMessage fail for user(%d), error detail: %s", id, err.Error())
 		return nil, err
 	}
 	return temp.Message, nil
@@ -175,7 +177,7 @@ type TempGroupChat struct {
 
 // Add a user's id into the group chat
 func MongoGroupChatAddUser(groupId, userId int64) error {
-	_, err := GroupChats.UpdateOne(getTimeOutCtx(3),
+	_, err := GroupChatsColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": groupId},
 		bson.M{"$addToSet": bson.M{"users_id": userId}},
 		options.Update().SetUpsert(true))
@@ -189,7 +191,7 @@ func MongoGroupChatAddUser(groupId, userId int64) error {
 // Query the user's id of the group
 func MongoQueryGroupChatUsers(groupId int64) ([]int64, error) {
 	temp := new(TempGroupChat)
-	err := GroupChats.FindOne(getTimeOutCtx(3), bson.M{"_id": groupId}).Decode(temp)
+	err := GroupChatsColl.FindOne(getTimeOutCtx(3), bson.M{"_id": groupId}).Decode(temp)
 	if nil != err {
 		log.Printf("Error: query users fail for groupChat(%d), error detail: %s", groupId, err.Error())
 		return nil, err
@@ -200,7 +202,7 @@ func MongoQueryGroupChatUsers(groupId int64) ([]int64, error) {
 // Query the all groups information
 func MongoQueryGroupChatAll() ([]TempGroupChat, error) {
 	ctx := getTimeOutCtx(30)
-	curs, err := GroupChats.Find(ctx, bson.D{})
+	curs, err := GroupChatsColl.Find(ctx, bson.D{})
 	if nil != err {
 		log.Printf("Error: query all group chat information fail")
 		return nil, err
@@ -221,7 +223,7 @@ func MongoQueryGroupChatAll() ([]TempGroupChat, error) {
 
 // Move a user's id out from a group chat
 func MongoGroupChatDelUser(groupId, userId int64) error {
-	_, err := GroupChats.UpdateOne(getTimeOutCtx(3),
+	_, err := GroupChatsColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": groupId},
 		bson.M{"$pull": bson.M{"users_id": userId}},
 		options.Update().SetUpsert(true))
@@ -239,7 +241,7 @@ type TempSubscription struct {
 
 // Add a user's into the subscription
 func MongoSubscriptionAddUser(subsId, userId int64) error {
-	_, err := Subscriptions.UpdateOne(getTimeOutCtx(3),
+	_, err := SubscriptionsColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": subsId},
 		bson.M{"$addToSet": bson.M{"users_id": userId}},
 		options.Update().SetUpsert(true))
@@ -253,7 +255,7 @@ func MongoSubscriptionAddUser(subsId, userId int64) error {
 // Query the user's id of the subscription
 func MongoQuerySubscriptionUsers(subsId int64) ([]int64, error) {
 	temp := new(TempSubscription)
-	err := Subscriptions.FindOne(getTimeOutCtx(3), bson.M{"_id": subsId}).Decode(temp)
+	err := SubscriptionsColl.FindOne(getTimeOutCtx(3), bson.M{"_id": subsId}).Decode(temp)
 	if nil != err {
 		log.Printf("Error: query user fail for subscription(%d), error detail: %s", subsId, err.Error())
 		return nil, err
@@ -264,7 +266,7 @@ func MongoQuerySubscriptionUsers(subsId int64) ([]int64, error) {
 // Query the all subscription information
 func MongoQuerySubscriptionAll() ([]TempSubscription, error) {
 	ctx := getTimeOutCtx(30)
-	curs, err := Subscriptions.Find(ctx, bson.D{})
+	curs, err := SubscriptionsColl.Find(ctx, bson.D{})
 	if nil != err {
 		log.Printf("Error: query all subscription fail")
 		return nil, err
@@ -286,7 +288,7 @@ func MongoQuerySubscriptionAll() ([]TempSubscription, error) {
 
 // Move a user's id out from a subscription
 func MongoSubscriptionDelUser(subsId, userId int64) error {
-	_, err := Subscriptions.UpdateOne(getTimeOutCtx(3),
+	_, err := SubscriptionsColl.UpdateOne(getTimeOutCtx(3),
 		bson.M{"_id": subsId},
 		bson.M{"$pull": bson.M{"users_id": userId}},
 		options.Update().SetUpsert(true))
