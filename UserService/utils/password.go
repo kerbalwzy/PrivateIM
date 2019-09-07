@@ -1,13 +1,9 @@
-package MySQLBind
+package utils
 
 import (
 	"crypto/hmac"
 	"crypto/md5"
 	"encoding/hex"
-)
-
-const (
-	PasswordSalt = "fasdfasf87tr3h87sf23386t123!@e23BLfishf"
 )
 
 // get a password hash vale with salts

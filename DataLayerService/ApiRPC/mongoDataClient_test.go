@@ -1,7 +1,5 @@
 package ApiRPC
 
-import "testing"
-
 var (
 	testUserId1        int64 = 100
 	testUserId2        int64 = 200
@@ -113,29 +111,29 @@ var (
 //	}
 //}
 
-func TestAddUserToSubscription(t *testing.T) {
-	data, err := AddUserToSubscription(testSubsId, testUserId1)
-	if nil != err {
-		t.Error("AddUserToSubscription fail: ", err)
-	} else {
-		t.Logf("AddUserToSubscription success: the data = %v", data)
-	}
-}
-
-func TestGetUsersOfSubscription(t *testing.T) {
-	data, err := GetUsersOfSubscription(testSubsId)
-	if nil != err {
-		t.Error("GetUsersOfSubscription fail: ", err)
-	} else {
-		t.Logf("GetUsersOfSubscription success: the data = %v", data)
-	}
-}
-
-func TestDelUserFromSubscription(t *testing.T) {
-	data, err := DelUserFromSubscription(testSubsId, testUserId1)
-	if nil != err {
-		t.Error("DelUserFromSubscription fail: ", err)
-	} else {
-		t.Logf("DelUserFromSubscription success: the data = %v", data)
-	}
-}
+//func TestAddUserToSubscription(t *testing.T) {
+//	data, err := AddUserToSubscription(testSubsId, testUserId1)
+//	if nil != err {
+//		t.Error("AddUserToSubscription fail: ", err)
+//	} else {
+//		t.Logf("AddUserToSubscription success: the data = %v", data)
+//	}
+//}
+//
+//func TestGetUsersOfSubscription(t *testing.T) {
+//	data, err := GetUsersOfSubscription(testSubsId)
+//	if nil != err {
+//		t.Error("GetUsersOfSubscription fail: ", err)
+//	} else {
+//		t.Logf("GetUsersOfSubscription success: the data = %v", data)
+//	}
+//}
+//
+//func TestDelUserFromSubscription(t *testing.T) {
+//	data, err := DelUserFromSubscription(testSubsId, testUserId1)
+//	if nil != err {
+//		t.Error("DelUserFromSubscription fail: ", err)
+//	} else {
+//		t.Logf("DelUserFromSubscription success: the data = %v", data)
+//	}
+//}

@@ -7,6 +7,9 @@
   | [SignIn](#2)     | POST   | /auth/profile     | 0             | 登录                           |
   | [GetProfile](#3) | GET    | /info/profile     | 1             | 获取个人信息                   |
   | [PutProfile](#4) | PUT    | /info/profile     | 1             | 修改个人信息                   |
+  | [PutPassword](#4_1) | PUT | /info/password | 1 | 修改密码 |
+  | [GetResetPasswordEmail](#4_2) | GET | /info/password | 0 | 忘记密码-发送修改链接邮件 |
+  | [ForgetPassword](#4_3) | POST | /info/password | 0 | 忘记密码-重置密码 |
   | [GetAvatar](#5) | GET    | /info/avatar      | 1             | 获取个人头像                   |
   | [PutAvatar](#6)  | PUT    | /info/avatar      | 1             | 更新个人头像                   |
   | [GetQrCode](#7) | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
@@ -90,7 +93,7 @@ JsonBodyParams: `所有参数均为必传`
 | Column   | DataType | Constraints                 | Description    |
 | -------- | -------- | --------------------------- | -------------- |
 | email    | string   | 符合邮箱格式,最多100个字符; | 注册的邮箱地址 |
-| password | string   | 8到12位个符                 | 密码           |
+| password | string   | 8到12位个字符               | 密码           |
 
 ```json
 {
@@ -157,26 +160,45 @@ JsonBodyParams: `所有参数为必填, 如果未发生改变则填写原值`
 | mobile  | string   | 0个或者11个数字字符                        | 用户手机号 |
 | gender  | int      | 0/1/2;  (0: 未知) ;    (1: 女)    (2: 男); | 性别       |
 
-##### Response: 
+##### Response: ⚠️**与GetProfile的完全一致**
 
-Headers: `Content-Type: application/json;`
-
-JsonBodyResult:
-
-| Column | DataType | Description                        |
-| ------ | -------- | ---------------------------------- |
-| name   | string   | 用户昵称                           |
-| mobile | string   | 手机号, 默认为空                   |
-| gender | int      | 性别 (0: 未知)   (1: 女)   (2: 男) |
-
-```json
-{
-    "name": "newName",
-    "mobile": "13122222221",
-    "gender": 1
-}
-```
 ---
+
+- #### <span id="4_1">PutPassword 修改密码</span> [Top](#0)
+
+##### Request:
+
+Path: `/info/password`	Method: `PUT`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​		    `Content-Type: application/json;`
+
+JsonBodyParams: `所有参数必传`
+
+| Columns          | DataType | Constraints   | Description |
+| ---------------- | -------- | ------------- | ----------- |
+| old_password     | string   | 8到12位个字符 | 旧密码      |
+| password         | string   | --            | 新密码      |
+| confirm_password | string   | --            | 确认密码    |
+
+##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
+
+----
+
+- #### <span id="4_2">GetResetPasswordEmail 忘记密码-发送修改链接邮件</span> [Top](#0)
+
+##### Request: 
+
+Path: `/info/password`	Method: `GET`
+
+QueryStringParams: `查询字符串参数, 必传`
+
+| Columns | DataType | Constraints                 | Description  |
+| ------- | -------- | --------------------------- | ------------ |
+| email   | string   | 符合邮箱格式,最多100个字符; | 注册的邮箱号 |
+
+
 
 - #### <span id="5">GetAvatar 获取用户头像</span> [Top](#0)
 

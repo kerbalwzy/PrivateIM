@@ -290,6 +290,7 @@ func SelectUserAvatarById(id int64) (string, error) {
 	if err == sql.ErrNoRows {
 		return "", nil
 	}
+	// other error happened, abort it
 	if nil != err {
 		return "", err
 	}

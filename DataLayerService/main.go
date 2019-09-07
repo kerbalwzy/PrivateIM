@@ -3,6 +3,6 @@ package main
 import "./ApiRPC"
 
 func main() {
-	//ApiRPC.StartMySQLDataRPCServer()
+	go ApiRPC.StartMySQLDataRPCServer()
 	ApiRPC.StartMongoDataRPCServer()
 }

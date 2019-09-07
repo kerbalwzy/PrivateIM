@@ -18,3 +18,9 @@
 # MacOS files
 .DS_STore
 log
+
+# CA TSL files
+*.csr
+*.key
+*.pem
+*.srl
