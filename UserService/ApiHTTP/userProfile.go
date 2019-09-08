@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"gopkg.in/go-playground/validator.v8"
 	"io/ioutil"
+	"time"
 
 	conf "../Config"
 )
@@ -20,11 +22,14 @@ const (
 
 // Just used to validate a basic type value, not struct instance.
 // The main use for validate the query string params
-var simpleFieldValidate *validator.Validate
+var (
+	simpleFieldValidate *validator.Validate
+)
 
 func init() {
 	config := &validator.Config{TagName: "validate"}
 	simpleFieldValidate = validator.New(config)
+
 }
 
 // GetProfile HTTP API function
@@ -180,6 +185,8 @@ func PutPassword(c *gin.Context) {
 	c.Status(200)
 }
 
+// GetResetPasswordEmail HTTP API function
+// Send a email which content with the `Auth-Token` to the user's email box for reset password.
 func GetResetPasswordEmail(c *gin.Context) {
 	tempEmail := c.Request.URL.Query().Get("email")
 	if tempEmail == "" {
@@ -191,10 +198,49 @@ func GetResetPasswordEmail(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "param: email validate failed"})
 		return
 	}
-
+	data, err := ApiRPC.GetUserByEmail(tempEmail)
+	if nil != err {
+		c.JSON(400, gin.H{"error": "email not registered"})
+		return
+	}
+	if ok := utils.CheckEmailSentIn3Minute(tempEmail); ok {
+		c.JSON(200, gin.H{"message": "the email was sent, please check your email box"})
+		return
+	}
+	// send the reset password authentication link email
+	claims := utils.CustomJWTClaims{
+		Id: data.Id,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: int64(time.Now().Unix() + conf.ResetPasswordTokenAliveTIme), // expire time
+			Issuer:    conf.AuthTokenIssuer,                                        //signal issuer
+		},
+	}
+	authToken, _ := utils.CreateJWTToken(claims, []byte(conf.AuthTokenSalt))
+	go utils.SendPasswordResetEmail(tempEmail, authToken)
+	c.Status(200)
 }
 
+type TempForgetPassword struct {
+	Password        string `json:"password" binding:"passwordValidator"`
+	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=Password"`
+}
+
+// ForgetPassword HTTP API function
+// the auth-token is from the `reset password email`
 func ForgetPassword(c *gin.Context) {
+	temp := new(TempForgetPassword)
+	if err := c.ShouldBindJSON(temp); nil != err {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	userId := c.MustGet(JWTGetUserId).(int64)
+	passwordHash := utils.GetPasswordHash(temp.Password, conf.PasswordHashSalt)
+	_, err := ApiRPC.PutUserPasswordById(passwordHash, userId)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(200)
 
 }
 

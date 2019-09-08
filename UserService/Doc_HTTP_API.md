@@ -1,4 +1,4 @@
-# UserCenter
+# UserService
 - #### HTTP-API Functions  <span id="0"> </span>
 
   | Name       | Method | URL               | Auth Required | Description                    |
@@ -198,7 +198,30 @@ QueryStringParams: `查询字符串参数, 必传`
 | ------- | -------- | --------------------------- | ------------ |
 | email   | string   | 符合邮箱格式,最多100个字符; | 注册的邮箱号 |
 
+##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
 
+---
+
+- #### <span id="4_3">ForgetPassword 忘记密码-重置密码</span> [Top](#0)
+
+##### Request:
+
+Path: `/info/password` 	Method: `POST`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​		    `Content-Type: application/json;`
+
+JsonBodyParams: `所有参数必传`
+
+| Columns          | DataType | Constraints   | Description |
+| ---------------- | -------- | ------------- | ----------- |
+| password         | string   | 8到12位个字符 | 新密码      |
+| confirm_password | string   | --            | 确认密码    |
+
+##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
+
+----
 
 - #### <span id="5">GetAvatar 获取用户头像</span> [Top](#0)
 
@@ -314,11 +337,10 @@ Path: `/relation/friend`		Method: `GET`
 
 Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
-JsonBodyParams: `至少包含三个参数中的一个, 参数优先级:id > email > name`
+JsonBodyParams: `至少包含两个参数中的一个, 在查询时只会使用其中一个参数, 参数优先级: email > name`
 
 | Column | DataType | Constraints                 | Descritption       |
 | ------ | -------- | --------------------------- | ------------------ |
-| id     | int64    | 无符号整型                  | 目标用户的ID       |
 | email  | string   | 符合邮箱格式,最多100个字符; | 目标用户的邮箱地址 |
 | name   | string   | 1到10个字符                 | 目标用户的昵称     |
 
@@ -326,16 +348,17 @@ JsonBodyParams: `至少包含三个参数中的一个, 参数优先级:id > emai
 
 Headers: `Content-Type: application/json;`
 
-JsonBodyResult: `id, mobile, gender, note只当两个用户存在有效好友关系,且好友保存了相关信息才会返回有效值, 否则都返回数据类型的默认值; 使用name作为搜索参数时可能返回多条数据`
+JsonBodyResult: `mobile, gender, note只当两个用户存在有效好友关系,且好友保存了相关信息才会返回有效值, 否则都返回数据类型的默认值; 使用name作为搜索参数时可能返回多条数据`
 
-| Column | DataType | Description      |
-| ------ | -------- | ---------------- |
-| id     | int64    | 目标用户ID       |
-| email  | string   | 目标用户邮箱地址 |
-| name   | string   | 目标用户昵称     |
-| mobile | string   | 目标用户手机号   |
-| gender | int      | 目标用户的性别   |
-| note   | string   | 给好友备注的名称 |
+| Column | DataType | Description                          |
+| ------ | -------- | ------------------------------------ |
+| id     | int64    | 目标用户ID                           |
+| email  | string   | 目标用户邮箱地址                     |
+| name   | string   | 目标用户昵称                         |
+| mobile | string   | 目标用户手机号(好友关系存在时有值)   |
+| gender | int      | 目标用户的性别(好友关系存在时有值)   |
+| note   | string   | 给好友备注的名称(好友关系存在时有值) |
+| avatar | string   | 用户的头像地址                       |
 
 ```json
 {	// the demo result is search by name = "test"
@@ -346,7 +369,8 @@ JsonBodyResult: `id, mobile, gender, note只当两个用户存在有效好友关
             "name": "test",
             "mobile": "13122222223",
             "gender": 1,
-            "note": "Li"
+            "note": "Li",
+            "avatar":"http://127.0.0.1:8080/static/photo/defaultAvatar.png"
         },
         {	// not friend
             "id": 1162663753959866368,
@@ -354,7 +378,8 @@ JsonBodyResult: `id, mobile, gender, note只当两个用户存在有效好友关
             "name": "test",
             "mobile": "",
             "gender": 0,
-            "note": ""
+            "note": "",
+            "avatar":"http://127.0.0.1:8080/static/photo/defaultAvatar.png"
         }
         ....
     ]

@@ -4,11 +4,12 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 
-	"../DataLayer"
+	"../ApiRPC"
+
+	pb "../Protos"
 )
 
 type GetFriendParams struct {
-	Id    int64  `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
@@ -19,105 +20,90 @@ type GetFriendResult struct {
 	Mobile string `json:"mobile"`
 	Gender int    `json:"gender"`
 	Note   string `json:"note"`
+	Avatar string `json:"avatar"`
 }
 
-// Get friend HTTP API function
+// Get friend HTTP API function.
+// Search the user by email or name. Only when the friendship is effect, the value of Mobile,
+// Gender and Note can be show for searcher.
 func GetFriend(c *gin.Context) {
 	params := new(GetFriendParams)
 	if err := c.ShouldBindJSON(params); nil != err {
 		c.JSON(400, gin.H{"error": "invalid params " + err.Error()})
 		return
 	}
-	if params.Id == 0 && params.Email == "" && params.Name == "" {
+	if params.Email == "" && params.Name == "" {
 		c.JSON(400, gin.H{"error": "invalid params"})
 		return
 	}
-	// search the other users by params
-	selfId := c.MustGet(JWTGetUserId).(int64)
-	users, err := SearchOtherUsers(selfId, params)
+	// search users by param, if the length of result is zero, return now.
+	users, err := GetUsersByEmailOrName(params)
 	if nil != err {
-		c.JSON(404, gin.H{"error": err.Error()})
+		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	// search the current friends of user
-	friendsIdAndNote, _ := GetFriendsIdAndNoteOfUser(selfId)
-	// hidden the private information if the friend relationship not existed
-	// create the result slice
-	resultSlice := make([]*GetFriendResult, 0)
-	for _, userP := range users {
-		result := &GetFriendResult{Id: userP.Id, Email: userP.Email, Name: userP.Name}
-		if note, ok := friendsIdAndNote[userP.Id]; ok {
-			result.Gender = userP.Gender
-			result.Mobile = userP.Mobile
-			result.Note = note
-		}
-		resultSlice = append(resultSlice, result)
+	if len(users) == 0 {
+		c.JSON(404, gin.H{"error": "not found by params"})
+		return
 	}
-	c.JSON(200, gin.H{"result": resultSlice})
-}
 
-// Search other users by params (GetFriendParams)
-func SearchOtherUsers(selfId int64, params *GetFriendParams) ([]*DataLayer.UserBasic, error) {
-	users, err := SearchUsers(params)
+	// search the friendship record data of the user
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	friendsIdNote, err := GetFriendsIdAndNoteOfUser(selfId)
 	if nil != err {
-		return nil, err
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
 
-	// delete self from users, if the slice is empty after that, return error
-	delIndex := -1
-	for index, user := range users {
-		if user.Id == selfId {
-			delIndex = index
-			break
+	// organizational results
+	result := make([]*GetFriendResult, 1)
+	for _, user := range users {
+		ret := &GetFriendResult{Id: user.Id, Name: user.Name, Email: user.Email}
+		if note, ok := friendsIdNote[user.Id]; ok {
+			ret.Mobile = user.Mobile
+			ret.Gender = int(user.Gender)
+			ret.Note = note
 		}
-	}
-	if delIndex != -1 {
-		users = append(users[:delIndex], users[delIndex+1:]...)
+		data, _ := ApiRPC.GetUserAvatarById(user.Id)
+		if data != nil {
+			ret.Avatar = data.Avatar
+		}
+
+		result = append(result, ret)
 	}
 
-	if len(users) == 0 {
-		return nil, errors.New("not found by params")
-	}
-	return users, nil
+	c.JSON(200, gin.H{"result": result})
 }
 
-// Search users by params (GetFriendParams)
-func SearchUsers(params *GetFriendParams) ([]*DataLayer.UserBasic, error) {
-	users := make([]*DataLayer.UserBasic, 0)
-	// if the Id not zero, use Id to query user first
-	userP := new(DataLayer.UserBasic)
-	if params.Id != 0 {
-		userP.Id = params.Id
-		_ = DataLayer.MySQLGetUserById(userP)
+// Search users by email or name, prefer to use email
+func GetUsersByEmailOrName(params *GetFriendParams) ([]*pb.UserBasicInfo, error) {
+	users := make([]*pb.UserBasicInfo, 1)
+	if params.Email != "" {
+		ret, err := ApiRPC.GetUserByEmail(params.Email)
+		if nil != err {
+			return nil, err
+		}
+		users = append(users, ret)
+		return users, nil
+	} else {
+		ret, err := ApiRPC.GetUsersByName(params.Name)
+		if nil != err {
+			return nil, err
+		}
+		users = append(users, ret.Data...)
+		return users, nil
 	}
-	// if the email still empty string, mean not found by id
-	if userP.Email == "" {
-		userP.Email = params.Email
-		_ = DataLayer.MySQLGetUserByEmail(userP)
-	}
-	// if the name still empty string, mean not found by id and email
-	if userP.Name == "" {
-		users, _ = DataLayer.MySQLGetUserByName(params.Name)
-	}
-	// if the id is not zero, mean found by id or email
-	if userP.Id != 0 {
-		users = append(users, userP)
-	}
-	if len(users) == 0 {
-		return nil, errors.New("not found by params")
-	}
-	return users, nil
 }
 
 // Get the id and note of the friends, and return a map, key is id, value is note
 func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
 	tempMap := make(map[int64]string)
-	friendsRelates, err := DataLayer.MySQLGetUserFriendsRelates(userId)
+	ret, err := ApiRPC.GetFriendshipInfo(userId)
 	if nil != err {
 		return tempMap, err
 	}
-	for _, relate := range friendsRelates {
-		// Judging the validity of relationship
+	for _, relate := range ret.Data {
+		// Judging the validity of relationship, only the effect friendship can be save
 		if relate.IsAccept && !relate.IsBlack && !relate.IsDelete {
 			tempMap[relate.FriendId] = relate.FriendNote
 		}
@@ -150,7 +136,7 @@ func AddFriend(c *gin.Context) {
 	}
 	c.JSON(statusCode, gin.H{"message": "initiate and add friends successfully, wait for the target user to agree"})
 
-	// todo: Let the communication center notify the target user
+	// todo: Let the MessageService know the change
 	//NotifyTargetUser(params.FriendId)
 
 }
@@ -160,15 +146,10 @@ func CheckAndAddFriend(selfId, friendId int64, note string) (int, error) {
 	if selfId == friendId {
 		return 400, ErrAddSelfAsFriend
 	}
-	err := DataLayer.MySQLAddOneFriend(selfId, friendId, note)
-	if err == DataLayer.ErrTargetUserNotExisted || err == DataLayer.ErrFriendshipAlreadyInEffect {
-		return 400, err
+	_, err := ApiRPC.AddOneNewFriend(selfId, friendId, note)
+	if nil != err {
+		return 500, err
 	}
-
-	if err == DataLayer.ErrInBlackList {
-		return 403, err
-	}
-
 	return 200, nil
 }
 
@@ -225,12 +206,8 @@ func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 	if params.Note == "" {
 		return 400, "note for friend not allow be an empty string"
 	}
-	if err := DataLayer.MySQLModifyNoteOfFriend(selfId, params.FriendId, params.Note); nil != err {
-		if err == DataLayer.ErrNoFriendship {
-			return 400, err.Error()
-		} else {
-			return 500, err.Error()
-		}
+	if _, err := ApiRPC.PutOneFriendNote(selfId, params.FriendId, params.Note); nil != err {
+		return 500, err.Error()
 	}
 
 	return 200, "modify note for friend successfully"
@@ -239,15 +216,11 @@ func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 // Handle a friend relationship request
 func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
 	// check if the friend request existed
-	err := DataLayer.MySQLAcceptOneFriend(selfId, params.FriendId, params.Note, params.IsAccept)
-	if err == DataLayer.ErrFriendRequestNotExisted || err == DataLayer.ErrFriendshipAlreadyInEffect {
-		return 400, err.Error()
-	}
+	_, err := ApiRPC.AcceptOneNewFriend(selfId, params.FriendId, params.Note, params.IsAccept)
 
 	if nil != err {
 		return 500, err.Error()
 	}
-
 	if params.IsAccept {
 		return 200, "you are friend now, chat happy"
 	} else {
@@ -258,10 +231,7 @@ func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
 
 // Manage the friend blacklist
 func ManageFriendShipBlacklist(selfId, friendId int64, isBlack bool) (int, string) {
-	err := DataLayer.MySQLManageFriendBlacklist(selfId, friendId, isBlack)
-	if DataLayer.ErrFriendBlacklistNoChange == err {
-		return 400, err.Error()
-	}
+	_, err := ApiRPC.PutFriendBlacklist(selfId, friendId, isBlack)
 
 	if nil != err {
 		return 500, err.Error()
@@ -285,11 +255,7 @@ func DeleteFriend(c *gin.Context) {
 		return
 	}
 	selfId := c.MustGet(JWTGetUserId).(int64)
-	err := DataLayer.MySQLDeleteOneFriend(selfId, params.FriendId)
-	if DataLayer.ErrNoFriendship == err {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
+	_, err := ApiRPC.DeleteOneFriend(selfId, params.FriendId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -300,10 +266,10 @@ func DeleteFriend(c *gin.Context) {
 // Get All Friend HTTP API function
 func AllFriends(c *gin.Context) {
 	selfId := c.MustGet(JWTGetUserId).(int64)
-	data, err := DataLayer.MySQLGetUserFriendsInfo(selfId)
+	ret, err := ApiRPC.GetFriendsBasicInfo(selfId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"friends": data})
+	c.JSON(200, gin.H{"friends": ret.Data})
 }
