@@ -129,9 +129,9 @@ func PutUserQRCodeById(qrCode string, id int64) (*pb.UserQRCode, error) {
 }
 
 // Functions for operate friendship record data between the user.
-func AddOneNewFriend(selfId, friendId int64) (*pb.Friendship, error) {
+func AddOneNewFriend(selfId, friendId int64, note string) (*pb.Friendship, error) {
 	client := getMySQLDataClient()
-	params := &pb.Friendship{SelfId: selfId, FriendId: friendId}
+	params := &pb.Friendship{SelfId: selfId, FriendId: friendId, FriendNote:note}
 	return client.AddOneNewFriend(getTimeOutCtx(3), params)
 }
 
