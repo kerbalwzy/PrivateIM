@@ -178,18 +178,14 @@ func PutFriend(c *gin.Context) {
 
 	statusCode := 200
 	message := ""
-	// modify friend note
-	if params.Action == 1 {
+
+	// do different thing by action
+	switch params.Action {
+	case 1:
 		statusCode, message = ModifyFriendNote(selfId, params)
-	}
-
-	// handle friend request
-	if params.Action == 2 {
+	case 2:
 		statusCode, message = CheckAndAcceptFriend(selfId, params)
-	}
-
-	// move friend to blacklist in or out
-	if params.Action == 3 {
+	case 3:
 		statusCode, message = ManageFriendShipBlacklist(selfId, params.FriendId, params.IsBlack)
 	}
 
