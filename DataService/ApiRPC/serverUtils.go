@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 
 	conf "../Config"
 )
+var CtxCanceledErr = errors.New("the client canceled or connection time out")
 
 // Check the client if canceled the calling or connection is time out
 func checkCtxCanceled(ctx context.Context) error {
@@ -43,10 +45,6 @@ func getCAOption() grpc.ServerOption {
 		ClientCAs:    certPool,
 	})
 	return grpc.Creds(c)
-}
-
-func recordLog() {
-
 }
 
 // new an interceptor, function similar to middleware

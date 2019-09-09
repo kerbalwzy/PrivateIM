@@ -4,10 +4,11 @@ const (
 	// gRPC config
 	MySQLDataRPCServerAddress = "0.0.0.0:23331"
 	MongoDataRPCServerAddress = "0.0.0.0:23332"
+	UserAuthRPCServerAddress  = "0.0.0.0:11111"
 
-	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/DataLayerService/CATSL/ca.pem"
-	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/DataLayerService/CATSL/client/client.pem"
-	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/DataLayerService/CATSL/client/client.key"
+	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/ca.pem"
+	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/client/client.pem"
+	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/client/client.key"
 
 	// static file config, about operating the avatar and qrCode
 	StaticFoldPath         = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/"

@@ -13,7 +13,7 @@ import (
 
 var (
 	ParamsErr      = errors.New("bad request because of the wrong params value")
-	CtxCanceledErr = errors.New("the client canceled or connection time out")
+
 )
 
 type MySQLData struct{}

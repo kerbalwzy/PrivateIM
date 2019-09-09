@@ -3,6 +3,8 @@ package ApiHTTP
 import (
 	"../utils"
 	"github.com/gin-gonic/gin"
+
+	conf "../Config"
 )
 
 // JWTAuthMiddleware, check the jwt token string from request.
@@ -16,7 +18,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// parseToken
-		claims, err := utils.ParseJWTToken(authToken, []byte(AuthTokenSalt))
+		claims, err := utils.ParseJWTToken(authToken, []byte(conf.AuthTokenSalt))
 		if err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			c.Abort()

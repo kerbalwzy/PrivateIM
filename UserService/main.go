@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+
+	"./ApiHTTP"
+	"./ApiRPC"
 )
 
 func init() {
@@ -10,6 +13,6 @@ func init() {
 }
 
 func main() {
-	go StartHttpServer()
-	StartGRPCServer()
+	go ApiHTTP.StartHttpServer()
+	ApiRPC.StartUserAuthRPCServer()
 }
