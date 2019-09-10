@@ -13,7 +13,7 @@
 
 ---
 
-- #### <span id="1">tb_user_basic</span>
+- #### <span id="1">tb_user_basic</span> [TOP](#0)
 
   | Column    | DataType     | Constraints           | Description                    |
   | --------- | ------------ | --------------------- | ------------------------------ |
@@ -29,28 +29,28 @@
 
   ```mysql
   CREATE TABLE `tb_user_basic` (
-      `id` bigint(20) unsigned NOT NULL,
-      `email` varchar(100) NOT NULL,
-    	`name` varchar(10) NOT NULL,
-      `password` varchar(100) NOT NULL,
-   	`mobile` char(11) NOT NULL DEFAULT '',
-    	`gender` tinyint(1) NOT NULL DEFAULT 0,
-      `avatar` varchar(100) NOT NULL DEFAULT '',
-      `qr_code` varchar(100) NOT NULL,
-      `is_delete` tinyint(1) NOT NULL DEFAULT 0,
-    	PRIMARY KEY (`id`),
-    	UNIQUE KEY `email_unique` (`email`),
-      UNIQUE KEY `qr_code_unique` (`qr_code`),
-    	KEY `name_index` (`name`),
-    	KEY `email_index` (`email`),
-    	KEY `mobile_index` (`mobile`)
+    `id` bigint(20) unsigned NOT NULL,
+    `email` varchar(100) NOT NULL,
+    `name` varchar(10) NOT NULL,
+    `password` varchar(100) NOT NULL,
+    `mobile` char(11) NOT NULL DEFAULT '',
+    `gender` tinyint(1) NOT NULL DEFAULT 0,
+    `avatar` varchar(100) NOT NULL DEFAULT '',
+    `qr_code` varchar(100) NOT NULL,
+    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `email_unique` (`email`),
+    UNIQUE KEY `qr_code_unique` (`qr_code`),
+    KEY `name_index` (`name`),
+    KEY `email_index` (`email`),
+    KEY `mobile_index` (`mobile`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   
   ```
 
 ----
 
-- #### <span id="2">tb_friendship</span>
+- #### <span id="2">tb_friendship</span> [TOP](#0)
 
   | Column      | DataType    | Constraints        | Description                              |
   | ----------- | ----------- | ------------------ | ---------------------------------------- |
@@ -75,7 +75,7 @@
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```
 
-- #### <span id="3">tb_group_chat</span>
+- #### <span id="3">tb_group_chat</span> [TOP](#0)
 
   | Column     | DataType     | Constraints         | Description                   |
   | ---------- | ------------ | ------------------- | ----------------------------- |
@@ -88,19 +88,19 @@
 
   ```mysql
   CREATE TABLE `tb_group_chat` (
-    	`id` bigint(20) NOT NULL,
-      `name` varchar(10) NOT NULL,
-      `manager_id` bigint(20) NOT NULL,
-      `avatar` varchar(100) NOT NULL DEFAULT '',
-      `qr_code` varchar(100) NOT NULL,
-      `is_delete` TINYINT(1) NOT NULL DEFAULT 0,
-      PRIMARY KEY (`id`),
-      UNIQUE KEY `qr_code_unique` (`qr_code`),
-      KEY `manager_id_index` (`manager_id`)
+    `id` bigint(20) NOT NULL,
+    `name` varchar(10) NOT NULL,
+    `manager_id` bigint(20) NOT NULL,
+    `avatar` varchar(100) NOT NULL DEFAULT '',
+    `qr_code` varchar(100) NOT NULL,
+    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `qr_code_unique` (`qr_code`),
+    KEY `manager_id_index` (`manager_id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```
 
-- #### <span id="4">tb_user_group_chat</span>
+- #### <span id="4">tb_user_group_chat</span> [TOP](#0)
 
   | Column    | DataType    | Constraints        | Description                                |
   | --------- | ----------- | ------------------ | ------------------------------------------ |
@@ -111,17 +111,17 @@
 
   ```mysql
   CREATE TABLE `tb_user_group_chat` (
-  	`group_id` BIGINT(20) NOT NULL,
-      `user_id` BIGINT(20) NOT NULL,
-      `user_note` VARCHAR(10) NOT NULL,
-      `is_delete` TINYINT(1) NOT NULL DEFAULT 0,
-      UNIQUE KEY `group_user_id_unique` (`group_id`, `user_id`),
-      KEY `group_id_index` (`group_id`),
-      KEY `user_id_index` (`user_id`) 
-  )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    `group_id` bigint(20) NOT NULL,
+    `user_id` bigint(20) NOT NULL,
+    `user_note` varchar(10) NOT NULL,
+    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    UNIQUE KEY `group_user_id_unique` (`group_id`,`user_id`),
+    KEY `group_id_index` (`group_id`),
+    KEY `user_id_index` (`user_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```
 
-- #### <span id="5">tb_subscription</span>
+- #### <span id="5">tb_subscription</span> [TOP](#0)
 
   | Column     | DataType     | Constraints         | Description                     |
   | ---------- | ------------ | ------------------- | ------------------------------- |
@@ -135,20 +135,20 @@
 
   ```mysql
   CREATE TABLE `tb_subscription` (
-  	`id` BIGINT(20) NOT NULL,
-      `name` VARCHAR(10) NOT NULL, 
-      `manager_id` BIGINT(20) NOT NULL,
-      `introduce` VARCHAR(150) NOT NULL,
-      `avatar` varchar(100) NOT NULL DEFAULT '',
-      `qr_code` VARCHAR(100) NOT NULL,
-      `is_delete` TINYINT(1) NOT NULL DEFAULT 0,
-      PRIMARY KEY (`id`),
-      UNIQUE KEY `qr_code_unique` (`qr_code`),
-      KEY `manager_id_index` (`manager_id`)
-  )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    `id` bigint(20) NOT NULL,
+    `name` varchar(10) NOT NULL,
+    `manager_id` bigint(20) NOT NULL,
+    `introduce` varchar(150) NOT NULL,
+    `avatar` varchar(100) NOT NULL DEFAULT '',
+    `qr_code` varchar(100) NOT NULL,
+    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `qr_code_unique` (`qr_code`),
+    KEY `manager_id_index` (`manager_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```
 
-- #### <span id="6">tb_user_subscription</span>
+- #### <span id="6">tb_user_subscription</span> [TOP](#0)
 
   | Column    | DataType   | Constraints        | Description                                 |
   | --------- | ---------- | ------------------ | ------------------------------------------- |
@@ -158,11 +158,11 @@
 
   ```mysql
   CREATE TABLE `tb_user_subscription` (
-  	`subs_id` BIGINT(20) NOT NULL,
-      `user_id` BIGINT(20) NOT NULL,
-      `is_delete` TINYINT(1) NOT NULL DEFAULT 0,
-      UNIQUE KEY `subs_user_id_index` (`subs_id`,`user_id`),
-      KEY `subs_id_index` (`subs_id`),
-      KEY `user_id_index` (`user_id`)
-  )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    `subs_id` bigint(20) NOT NULL,
+    `user_id` bigint(20) NOT NULL,
+    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    UNIQUE KEY `subs_user_id_index` (`subs_id`,`user_id`),
+    KEY `subs_id_index` (`subs_id`),
+    KEY `user_id_index` (`user_id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```

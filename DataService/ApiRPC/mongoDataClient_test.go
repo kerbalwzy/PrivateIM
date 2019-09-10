@@ -1,19 +1,21 @@
 package ApiRPC
 
+import "testing"
+
 var (
 	testUserId1        int64 = 100
 	testUserId2        int64 = 200
 	testDelayedMessage       = []byte("this is a test message")
 )
 
-//func TestSaveDelayedMessage(t *testing.T) {
-//	data, err := SaveDelayedMessage(testUserId1, testDelayedMessage)
-//	if nil != err {
-//		t.Error("SaveDelayedMessage fail: ", err)
-//	} else {
-//		t.Logf("SaveDelayedMessage success: save for user = %d", data.UserId)
-//	}
-//}
+func TestSaveDelayedMessage(t *testing.T) {
+	data, err := SaveDelayedMessage(testUserId1, testDelayedMessage)
+	if nil != err {
+		t.Error("SaveDelayedMessage fail: ", err)
+	} else {
+		t.Logf("SaveDelayedMessage success: save for user = %d", data.UserId)
+	}
+}
 //
 //func TestGetDelayedMessage(t *testing.T) {
 //	data, err := GetDelayedMessage(testUserId1)
