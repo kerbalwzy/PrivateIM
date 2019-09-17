@@ -164,7 +164,7 @@
 
 ---
 
-- #### <span id="7">订阅号的用户成员-缓存数据</span> [TOP](#0)
+- #### <span id="7">coll_subscription_users 订阅号的用户成员-缓存数据</span> [TOP](#0)
 
   | Name          | BsonType   | GolangType | Description            |
   | ------------- | ---------- | ---------- | ---------------------- |
@@ -185,7 +185,7 @@
 
 ---
 
-- #### <span id="8">用户的加入的群聊-缓存数据</span> [TOP](#0)
+- #### <span id="8">coll_user_group_chat 用户的加入的群聊-缓存数据</span> [TOP](#0)
 
   | Name           | BsonType   | GolangType | Description          |
   | -------------- | ---------- | ---------- | -------------------- |
@@ -206,7 +206,7 @@
 
 ---
 
-- #### <span id="9">用户关注的订阅号-缓存数据</span> [TOP](#0)
+- #### <span id="9">coll_user_subscription 用户关注的订阅号-缓存数据</span> [TOP](#0)
 
   | Name                  | BsonType   | GolangType | Description            |
   | --------------------- | ---------- | ---------- | ---------------------- |
