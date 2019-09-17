@@ -52,20 +52,20 @@
 
 - #### <span id="2">tb_friendship</span> [TOP](#0)
 
-  | Column      | DataType    | Constraints        | Description                              |
-  | ----------- | ----------- | ------------------ | ---------------------------------------- |
-  | self_id     | BIGINT(20)  | NOT NULL INDEX     | 用户自己的ID                             |
-  | friend_id   | BIGINT(20)  | NOT NULL INDEX     | 用户好友的ID                             |
-  | friend_note | VARCHAR(10) | NOT NULL           | 用户给好友设定备注名称,默认为好友昵称    |
-  | is_accept   | TINYINT(1)  | NOT NULL DEFAULT 0 | 好友是否接受了添加请求, 默认未接受       |
-  | is_black    | TINYINT(1)  | NOT NULL DEFAULT 0 | 是否将好友设置为黑名单内                 |
-  | is_delete   | TINYINT(1)  | NOT NULL DEFAULT 0 | 是否删除好友关系,用户注销时,删除所有关系 |
+  | Column      | DataType    | Constraints         | Description                              |
+  | ----------- | ----------- | ------------------- | ---------------------------------------- |
+  | self_id     | BIGINT(20)  | NOT NULL INDEX      | 用户自己的ID                             |
+  | friend_id   | BIGINT(20)  | NOT NULL INDEX      | 用户好友的ID                             |
+  | friend_note | VARCHAR(10) | NOT NULL DEFALUT '' | 用户给好友设定备注名称,默认为空字符串    |
+  | is_accept   | TINYINT(1)  | NOT NULL DEFAULT 0  | 好友是否接受了添加请求, 默认未接受       |
+  | is_black    | TINYINT(1)  | NOT NULL DEFAULT 0  | 是否将好友设置为黑名单内                 |
+  | is_delete   | TINYINT(1)  | NOT NULL DEFAULT 0  | 是否删除好友关系,用户注销时,删除所有关系 |
 
   ```mysql
   CREATE TABLE `tb_friendship` (
     `self_id` bigint(20) NOT NULL,
     `friend_id` bigint(20) NOT NULL,
-    `friend_note` varchar(10) NOT NULL,
+    `friend_note` varchar(10) NOT NULL DEFAULT '',
     `is_accept` tinyint(1) NOT NULL DEFAULT 0,
     `is_black` tinyint(1) NOT NULL DEFAULT 0,
     `is_delete` tinyint(1) NOT NULL DEFAULT 0,
