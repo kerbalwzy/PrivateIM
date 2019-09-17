@@ -1,11 +1,11 @@
-## Project Mongo DB Collection Introduction [TOP](#0)
+## <span id="0">Project Mongo DB Collection Introduction </span>
 
 - #### Collections
 
   | Name                                | Description                                                  |
   | ----------------------------------- | ------------------------------------------------------------ |
   | [coll_delay_message](#1)            | 延时消息; 用户因未上线待接收的消息, 用户上线接收后则从集合删除 |
-  | [coll_chat_history](2)              | 一对一用户聊天消息历史记录                                   |
+  | [coll_chat_history](#2)             | 一对一用户聊天消息历史记录                                   |
   | [coll_group_chat_history](#3)       | 群聊消息历史记录                                             |
   | [coll_subscription_msg_history](#4) | 订阅号消息历史记录                                           |
   | [coll_user_friends](#5)             | 用户的好友-缓存数据;  MySQL原数据被改变时需要同步更新        |
