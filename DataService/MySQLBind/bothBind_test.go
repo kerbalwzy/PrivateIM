@@ -212,6 +212,7 @@ func TestUpdateOneUserProfileByIdPlus(t *testing.T) {
 }
 
 // ------------------------------------------------------------------
+
 // Testing for operating 'tb_friendship'
 var (
 	selfId, friendId         int64
@@ -506,6 +507,7 @@ func TestSelectBlacklistFriendsId(t *testing.T) {
 }
 
 // ------------------------------------------------------------------
+
 // Testing for operating 'tb_group_chat'
 var (
 	groupChatName = "测试群聊1"
@@ -526,7 +528,7 @@ func TestInsertOneNewGroupChat(t *testing.T) {
 }
 
 func TestSelectOneGroupChatById(t *testing.T) {
-	groupChat, err := SelectOneGroupChatById(testGroupChatId)
+	groupChat, err := SelectOneGroupChatById(testGroupChatId, false)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -537,7 +539,7 @@ func TestSelectOneGroupChatById(t *testing.T) {
 }
 
 func TestSelectManyGroupChatByName(t *testing.T) {
-	groupChats, err := SelectManyGroupChatByName(groupChatName)
+	groupChats, err := SelectManyGroupChatByName(groupChatName, false)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -551,7 +553,7 @@ func TestSelectManyGroupChatByName(t *testing.T) {
 }
 
 func TestSelectManyGroupChatByManagerId(t *testing.T) {
-	groupChats, err := SelectManyGroupChatByManagerId(managerId)
+	groupChats, err := SelectManyGroupChatByManagerId(managerId, false)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -563,13 +565,24 @@ func TestSelectManyGroupChatByManagerId(t *testing.T) {
 	}
 }
 
+func TestSelectAllGroupChat(t *testing.T) {
+	groupChats, err := SelectAllGroupChat()
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(groupChats) < 1 {
+		t.Fatalf("there should have 1 group chat at least")
+	}
+
+}
+
 func TestUpdateOneGroupChatNameById(t *testing.T) {
 	newName := "newName"
 	err := UpdateOneGroupChatNameById(testGroupChatId, newName)
 	if nil != err {
 		t.Fatal(err)
 	}
-	groupChat, _ := SelectOneGroupChatById(testGroupChatId)
+	groupChat, _ := SelectOneGroupChatById(testGroupChatId, false)
 	if groupChat.Name != newName {
 		t.Fatalf("the new name should be: %s, but is: %s", newName, groupChat.Name)
 	}
@@ -580,7 +593,7 @@ func TestUpdateOneGroupChatManagerById(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
-	groupChat, _ := SelectOneGroupChatById(testGroupChatId)
+	groupChat, _ := SelectOneGroupChatById(testGroupChatId, false)
 	if groupChat.ManagerId != userId2 {
 		t.Fatalf("the new manager_id should be: %d, but is: %d", userId2, groupChat.ManagerId)
 	}
@@ -592,7 +605,7 @@ func TestUpdateOneGroupChatAvatarById(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
-	groupChat, _ := SelectOneGroupChatById(testGroupChatId)
+	groupChat, _ := SelectOneGroupChatById(testGroupChatId, false)
 	if groupChat.Avatar != newAvatar {
 		t.Fatalf("the new avatar should be: %s, but is: %s", newAvatar, groupChat.Avatar)
 	}
@@ -604,7 +617,7 @@ func TestUpdateOneGroupChatQrCodeById(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
-	groupChat, _ := SelectOneGroupChatById(testGroupChatId)
+	groupChat, _ := SelectOneGroupChatById(testGroupChatId, false)
 	if groupChat.QrCode != newQrCode {
 		t.Fatalf("the new qrCode should be: %s, but is: %s", newQrCode, groupChat.QrCode)
 	}
@@ -616,12 +629,175 @@ func TestUpdateOneGroupChatIsDeleteById(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
-	groupChat, _ := SelectOneGroupChatById(testGroupChatId)
+	groupChat, _ := SelectOneGroupChatById(testGroupChatId, true)
 	if !groupChat.IsDelete {
 		t.Fatalf("the is_delete of group chat(%d) should be true, but is false", testGroupChatId)
 	}
 
 }
+
+// Plus function test
+func TestInsertOneNewGroupChatPlus(t *testing.T) {
+	_ = DeleteOneGroupChatByIdReal(testGroupChatId)
+	// insert with not existed user as manager
+	_, err := InsertOneNewGroupChatPlus(groupChatName, groupAvatar, groupQrCode, 0)
+	if nil == err {
+		t.Fatal("should have an error, but not")
+	}
+	t.Logf("WantError: %s", err.Error())
+
+	// insert one group chat normally
+	managerId = userId1
+	groupChat, err := InsertOneNewGroupChatPlus(groupChatName, groupAvatar, groupQrCode, managerId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	testGroupChatId = groupChat.Id
+
+	userGroupChat, err := SelectOneUserGroupChat(testGroupChatId, managerId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if userGroupChat.GroupId != testGroupChatId || userGroupChat.UserId != managerId {
+		t.Fatal("insert one new row into tb_user_group_chat with wrong data")
+	}
+
+}
+
+// ------------------------------------------------------------------
+
+// Testing for operating 'tb_user_group_chat
+func TestInsertOneNewUserGroupChat(t *testing.T) {
+	_, err := InsertOneNewUserGroupChat(testGroupChatId, userId2, "user2")
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestSelectOneUserGroupChat(t *testing.T) {
+	userGroupChat, err := SelectOneUserGroupChat(testGroupChatId, userId2)
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("userGroupChat: %v", userGroupChat)
+}
+
+func TestSelectAllUserGroupChat(t *testing.T) {
+	data, err := SelectAllUserGroupChat()
+	if nil != err {
+		t.Fatal(err)
+	}
+	// after 'TestInsertOneNewGroupChatPlus' and 'TestInsertOneNewUserGroupChat', should have 2 rows data at least
+	if len(data) < 2 {
+		t.Fatal("there should have 1 userGroupChat at least, but not")
+	}
+
+}
+
+func TestSelectManyUserGroupChatByGroupId(t *testing.T) {
+	data, err := SelectManyUserGroupChatByGroupId(testGroupChatId, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	// after 'TestInsertOneNewGroupChatPlus' and 'TestInsertOneNewUserGroupChat', should have 2 rows data at least
+	if len(data) < 2 {
+		t.Fatal("should have 2 rows data at least, but not")
+	}
+	for index, userGroupChat := range data {
+		t.Logf("selectByGroupId\tuserGroupChat: %d >> %v", index, userGroupChat)
+	}
+}
+
+func TestSelectManyUserGroupChatByUserId(t *testing.T) {
+	data, err := SelectManyUserGroupChatByUserId(userId2, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(data) < 1 {
+		t.Fatal("should have 1 row data at least, but not ")
+	}
+}
+
+func TestSelectUsersIdOfGroupChat(t *testing.T) {
+	ids, err := SelectUsersIdOfGroupChat(testGroupChatId, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(ids) < 2 {
+		t.Fatal("should have 2 id at least, but not")
+	}
+	for index, id := range ids {
+		t.Logf("usersIdOfGroupChat: %d >> %d", index, id)
+	}
+}
+
+func TestSelectGroupChatsIdOfUser(t *testing.T) {
+	ids, err := SelectGroupChatsIdOfUser(userId2, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(ids) < 1 {
+		t.Fatal("should have 1 id at least, but not")
+	}
+	for index, id := range ids {
+		t.Logf("groupChatsIdOfUser: %d >> %d", index, id)
+	}
+}
+
+func TestUpdateOneUserGroupChatNote(t *testing.T) {
+	newNote := "newNote"
+	err := UpdateOneUserGroupChatNote(newNote, testGroupChatId, managerId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	userGroupChat, _ := SelectOneUserGroupChat(testGroupChatId, managerId)
+	if userGroupChat.UserNote != newNote {
+		t.Fatal("Update userGroupChat note fail")
+	}
+}
+
+func TestUpdateOneUserGroupChatIsDelete(t *testing.T) {
+	err := UpdateOneUserGroupChatIsDelete(true, testGroupChatId, userId2)
+	if nil != err {
+		t.Fatal(err)
+	}
+	userGroupChat, _ := SelectOneUserGroupChat(testGroupChatId, userId2)
+	if !userGroupChat.IsDelete {
+		t.Fatal("'is_delete should be true, but false")
+	}
+}
+
+// Plus function test
+func TestSelectGroupChatUsersInfoPlus(t *testing.T) {
+	data, err := SelectGroupChatUsersInfoPlus(testGroupChatId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	// after 'TestUpdateOneUserGroupChatIsDelete', only should have 1 row data at least
+	if len(data) < 1 {
+		t.Fatal("should have 1 row data at least, but not")
+	}
+	for index, info := range data {
+		t.Logf("groupChatUsersInfo: %d >> %v", index, info)
+	}
+
+}
+
+func TestSelectUserGroupChatsInfoPlus(t *testing.T) {
+	data, err := SelectUserGroupChatsInfoPlus(managerId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(data) < 1 {
+		t.Fatal("should have 1 row data at least, but not")
+	}
+	for index, info := range data {
+		t.Logf("userGroupChatsInfo: %d >> %v", index, info)
+	}
+
+}
+
+// ------------------------------------------------------------------
 
 // Clean the test data
 func TestDeleteOneUserByIdReal(t *testing.T) {
@@ -662,4 +838,17 @@ func TestDeleteOneGroupChatByIdReal(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+}
+
+func TestDeleteOneUserGroupChatReal(t *testing.T) {
+	err := DeleteOneUserGroupChatReal(testGroupChatId, managerId)
+	if nil != err {
+		t.Fatal(err)
+	}
+
+	err = DeleteOneUserGroupChatReal(testGroupChatId, userId2)
+	if nil != err {
+		t.Fatal(err)
+	}
+
 }

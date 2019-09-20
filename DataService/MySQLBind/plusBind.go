@@ -40,6 +40,9 @@ func UpdateOneUserProfileByIdPlus(name, mobile string, gender int32, id int64) e
 	return nil
 }
 
+// -----------------------------------------------------------------------
+
+//
 const (
 	SelectOneFriendIsBlackSQL  = `SELECT is_black FROM tb_friendship WHERE self_id= ? AND friend_id= ?`
 	SelectOneFriendIsAcceptSQL = `SELECT is_accept FROM tb_friendship WHERE self_id= ? AND friend_id= ?`
@@ -334,4 +337,181 @@ func SelectEffectiveFriendsIdPlus(selfId int64) ([]int64, error) {
 // Get the id of user's friends whom are in user's blacklist
 func SelectBlacklistFriendsIdPlus(selfId int64) ([]int64, error) {
 	return selectFiendsId(SelectBlacklistFriendsIdPlusSQL, selfId)
+}
+
+// -----------------------------------------------------------------------
+
+// Insert one new row data into 'tb_group_chat' table with authentication.
+// It will check the user who is the manager of the group chat if existed before insert the new row data into
+// 'tb_group_chat' table. Then will insert one row data into 'tb_user_group_chat' table at the same time.
+func InsertOneNewGroupChatPlus(name, avatar, qrCode string, managerId int64) (*TableGroupChat, error) {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+	// check the user who will be the manager if existed
+	row := tx.QueryRow(SelectOneUserByIdSQL, managerId, false)
+	user, err := scanUserFromRow(row)
+	if sql.ErrNoRows == err {
+		_ = tx.Rollback()
+		return nil, ErrGroupChatNotFound
+	}
+
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// insert one new row data into 'tb_group_chat' table
+	groupId := SnowFlakeNode.Generate().Int64()
+	_, err = tx.Exec(InsertOneNewGroupChatSQL, groupId, name, managerId, avatar, qrCode)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// insert one new row data int 'tb_user_group_chat' table
+	_, err = tx.Exec(InsertOneNewUserGroupChatSQL, groupId, managerId, user.Name, user.Name)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	return &TableGroupChat{Id: groupId, Name: name, Avatar: avatar, QrCode: qrCode, ManagerId: managerId}, nil
+}
+
+// -----------------------------------------------------------------------
+
+const (
+	SelectOneGroupChatIsDeleteById = `SELECT is_delete FROM tb_group_chat WHERE id= ?`
+
+	SelectGroupChatUsersInfoPlusSQL = `SELECT group_id, user_id, user_note, tb_user_basic.name, gender, email, avatar FROM
+tb_user_group_chat, tb_user_basic WHERE tb_user_group_chat.group_id= ? AND tb_user_group_chat.is_delete= FALSE AND 
+tb_user_basic.id= tb_user_group_chat.user_id AND tb_user_basic.is_delete = FALSE`
+)
+
+// The information of users whom are the member of the group chat
+// Because protocol buffer 3 only have int32, so 'Gender' also use int32 here.
+type JoinTableGroupChatUsersInfo struct {
+	GroupId    int64  `json:"group_id"`
+	UserId     int64  `json:"user_id"`
+	UserNote   string `json:"user_note"`
+	UserName   string `json:"user_name"`
+	UserGender int32  `json:"user_gender"`
+	UserEmail  string `json:"user_email"`
+	UserAvatar string `json:"user_avatar"`
+}
+
+// Get the information of the users whom are member of one group chat.
+// Requiring the 'is_delete' is 'false' both in 'tb_user_group_chat' and 'tb_user_basic'.
+// Meaning only can find effective members of the group chat.
+// It will check the group chat is still not dissolved before query data.
+func SelectGroupChatUsersInfoPlus(groupId int64) ([]*JoinTableGroupChatUsersInfo, error) {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+	// check the group chat is still not dissolved
+	row := tx.QueryRow(SelectOneGroupChatIsDeleteById, groupId)
+	groupChatIsDelete := new(bool)
+	err = row.Scan(groupChatIsDelete)
+	if sql.ErrNoRows == err || *groupChatIsDelete {
+		_ = tx.Rollback()
+		return nil, ErrGroupChatNotFound
+	}
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	// get the user's information of the group chat
+	rows, err := tx.Query(SelectGroupChatUsersInfoPlusSQL, groupId)
+	if nil != err {
+		return nil, err
+	}
+
+	result := make([]*JoinTableGroupChatUsersInfo, 0)
+	for rows.Next() {
+		temp := new(JoinTableGroupChatUsersInfo)
+		err := rows.Scan(&(temp.GroupId), &(temp.UserId), &(temp.UserNote), &(temp.UserName),
+			&(temp.UserGender), &(temp.UserEmail), &(temp.UserAvatar))
+		if nil != err {
+			continue
+		}
+		result = append(result, temp)
+	}
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	return result, nil
+}
+
+const (
+	SelectOneUserIsDeleteById = `SELECT is_delete FROM tb_user_basic WHERE id= ?`
+
+	SelectUserGroupChatsInfoPlusSQL = `SELECT user_id, group_id, name, avatar, qr_code FROM tb_group_chat,
+ tb_user_group_chat WHERE tb_user_group_chat.user_id= ? AND tb_user_group_chat.is_delete= FALSE AND tb_group_chat.id=
+ tb_user_group_chat.group_id AND tb_group_chat.is_delete=FALSE`
+)
+
+// The information of the group chat which the user have joined.
+type JoinTableUserGroupChatsInfo struct {
+	UserId      int64  `json:"user_id"`
+	GroupId     int64  `json:"group_id"`
+	GroupName   string `json:"group_name"`
+	GroupAvatar string `json:"group_avatar"`
+	GroupQrCode string `json:"group_qr_code"`
+}
+
+// Get the information of the group chat which the user have joined.
+// Requiring the 'is_delete' is 'false' both in 'tb_user_group_chat' and 'tb_group_chat'
+// Meaning only can find effective group chat the user joined.
+// It will check the value of 'is_delete' column in 'tb_user_basic' which found by 'user_id', before query data.
+func SelectUserGroupChatsInfoPlus(userId int64) ([]*JoinTableUserGroupChatsInfo, error) {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+	// check the user if still effective
+	row := tx.QueryRow(SelectOneUserIsDeleteById, userId)
+	userIsDelete := new(bool)
+	err = row.Scan(userIsDelete)
+	if sql.ErrNoRows == err || *userIsDelete {
+		_ = tx.Rollback()
+		return nil, ErrUserNotFound
+	}
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// get the information of the group chat which the user have joined
+	rows, err := tx.Query(SelectUserGroupChatsInfoPlusSQL, userId)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	result := make([]*JoinTableUserGroupChatsInfo, 0)
+	for rows.Next() {
+		temp := new(JoinTableUserGroupChatsInfo)
+		err := rows.Scan(&(temp.UserId), &(temp.GroupId), &(temp.GroupName),
+			&(temp.GroupAvatar), &(temp.GroupQrCode))
+		if nil != err {
+			continue
+		}
+		result = append(result, temp)
+	}
+
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+	return result, nil
 }
