@@ -341,7 +341,7 @@ func SelectBlacklistFriendsIdPlus(selfId int64) ([]int64, error) {
 
 // -----------------------------------------------------------------------
 
-// Insert one new row data into 'tb_group_chat' table with authentication.
+// Insert one new row data into 'tb_group_chat' table with checking.
 // It will check the user who is the manager of the group chat if existed before insert the new row data into
 // 'tb_group_chat' table. Then will insert one row data into 'tb_user_group_chat' table at the same time.
 func InsertOneNewGroupChatPlus(name, avatar, qrCode string, managerId int64) (*TableGroupChat, error) {
@@ -409,7 +409,7 @@ type JoinTableGroupChatUsersInfo struct {
 // Get the information of the users whom are member of one group chat.
 // Requiring the 'is_delete' is 'false' both in 'tb_user_group_chat' and 'tb_user_basic'.
 // Meaning only can find effective members of the group chat.
-// It will check the group chat is still not dissolved before query data.
+// It will checking the group chat is still not dissolved before query data.
 func SelectGroupChatUsersInfoPlus(groupId int64) ([]*JoinTableGroupChatUsersInfo, error) {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
@@ -515,3 +515,130 @@ func SelectUserGroupChatsInfoPlus(userId int64) ([]*JoinTableUserGroupChatsInfo,
 	}
 	return result, nil
 }
+
+// -----------------------------------------------------------------------
+
+// Insert one new row data into 'tb_subscription' table with checking.
+// It will check the user who will be the manager of the subscription if existed before insert the new row data into
+// 'tb_subscription' table. Then will insert one row data into 'tb_user_subscription' table at the same time. Meaning
+// the manager will always follow the subscription of himself, to know what the message sent from it at first time.
+func InsertOneNewSubscriptionPlus(name, introduce, avatar, qrCode string, managerId int64) (*TableSubscription, error) {
+	tx, err := MySQLClient.Begin()
+	if nil != err {
+		return nil, err
+	}
+	// check the manager if existed
+	userIsDelete := new(bool)
+	row := tx.QueryRow(SelectOneUserIsDeleteById, managerId)
+	err = row.Scan(userIsDelete)
+	if sql.ErrNoRows == err || *userIsDelete {
+		_ = tx.Rollback()
+		return nil, ErrUserNotFound
+
+	}
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// insert the one row data of the new subscription.
+	id := SnowFlakeNode.Generate().Int64()
+	_, err = tx.Exec(InsertOneNewSubscriptionSQL, id, name, managerId, introduce, avatar, qrCode)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	// insert one new row data into 'tb_user_subscription' table.
+	_, err = tx.Exec(InsertOneNewUserSubscriptionSQL, id, managerId)
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if nil != err {
+		_ = tx.Rollback()
+		return nil, err
+	}
+
+	temp := &TableSubscription{Id: id, Name: name, ManagerId: managerId,
+		Introduce: introduce, Avatar: avatar, QrCode: qrCode}
+	return temp, nil
+}
+
+// -----------------------------------------------------------------------
+
+const (
+	SelectSubscriptionsOfUserPlusSQL = `SELECT user_id, subs_id, name, introduce, avatar, qr_code FROM 
+tb_user_subscription,tb_subscription WHERE tb_user_subscription.user_id= ? AND tb_user_subscription.is_delete= FALSE AND 
+ tb_subscription.id= tb_user_subscription.subs_id AND tb_subscription.is_delete=FALSE `
+
+	SelectUsersOfSubscriptionPlusSQL = `SELECT subs_id, user_id, email, name, gender FROM tb_user_subscription, 
+tb_user_basic WHERE tb_user_subscription.subs_id= ? AND tb_user_subscription.is_delete= FALSE AND 
+tb_user_basic.id= tb_user_subscription.user_id AND tb_user_basic.is_delete= FALSE `
+)
+
+
+// The information of the subscription those the user followed
+type JoinTableUserSubscriptionsInfo struct {
+	UserId    int64  `json:"user_id"`
+	SubsId    int64  `json:"subs_id"`
+	Name      string `json:"name"`
+	Introduce string `json:"introduce"`
+	Avatar    string `json:"avatar"`
+	QrCode    string `json:"qr_code"`
+}
+
+// Get the information of the subscriptions which the user was followed.
+// Requiring the 'is_delete' is 'false' both in 'tb_subscription' and 'tb_user_subscription' table.
+func SelectSubscriptionsOfUserPlus(userId int64) ([]*JoinTableUserSubscriptionsInfo, error) {
+	rows, err := MySQLClient.Query(SelectSubscriptionsOfUserPlusSQL, userId)
+	if nil != err {
+		return nil, err
+	}
+	result := make([]*JoinTableUserSubscriptionsInfo, 0)
+	for rows.Next() {
+		temp := new(JoinTableUserSubscriptionsInfo)
+		err := rows.Scan(&(temp.UserId), &(temp.SubsId), &(temp.Name),
+			&(temp.Introduce), &(temp.Avatar), &(temp.QrCode))
+		if nil != err {
+			continue
+		}
+		result = append(result, temp)
+	}
+
+	return result, nil
+}
+
+// The information of user whom was followed the subscription
+// Because protocol buffer 3 only have int32, so 'Gender' also use int32 here.
+type JoinTableSubscriptionUsersInfo struct {
+	SubsId int64  `json:"subs_id"`
+	UserId int64  `json:"user_id"`
+	Email  string `json:"email"`
+	Name   string `json:"name"`
+	Gender int32  `json:"gender"`
+}
+
+// Get the information of the user whom was followed the subscription.
+// Requiring the 'is_delete' is 'false' both in 'tb_user_basic' and 'tb_user_subscription' table.
+func SelectUsersOfSubscriptionPlus(subsId int64) ([]*JoinTableSubscriptionUsersInfo, error) {
+	rows, err := MySQLClient.Query(SelectUsersOfSubscriptionPlusSQL, subsId)
+	if nil != err {
+		return nil, err
+	}
+	result := make([]*JoinTableSubscriptionUsersInfo, 0)
+	for rows.Next() {
+		temp := new(JoinTableSubscriptionUsersInfo)
+		err := rows.Scan(&(temp.SubsId), &(temp.UserId), &(temp.Email), &(temp.Name), &(temp.Gender))
+		if nil != err {
+			continue
+		}
+		result = append(result, temp)
+	}
+	return result, nil
+
+}
+
+// -----------------------------------------------------------------------

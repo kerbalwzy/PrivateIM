@@ -799,7 +799,284 @@ func TestSelectUserGroupChatsInfoPlus(t *testing.T) {
 
 // ------------------------------------------------------------------
 
-// Clean the test data
+// Testing for operating 'tb_subscription' table
+var (
+	testSubsId1, testSubsManagerId int64
+	testSubsName                   = "subsName1"
+	testIntroduce                  = "<test subscription introduce>"
+	testSubsAvatar                 = "<test subscription avatar pic name>"
+	testSubsQrCode                 = "<test subscription qr code pic name>"
+)
+
+func TestInsertOneNewSubscription(t *testing.T) {
+	testSubsManagerId = userId1
+	subs, err := InsertOneNewSubscription(testSubsName, testIntroduce, testSubsAvatar,
+		testSubsQrCode, testSubsManagerId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("insertOneNewSubscription: %v", subs)
+	testSubsId1 = subs.Id
+}
+
+func TestSelectOneSubscriptionById(t *testing.T) {
+	_, err := SelectOneSubscriptionById(testSubsId1, false)
+	if nil != err {
+		t.Fatal()
+	}
+}
+
+func TestSelectOneSubscriptionByName(t *testing.T) {
+	_, err := SelectOneSubscriptionByName(testSubsName, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestSelectManySubscriptionByManagerId(t *testing.T) {
+	data, err := SelectManySubscriptionByManagerId(testSubsManagerId, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(data) < 1 {
+		t.Fatal("should have 1 subscription at least, but not")
+	}
+}
+
+func TestUpdateOneSubscriptionNameById(t *testing.T) {
+	newName := "subsNameN"
+	err := UpdateOneSubscriptionNameById(newName, testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	data, err := SelectOneSubscriptionByName(newName, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if data.Id != testSubsId1 {
+		t.Fatal("the id is wrong")
+	}
+}
+
+func TestUpdateOneSubscriptionManagerById(t *testing.T) {
+	err := UpdateOneSubscriptionManagerById(userId2, testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	data, _ := SelectOneSubscriptionById(testSubsId1, false)
+	if data.ManagerId != userId2 {
+		t.Fatal("update manager id fail")
+	}
+
+}
+
+func TestUpdateOneSubscriptionIntroduceById(t *testing.T) {
+	newIntroduce := "<new introduce test>"
+	err := UpdateOneSubscriptionIntroduceById(newIntroduce, testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	data, _ := SelectOneSubscriptionById(testSubsId1, false)
+	if data.Introduce != newIntroduce {
+		t.Fatal("update introduce fail")
+	}
+}
+
+func TestUpdateOneSubscriptionAvatarById(t *testing.T) {
+	newAvatar := "<new avatar pic name>"
+	err := UpdateOneSubscriptionAvatarById(newAvatar, testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	data, _ := SelectOneSubscriptionById(testSubsId1, false)
+	if data.Avatar != newAvatar {
+		t.Fatal("update the avatar fail")
+	}
+
+}
+
+func TestUpdateOneSubscriptionQrCodeById(t *testing.T) {
+	newQrCode := "<new qr code pic name>"
+	err := UpdateOneSubscriptionQrCodeById(newQrCode, testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	data, _ := SelectOneSubscriptionById(testSubsId1, false)
+	if data.QrCode != newQrCode {
+		t.Fatal("update the qr_code fail")
+	}
+}
+
+func TestUpdateOneSubscriptionIsDeleteById(t *testing.T) {
+	err := UpdateOneSubscriptionIsDeleteById(true, testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	_, err = SelectOneSubscriptionById(testSubsId1, false)
+	if err == nil {
+		t.Fatal("should have an error")
+	}
+	data, _ := SelectOneSubscriptionById(testSubsId1, true)
+	if data == nil {
+		t.Fatal("update the is_delete fail")
+	}
+
+	// recover the data
+	_ = UpdateOneSubscriptionIsDeleteById(false, testSubsId1)
+}
+
+// Plus function test
+func TestInsertOneNewSubscriptionPlus(t *testing.T) {
+
+	// insert with not existed manager
+	_, err := InsertOneNewSubscriptionPlus(testSubsName, testIntroduce, testSubsAvatar,
+		testSubsQrCode, 0)
+	if nil == err {
+		t.Fatal(err)
+	}
+	t.Logf("WantError: %s", err.Error())
+
+	// insert normally
+	data, err := InsertOneNewSubscriptionPlus(testSubsName, testIntroduce, testSubsAvatar, testSubsQrCode, userId2)
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("newSubscription: %v", data)
+	userSubs, err := SelectOneUserSubscriptionByIds(data.Id, userId2, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if data.Id != userSubs.SubsId || userId2 != userSubs.UserId {
+		t.Fatal("the id should be same")
+	}
+
+	t.Logf("newUserSubscription: %v", userSubs)
+
+	// clean the test data
+	_ = DeleteOneSubscriptionReal(data.Id)
+
+	err = DeleteOneUserSubscriptionReal(userSubs.SubsId, userSubs.UserId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+// ------------------------------------------------------------------
+func TestInsertOneNewUserSubscription(t *testing.T) {
+	_, err := InsertOneNewUserSubscription(testSubsId1, userId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	_, err = InsertOneNewUserSubscription(testSubsId1, userId1)
+	if nil == err {
+		t.Fatal("should have an error")
+	}
+	t.Logf("WantError: %s", err.Error())
+
+	_, _ = InsertOneNewUserSubscription(testSubsId1, userId2)
+}
+
+func TestSelectOneUserSubscriptionByIds(t *testing.T) {
+	data, err := SelectOneUserSubscriptionByIds(testSubsId1, userId1, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if data.SubsId != testSubsId1 || data.UserId != userId1 {
+		t.Fatal("ids is wrong")
+	}
+}
+
+func TestSelectManyUserSubscriptionBySubsId(t *testing.T) {
+	data, err := SelectManyUserSubscriptionBySubsId(testSubsId1, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(data) < 2 {
+		t.Fatal("should have 2 rows data at least")
+	}
+	for index, temp := range data {
+		t.Logf("userSubs: %d >> %v", index, temp)
+	}
+}
+
+func TestSelectManyUserSubscriptionByUserId(t *testing.T) {
+	data, err := SelectManyUserSubscriptionByUserId(userId1, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(data) < 1 {
+		t.Fatal("should have 1 row data at least")
+	}
+	for index, temp := range data {
+		t.Logf("userSubs: %d >> %v", index, temp)
+	}
+}
+
+func TestSelectUsersIdOfSubscription(t *testing.T) {
+	ids, err := SelectUsersIdOfSubscription(testSubsId1, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(ids) < 2 {
+		t.Fatal("should have tow rows data at least")
+	}
+}
+
+func TestSelectSubscriptionsIdOfUser(t *testing.T) {
+	ids, err := SelectSubscriptionsIdOfUser(userId1, false)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(ids) < 1 {
+		t.Fatal("should have 1 row data at least")
+	}
+}
+
+func TestUpdateOneUserSubscriptionIsDelete(t *testing.T) {
+	err := UpdateOneUserSubscriptionIsDelete(true, testSubsId1, userId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	_, err = SelectOneUserSubscriptionByIds(testSubsId1, userId1, true)
+	if nil != err {
+		t.Fatal(err)
+	}
+	_ = UpdateOneUserSubscriptionIsDelete(false, testSubsId1, userId1)
+}
+
+// Plus function test
+
+func TestSelectSubscriptionsOfUserPlus(t *testing.T) {
+	subss, err := SelectSubscriptionsOfUserPlus(userId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(subss) < 1 {
+		t.Fatal("should have 1 row data at least")
+	}
+
+	for index, item := range subss {
+		t.Logf("subsOfUser: %d >> %v", index, item)
+	}
+}
+
+func TestSelectUsersOfSubscriptionPlus(t *testing.T) {
+	users, err := SelectUsersOfSubscriptionPlus(testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	if len(users) < 2 {
+		t.Fatal("should have 2 rows data at least")
+	}
+
+	for index, item := range users {
+		t.Logf("userOfSubs: %d >> %v", index, item)
+	}
+}
+
+// ------------------------------------------------------------------
+
+//Clean the test data
 func TestDeleteOneUserByIdReal(t *testing.T) {
 	// this is delete one row data real
 	err := DeleteOneUserByIdReal(userId1)
@@ -851,4 +1128,22 @@ func TestDeleteOneUserGroupChatReal(t *testing.T) {
 		t.Fatal(err)
 	}
 
+}
+
+func TestDeleteOneSubscriptionReal(t *testing.T) {
+	err := DeleteOneSubscriptionReal(testSubsId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteOneUserSubscriptionReal(t *testing.T) {
+	err := DeleteOneUserSubscriptionReal(testSubsId1, userId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	err = DeleteOneUserSubscriptionReal(testSubsId1, userId2)
+	if nil != err {
+		t.Fatal(err)
+	}
 }
