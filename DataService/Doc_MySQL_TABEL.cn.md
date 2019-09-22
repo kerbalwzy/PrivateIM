@@ -123,15 +123,15 @@
 
 - #### <span id="5">tb_subscription</span> [TOP](#0)
 
-  | Column     | DataType     | Constraints         | Description                     |
-  | ---------- | ------------ | ------------------- | ------------------------------- |
-  | id         | BIGINT(20)   | NOT NULL INDEX      | 订阅号ID,雪花算法生成uint64数值 |
-  | name       | VARCHAR(10)  | NOT NULL            | 订阅号名称, 也不允许为空字符串  |
-  | manager_id | BIGINT(20)   | NOT NULL INDEX      | 订阅号拥有者ID                  |
-  | introduce  | VARCHAR(150) | NOT NULL            | 订阅号简介                      |
-  | avatar     | VARCHAR(100) | NOT NULL DEFALUT '' | 订阅号头像文件名称              |
-  | qr_code    | VARCHAR(100) | NOT NULL UNIQUE     | 订阅号二维码文件名称            |
-  | is_delete  | TINYINT(1)   | NOT NULL DEFAULT 0  | 是否注销                        |
+  | Column     | DataType     | Constraints         | Description                        |
+  | ---------- | ------------ | ------------------- | ---------------------------------- |
+  | id         | BIGINT(20)   | NOT NULL INDEX      | 订阅号ID,雪花算法生成uint64数值    |
+  | name       | VARCHAR(10)  | NOT NULL UNIQUE     | 订阅号名称, 唯一, 不允许为空字符串 |
+  | manager_id | BIGINT(20)   | NOT NULL INDEX      | 订阅号拥有者ID                     |
+  | introduce  | VARCHAR(150) | NOT NULL            | 订阅号简介                         |
+  | avatar     | VARCHAR(100) | NOT NULL DEFALUT '' | 订阅号头像文件名称                 |
+  | qr_code    | VARCHAR(100) | NOT NULL UNIQUE     | 订阅号二维码文件名称               |
+  | is_delete  | TINYINT(1)   | NOT NULL DEFAULT 0  | 是否注销                           |
 
   ```mysql
   CREATE TABLE `tb_subscription` (
@@ -141,9 +141,10 @@
     `introduce` varchar(150) NOT NULL,
     `avatar` varchar(100) NOT NULL DEFAULT '',
     `qr_code` varchar(100) NOT NULL,
-    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    `is_delete` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     UNIQUE KEY `qr_code_unique` (`qr_code`),
+    UNIQUE KEY `name_unique` (`name`),
     KEY `manager_id_index` (`manager_id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```
