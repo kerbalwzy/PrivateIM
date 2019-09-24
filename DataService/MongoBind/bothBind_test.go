@@ -428,3 +428,34 @@ func TestUpdateSubscriptionUsersToDelOne(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// ------------------------------------------------------------------------------------
+
+// Plus functions test
+func TestUpdateMoveUserIntoGroupChat(t *testing.T) {
+	err := UpdateMoveUserIntoGroupChat(testUserId1, testGroupChatId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateMoveUserOutFromGroupChat(t *testing.T) {
+	err := UpdateMoveUserOutFromGroupChat(testUserId1, testGroupChatId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateMakeUserFollowSubscription(t *testing.T) {
+	err := UpdateMakeUserFollowSubscription(testUserId1, testSubsId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateMakeUserUnFollowSubscription(t *testing.T) {
+	err := UpdateMakeUserUnFollowSubscription(testUserId1, testSubsId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}

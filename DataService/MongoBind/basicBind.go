@@ -648,3 +648,5 @@ func FindSubscriptionUsersById(subsId int64) (*DocSubscriptionUsers, error) {
 	err := CollSubscriptionUsers.FindOne(getTimeOutCtx(3), bson.M{"_id": subsId}).Decode(temp)
 	return temp, err
 }
+
+// ------------------------------------------------------------------------------------
