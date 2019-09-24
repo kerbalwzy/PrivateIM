@@ -1,9 +1,8 @@
 package MongoBind
 
 import (
-	"context"
+
 	"log"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,7 +27,7 @@ var (
 func init() {
 	var err error
 	MongoClient, err = mongo.Connect(getTimeOutCtx(10),
-		options.Client().ApplyURI(conf.MsgDbMongoURI))
+		options.Client().ApplyURI(conf.MongoDBURI))
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -48,11 +47,7 @@ func init() {
 
 }
 
-// Return a context instance with deadline
-func getTimeOutCtx(expire time.Duration) context.Context {
-	ctx, _ := context.WithTimeout(context.Background(), expire*time.Second)
-	return ctx
-}
+
 
 // Id is for user's id
 type TempDelayedMessage struct {

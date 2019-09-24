@@ -254,3 +254,53 @@ func TestFindSubscriptionHistoryByIdAndDate(t *testing.T) {
 }
 
 // ------------------------------------------------------------------------------------
+
+var (
+	testUserId   int64 = 1234
+	testFriendId int64 = 2345
+)
+
+func TestUpdateUserFriendsToAddFriend(t *testing.T) {
+	err := UpdateUserFriendsToAddFriend(testUserId, testFriendId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateUserFriendsToDelFriend(t *testing.T) {
+	err := UpdateUserFriendsToDelFriend(testUserId, testFriendId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateUserBlacklistToAddUser(t *testing.T) {
+	err := UpdateUserBlacklistToAddUser(testUserId, testFriendId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateUserBlacklistToDelUser(t *testing.T) {
+	err := UpdateUserBlacklistToDelUser(testUserId, testFriendId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+// Plus functions test
+func TestUpdateMoveFriendIntoBlacklistPlus(t *testing.T) {
+	err := UpdateMoveFriendIntoBlacklistPlus(testUserId, testFriendId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateMoveFriendOutFromBlacklistPlus(t *testing.T) {
+	err := UpdateMoveFriendOutFromBlacklistPlus(testUserId, testFriendId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+// ------------------------------------------------------------------------------------

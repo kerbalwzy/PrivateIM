@@ -54,6 +54,18 @@ func init() {
 
 }
 
+// Update options:
+var (
+	// when the document want be update not existed, insert new one.
+	upsertTrueOption = options.Update().SetUpsert(true)
+)
+
+// Custom errors:
+var (
+	ErrFoundCount             = errors.New("the found count should be 0 or 1")
+	ErrMessageHistoryNotFound = errors.New("the message history not found")
+)
+
 // Return a context instance with deadline
 func getTimeOutCtx(expire time.Duration) context.Context {
 	ctx, _ := context.WithTimeout(context.Background(), expire*time.Second)
@@ -76,18 +88,6 @@ func GetJoinUserId(userId1, userId2 int64) string {
 		return fmt.Sprintf("%d_%d", userId2, userId1)
 	}
 }
-
-// Update options:
-var (
-	// when the document want be update not existed, insert new one.
-	upsertTrueOption = options.Update().SetUpsert(true)
-)
-
-// Custom errors:
-var (
-	ErrFoundCount             = errors.New("the found count should be 0 or 1")
-	ErrMessageHistoryNotFound = errors.New("the message history not found")
-)
 
 // information for history messages(message recorded for every date).
 // Because there only have int32 and int64 in protocol buffers3, so the 'Date' defined with int32
@@ -193,6 +193,7 @@ func findManyHistoryMessageByIdAndDate(coll *mongo.Collection, id interface{}, d
 }
 
 // ------------------------------------------------------------------------------------
+
 /* delay_message document eg.:
 {
 	"_id": <user_id>,
@@ -305,7 +306,7 @@ func FindUserChatHistoryByJoinIdAndDate(joinUserId string, date int32) (*DocUser
 
 // ------------------------------------------------------------------------------------
 
-/*
+/* group_chat_history document eg.:
 {
 	"_id": <the group chat id>,
 	"history": [
@@ -380,7 +381,7 @@ func FindGroupChatHistoryByIdAndDate(groupId int64, date int32) (*DocGroupChatHi
 
 // ------------------------------------------------------------------------------------
 
-/*
+/* subscription_msg_history document eg.:
 {
 	"_id": <the subscription id>,
 	"history": [
@@ -451,3 +452,57 @@ func FindSubscriptionHistoryByIdAndDate(subsId int64, date int32) (*DocSubscript
 
 	return temp, nil
 }
+
+// ------------------------------------------------------------------------------------
+
+// Update an id array in a document which found by id in target collection.
+// The document would be found by 'queryId' in 'coll'.
+func updateIdArrayOfOneDocument(coll *mongo.Collection, queryId, updateId int64, arrayName, operate string, ) error {
+	_, err := coll.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": queryId},
+		bson.M{operate: bson.M{arrayName: updateId}},
+		upsertTrueOption)
+	return err
+}
+
+/* user_friends document eg.:
+{
+	"_id": <the user id eg>,
+    "friends": [
+        <another user id>,
+        <another user id>,
+    ],
+    "blacklist": [
+    	<another user id>,
+        <another user id>,
+    ]
+}
+*/
+// information for user's friends.
+type DocUserFriends struct {
+	UserId    int64   `bson:"user_id"`
+	Friends   []int64 `bson:"friends"`
+	Blacklist []int64 `bson:"blacklist"`
+}
+
+// Update the 'friends' array to add one new friend's id.
+func UpdateUserFriendsToAddFriend(userId, friendId int64) error {
+	return updateIdArrayOfOneDocument(CollUserFriends, userId, friendId, "friends", "$addToSet")
+}
+
+// Update the 'friends' array to delete one friend's id.
+func UpdateUserFriendsToDelFriend(userId, friendId int64) error {
+	return updateIdArrayOfOneDocument(CollUserFriends, userId, friendId, "friends", "$pull")
+}
+
+// Update the 'blacklist' array to add one user id.
+func UpdateUserBlacklistToAddUser(userId, anotherId int64) error {
+	return updateIdArrayOfOneDocument(CollUserFriends, userId, anotherId, "blacklist", "$addToSet")
+}
+
+// Update the 'blacklist' array to delete one user id.
+func UpdateUserBlacklistToDelUser(userId, anotherId int64) error {
+	return updateIdArrayOfOneDocument(CollUserFriends, userId, anotherId, "blacklist", "$pull")
+}
+
+// ------------------------------------------------------------------------------------
