@@ -26,7 +26,7 @@ var (
 	CollUserGroupChats,    // the id of the group chat which the user was joined.
 	CollUserSubscriptions, // the id of the subscription which the user was followed
 
-	CollGroupUsers, // the id of users whom are belong to the group chat.
+	CollGroupChatUsers, // the id of users whom are belong to the group chat.
 	CollSubscriptionUsers *mongo.Collection // the id of users whom are followed the subscription.
 )
 
@@ -49,7 +49,7 @@ func init() {
 	CollUserGroupChats = db.Collection(conf.CollUserGroupChatsName)
 	CollUserSubscriptions = db.Collection(conf.CollUserSubscriptions)
 
-	CollGroupUsers = db.Collection(conf.CollGroupChatUsersName)
+	CollGroupChatUsers = db.Collection(conf.CollGroupChatUsersName)
 	CollSubscriptionUsers = db.Collection(conf.CollSubscriptionUsersName)
 
 }
@@ -582,3 +582,69 @@ func FindUserSubscriptionsById(userId int64) (*DocUserSubscriptions, error) {
 }
 
 // ------------------------------------------------------------------------------------
+
+/* group_chat_users document eg.:
+{
+	"_id": <the group chat id>,
+	"users" : [
+		<the user id>,
+		<the user id>,
+		...
+	]
+}
+*/
+// information for the users which belong to the group chat
+type DocGroupChatUsers struct {
+	GroupId int64   `bson:"_id"`
+	Users   []int64 `bson:"users"`
+}
+
+// Update the 'users' array to add one user id.
+func UpdateGroupChatUserToAddOne(groupChatId, userId int64) error {
+	return updateIdArrayOfOneDocument(CollGroupChatUsers, groupChatId, userId, "users", "$addToSet")
+}
+
+// Update the 'users' array to delete one user id.
+func UpdateGroupChatUsersToDelOne(groupChatId, userId int64) error {
+	return updateIdArrayOfOneDocument(CollGroupChatUsers, groupChatId, userId, "users", "$pull")
+}
+
+func FindGroupChatUsersById(groupChatId int64) (*DocGroupChatUsers, error) {
+	temp := new(DocGroupChatUsers)
+	err := CollGroupChatUsers.FindOne(getTimeOutCtx(3), bson.M{"_id": groupChatId}).Decode(temp)
+	return temp, err
+}
+
+// ------------------------------------------------------------------------------------
+
+/* subscription_users document eg.:
+{
+	"_id": <the subscription id>,
+	"users" : [
+		<the user id>,
+		<the user id>,
+		...
+	]
+}
+*/
+// information for the users which followed the subscription.
+type DocSubscriptionUsers struct {
+	SubsId int64   `bson:"_id"`
+	Users  []int64 `bson:"users"`
+}
+
+// Update the 'users' array to add one user id.
+func UpdateSubscriptionUsersToAddOne(subsId, userId int64) error {
+	return updateIdArrayOfOneDocument(CollSubscriptionUsers, subsId, userId, "users", "$addToSet")
+}
+
+// Update the 'users' array to delete one user id.
+func UpdateSubscriptionUsersToDelOne(subsId, userId int64) error {
+	return updateIdArrayOfOneDocument(CollSubscriptionUsers, subsId, userId, "users", "$pull")
+}
+
+func FindSubscriptionUsersById(subsId int64) (*DocSubscriptionUsers, error) {
+	temp := new(DocSubscriptionUsers)
+	err := CollSubscriptionUsers.FindOne(getTimeOutCtx(3), bson.M{"_id": subsId}).Decode(temp)
+	return temp, err
+}
