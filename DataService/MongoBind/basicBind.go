@@ -323,7 +323,7 @@ func FindUserChatHistoryByJoinIdAndDate(joinUserId string, date int32) (*DocUser
 */
 // information for group chat history.
 type DocGroupChatHistory struct {
-	GroupId int64            `bson:"group_id"`
+	GroupId int64            `bson:"_id"`
 	History []historyMessage `bson:"history"`
 }
 
@@ -398,7 +398,7 @@ func FindGroupChatHistoryByIdAndDate(groupId int64, date int32) (*DocGroupChatHi
 */
 // information for subscription message history.
 type DocSubscriptionHistory struct {
-	SubsId  int64            `bson:"subs_id"`
+	SubsId  int64            `bson:"_id"`
 	History []historyMessage `bson:"history"`
 }
 
@@ -480,7 +480,7 @@ func updateIdArrayOfOneDocument(coll *mongo.Collection, queryId, updateId int64,
 */
 // information for user's friends.
 type DocUserFriends struct {
-	UserId    int64   `bson:"user_id"`
+	UserId    int64   `bson:"_id"`
 	Friends   []int64 `bson:"friends"`
 	Blacklist []int64 `bson:"blacklist"`
 }
@@ -503,6 +503,12 @@ func UpdateUserBlacklistToAddUser(userId, anotherId int64) error {
 // Update the 'blacklist' array to delete one user id.
 func UpdateUserBlacklistToDelUser(userId, anotherId int64) error {
 	return updateIdArrayOfOneDocument(CollUserFriends, userId, anotherId, "blacklist", "$pull")
+}
+
+func FindUserFriendsAndBlacklistById(userId int64) (*DocUserFriends, error) {
+	temp := new(DocUserFriends)
+	err := CollUserFriends.FindOne(getTimeOutCtx(3), bson.M{"_id": userId}).Decode(temp)
+	return temp, err
 }
 
 // ------------------------------------------------------------------------------------

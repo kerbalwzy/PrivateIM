@@ -256,8 +256,8 @@ func TestFindSubscriptionHistoryByIdAndDate(t *testing.T) {
 // ------------------------------------------------------------------------------------
 
 var (
-	testUserId   int64 = 1234
-	testFriendId int64 = 2345
+	testUserId   int64 = 12345
+	testFriendId int64 = 23456
 )
 
 func TestUpdateUserFriendsToAddFriend(t *testing.T) {
@@ -265,6 +265,8 @@ func TestUpdateUserFriendsToAddFriend(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+
+	_ = UpdateUserFriendsToAddFriend(testUserId2, testFriendId)
 }
 
 func TestUpdateUserFriendsToDelFriend(t *testing.T) {
@@ -279,12 +281,29 @@ func TestUpdateUserBlacklistToAddUser(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+
+	_ = UpdateUserBlacklistToAddUser(testUserId2, testUserId1)
 }
 
 func TestUpdateUserBlacklistToDelUser(t *testing.T) {
 	err := UpdateUserBlacklistToDelUser(testUserId, testFriendId)
 	if nil != err {
 		t.Fatal(err)
+	}
+}
+
+func TestFindUserFriendsAndBlacklistById(t *testing.T) {
+	data, err := FindUserFriendsAndBlacklistById(testUserId2)
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("UserFriendsAndBlacklist: for user id= %d", data.UserId)
+	for index, item := range data.Friends {
+		t.Logf("friends: %d >> %d", index, item)
+	}
+
+	for index, item := range data.Blacklist {
+		t.Logf("blacklist: %d >> %d", index, item)
 	}
 }
 
