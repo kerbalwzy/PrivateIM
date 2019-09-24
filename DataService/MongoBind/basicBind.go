@@ -467,14 +467,16 @@ func updateIdArrayOfOneDocument(coll *mongo.Collection, queryId, updateId int64,
 
 /* user_friends document eg.:
 {
-	"_id": <the user id eg>,
+	"_id": <the user id>,
     "friends": [
         <another user id>,
         <another user id>,
+		...
     ],
     "blacklist": [
     	<another user id>,
         <another user id>,
+		...
     ]
 }
 */
@@ -508,6 +510,74 @@ func UpdateUserBlacklistToDelUser(userId, anotherId int64) error {
 func FindUserFriendsAndBlacklistById(userId int64) (*DocUserFriends, error) {
 	temp := new(DocUserFriends)
 	err := CollUserFriends.FindOne(getTimeOutCtx(3), bson.M{"_id": userId}).Decode(temp)
+	return temp, err
+}
+
+// ------------------------------------------------------------------------------------
+
+/* user_group_chats document eg.:
+{
+	"_id": <the user id>,
+	"groups": [
+		<the group chat id>,
+		<the group chat id>,
+		...
+	]
+}
+*/
+// information for the group chat which the user had joined.
+type DocUserGroupChats struct {
+	UserId int64   `bson:"_id"`
+	Groups []int64 `bson:"groups"`
+}
+
+// Update the 'groups' array to add one group chat id.
+func UpdateUserGroupChatsToAddOne(userId, groupChatId int64) error {
+	return updateIdArrayOfOneDocument(CollUserGroupChats, userId, groupChatId, "groups", "$addToSet")
+}
+
+// Update the 'groups' array to delete one group chat id.
+func UpdateUserGroupChatsToDelOne(userId, groupChatId int64) error {
+	return updateIdArrayOfOneDocument(CollUserGroupChats, userId, groupChatId, "groups", "$pull")
+}
+
+func FindUserGroupChatsById(userId int64) (*DocUserGroupChats, error) {
+	temp := new(DocUserGroupChats)
+	err := CollUserGroupChats.FindOne(getTimeOutCtx(3), bson.M{"_id": userId}).Decode(temp)
+	return temp, err
+}
+
+// ------------------------------------------------------------------------------------
+
+/* user_subscriptions document eg.:
+{
+	"_id": <the user id>,
+	"subscriptions": [
+		<the subscription id>,
+		<the subscription id>,
+		...
+	]
+}
+*/
+// information for the subscription which the user had followed.
+type DocUserSubscriptions struct {
+	UserId        int64   `bson:"_id"`
+	Subscriptions []int64 `bson:"subscriptions"`
+}
+
+// Update the 'subscription' array to add one subscription id.
+func UpdateUserSubscriptionsToAddOne(userId, subsId int64) error {
+	return updateIdArrayOfOneDocument(CollUserSubscriptions, userId, subsId, "subscriptions", "$addToSet")
+}
+
+// Update the 'subscription' array to delete one subscription id.
+func UpdateUserSubscriptionsToDelOne(userId, subsId int64) error {
+	return updateIdArrayOfOneDocument(CollUserSubscriptions, userId, subsId, "subscriptions", "$pull")
+}
+
+func FindUserSubscriptionsById(userId int64) (*DocUserSubscriptions, error) {
+	temp := new(DocUserSubscriptions)
+	err := CollUserSubscriptions.FindOne(getTimeOutCtx(3), bson.M{"_id": userId}).Decode(temp)
 	return temp, err
 }
 

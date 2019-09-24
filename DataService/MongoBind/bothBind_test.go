@@ -323,3 +323,56 @@ func TestUpdateMoveFriendOutFromBlacklistPlus(t *testing.T) {
 }
 
 // ------------------------------------------------------------------------------------
+
+func TestUpdateUserGroupChatsToAddOne(t *testing.T) {
+	err := UpdateUserGroupChatsToAddOne(testUserId1, testGroupChatId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+func TestFindUserGroupChatsById(t *testing.T) {
+	data, err := FindUserGroupChatsById(testUserId1)
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("user(%d)'s group chat id", data.UserId)
+	for index, id := range data.Groups {
+		t.Logf("%d >> %d", index, id)
+	}
+}
+
+func TestUpdateUserGroupChatsToDelOne(t *testing.T) {
+	err := UpdateUserGroupChatsToDelOne(testUserId1, testGroupChatId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+// ------------------------------------------------------------------------------------
+
+func TestUpdateUserSubscriptionsToAddOne(t *testing.T) {
+	err := UpdateUserSubscriptionsToAddOne(testUserId, testSubsId)
+	if nil != err {
+	}
+}
+
+func TestFindUserSubscriptionsById(t *testing.T) {
+	data, err := FindUserSubscriptionsById(testUserId)
+	if nil != err {
+		t.Fatal(err)
+	}
+	t.Logf("user(%d)'s subscriptions id", data.UserId)
+	for index, id := range data.Subscriptions {
+		t.Logf("%d >> %d", index, id)
+	}
+}
+
+func TestUpdateUserSubscriptionsToDelOne(t *testing.T) {
+	err := UpdateUserSubscriptionsToDelOne(testUserId, testSubsId)
+	if nil != err {
+		t.Fatal(err)
+	}
+}
+
+// ------------------------------------------------------------------------------------
