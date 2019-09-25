@@ -115,19 +115,20 @@ func scanUserFromRow(row *sql.Row) (*TableUserBasic, error) {
 }
 
 const (
-	InsertOneNewUserSQL = `INSERT INTO tb_user_basic (id, email, name, password, mobile, gender, avatar, qr_code) 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	InsertOneNewUserSQL = `INSERT INTO tb_user_basic (id, email, name, password, mobile, gender, avatar, qr_code, is_delete) 
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	DeleteOneUserRealSQL = `DELETE FROM tb_user_basic WHERE id = ?`
 )
 
 // Insert one row new data for saving information of new user.
 // The 'id' will auto generate by 'SnowFlakeNode', the 'is_delete' will use default value 'false'.
 func InsertOneNewUser(email, name, password, mobile string,
-	gender int32, avatar, qrCode string) (*TableUserBasic, error) {
+	gender int32, avatar, qrCode string, isDelete bool) (*TableUserBasic, error) {
 
 	// generate an ID and insert the data
 	id := SnowFlakeNode.Generate().Int64()
-	err := execSqlWithTransaction(InsertOneNewUserSQL, id, email, name, password, mobile, gender, avatar, qrCode)
+	err := execSqlWithTransaction(InsertOneNewUserSQL,
+		id, email, name, password, mobile, gender, avatar, qrCode, isDelete)
 	if nil != err {
 		return nil, err
 	}

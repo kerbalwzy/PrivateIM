@@ -20,7 +20,7 @@ var (
 
 func TestInsertOneNewUser(t *testing.T) {
 	user, err := InsertOneNewUser(tempEmail1, tempName, tempPassword, tempMobile,
-		tempGender, tempAvatar, tempQrCode1)
+		tempGender, tempAvatar, tempQrCode1, false)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestInsertOneNewUser(t *testing.T) {
 	userId1 = user.Id
 
 	user2, err := InsertOneNewUser(tempEmail2, tempName, tempPassword, tempMobile,
-		tempGender, tempAvatar, tempQrCode2)
+		tempGender, tempAvatar, tempQrCode2, false)
 	if nil != err {
 		t.Fatal(err)
 	}
