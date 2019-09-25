@@ -870,14 +870,14 @@ func TestUpdateOneSubscriptionManagerById(t *testing.T) {
 
 }
 
-func TestUpdateOneSubscriptionIntroduceById(t *testing.T) {
-	newIntroduce := "<new introduce test>"
-	err := UpdateOneSubscriptionIntroduceById(newIntroduce, testSubsId1)
+func TestUpdateOneSubscriptionIntroById(t *testing.T) {
+	newIntro := "<new introduce test>"
+	err := UpdateOneSubscriptionIntroById(newIntro, testSubsId1)
 	if nil != err {
 		t.Fatal(err)
 	}
 	data, _ := SelectOneSubscriptionById(testSubsId1, false)
-	if data.Introduce != newIntroduce {
+	if data.Intro != newIntro {
 		t.Fatal("update introduce fail")
 	}
 }

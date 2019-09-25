@@ -522,7 +522,7 @@ func SelectUserGroupChatsInfoPlus(userId int64) ([]*JoinTableUserGroupChatsInfo,
 // It will check the user who will be the manager of the subscription if existed before insert the new row data into
 // 'tb_subscription' table. Then will insert one row data into 'tb_user_subscription' table at the same time. Meaning
 // the manager will always follow the subscription of himself, to know what the message sent from it at first time.
-func InsertOneNewSubscriptionPlus(name, introduce, avatar, qrCode string, managerId int64) (*TableSubscription, error) {
+func InsertOneNewSubscriptionPlus(name, intro, avatar, qrCode string, managerId int64) (*TableSubscription, error) {
 	tx, err := MySQLClient.Begin()
 	if nil != err {
 		return nil, err
@@ -543,7 +543,7 @@ func InsertOneNewSubscriptionPlus(name, introduce, avatar, qrCode string, manage
 
 	// insert the one row data of the new subscription.
 	id := SnowFlakeNode.Generate().Int64()
-	_, err = tx.Exec(InsertOneNewSubscriptionSQL, id, name, managerId, introduce, avatar, qrCode)
+	_, err = tx.Exec(InsertOneNewSubscriptionSQL, id, name, managerId, intro, avatar, qrCode)
 	if nil != err {
 		_ = tx.Rollback()
 		return nil, err
@@ -563,14 +563,14 @@ func InsertOneNewSubscriptionPlus(name, introduce, avatar, qrCode string, manage
 	}
 
 	temp := &TableSubscription{Id: id, Name: name, ManagerId: managerId,
-		Introduce: introduce, Avatar: avatar, QrCode: qrCode}
+		Intro: intro, Avatar: avatar, QrCode: qrCode}
 	return temp, nil
 }
 
 // -----------------------------------------------------------------------
 
 const (
-	SelectSubscriptionsOfUserPlusSQL = `SELECT user_id, subs_id, name, introduce, avatar, qr_code FROM 
+	SelectSubscriptionsOfUserPlusSQL = `SELECT user_id, subs_id, name, intro, avatar, qr_code FROM 
 tb_user_subscription,tb_subscription WHERE tb_user_subscription.user_id= ? AND tb_user_subscription.is_delete= FALSE AND 
  tb_subscription.id= tb_user_subscription.subs_id AND tb_subscription.is_delete=FALSE `
 
@@ -579,15 +579,14 @@ tb_user_basic WHERE tb_user_subscription.subs_id= ? AND tb_user_subscription.is_
 tb_user_basic.id= tb_user_subscription.user_id AND tb_user_basic.is_delete= FALSE `
 )
 
-
 // The information of the subscription those the user followed
 type JoinTableUserSubscriptionsInfo struct {
-	UserId    int64  `json:"user_id"`
-	SubsId    int64  `json:"subs_id"`
-	Name      string `json:"name"`
-	Introduce string `json:"introduce"`
-	Avatar    string `json:"avatar"`
-	QrCode    string `json:"qr_code"`
+	UserId int64  `json:"user_id"`
+	SubsId int64  `json:"subs_id"`
+	Name   string `json:"name"`
+	Intro  string `json:"intro"`
+	Avatar string `json:"avatar"`
+	QrCode string `json:"qr_code"`
 }
 
 // Get the information of the subscriptions which the user was followed.
@@ -601,7 +600,7 @@ func SelectSubscriptionsOfUserPlus(userId int64) ([]*JoinTableUserSubscriptionsI
 	for rows.Next() {
 		temp := new(JoinTableUserSubscriptionsInfo)
 		err := rows.Scan(&(temp.UserId), &(temp.SubsId), &(temp.Name),
-			&(temp.Introduce), &(temp.Avatar), &(temp.QrCode))
+			&(temp.Intro), &(temp.Avatar), &(temp.QrCode))
 		if nil != err {
 			continue
 		}
