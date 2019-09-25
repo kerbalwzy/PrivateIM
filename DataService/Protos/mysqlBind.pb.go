@@ -24,338 +24,257 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type QueryUserField int32
-
-const (
-	QueryUserField_ById    QueryUserField = 0
-	QueryUserField_ByEmail QueryUserField = 1
-	QueryUserField_ByName  QueryUserField = 2
-)
-
-var QueryUserField_name = map[int32]string{
-	0: "ById",
-	1: "ByEmail",
-	2: "ByName",
-}
-
-var QueryUserField_value = map[string]int32{
-	"ById":    0,
-	"ByEmail": 1,
-	"ByName":  2,
-}
-
-func (x QueryUserField) String() string {
-	return proto.EnumName(QueryUserField_name, int32(x))
-}
-
-func (QueryUserField) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{0}
-}
-
-type UpdateUserField int32
-
-const (
-	UpdateUserField_NameMobileGender UpdateUserField = 0
-	UpdateUserField_Password         UpdateUserField = 1
-)
-
-var UpdateUserField_name = map[int32]string{
-	0: "NameMobileGender",
-	1: "Password",
-}
-
-var UpdateUserField_value = map[string]int32{
-	"NameMobileGender": 0,
-	"Password":         1,
-}
-
-func (x UpdateUserField) String() string {
-	return proto.EnumName(UpdateUserField_name, int32(x))
-}
-
-func (UpdateUserField) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{1}
-}
-
-// messages for operate the user basic information
-type UserBasicInfo struct {
-	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Mobile               string   `protobuf:"bytes,3,opt,name=mobile,proto3" json:"mobile,omitempty"`
-	Email                string   `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
-	Password             string   `protobuf:"bytes,5,opt,name=password,proto3" json:"password,omitempty"`
-	Gender               int32    `protobuf:"varint,6,opt,name=gender,proto3" json:"gender,omitempty"`
-	CreateTime           string   `protobuf:"bytes,7,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+type EmptyParam struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *UserBasicInfo) Reset()         { *m = UserBasicInfo{} }
-func (m *UserBasicInfo) String() string { return proto.CompactTextString(m) }
-func (*UserBasicInfo) ProtoMessage()    {}
-func (*UserBasicInfo) Descriptor() ([]byte, []int) {
+func (m *EmptyParam) Reset()         { *m = EmptyParam{} }
+func (m *EmptyParam) String() string { return proto.CompactTextString(m) }
+func (*EmptyParam) ProtoMessage()    {}
+func (*EmptyParam) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d28f1fa67868a9e4, []int{0}
 }
 
-func (m *UserBasicInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserBasicInfo.Unmarshal(m, b)
+func (m *EmptyParam) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EmptyParam.Unmarshal(m, b)
 }
-func (m *UserBasicInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserBasicInfo.Marshal(b, m, deterministic)
+func (m *EmptyParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EmptyParam.Marshal(b, m, deterministic)
 }
-func (m *UserBasicInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserBasicInfo.Merge(m, src)
+func (m *EmptyParam) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EmptyParam.Merge(m, src)
 }
-func (m *UserBasicInfo) XXX_Size() int {
-	return xxx_messageInfo_UserBasicInfo.Size(m)
+func (m *EmptyParam) XXX_Size() int {
+	return xxx_messageInfo_EmptyParam.Size(m)
 }
-func (m *UserBasicInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserBasicInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UserBasicInfo proto.InternalMessageInfo
-
-func (m *UserBasicInfo) GetId() int64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
+func (m *EmptyParam) XXX_DiscardUnknown() {
+	xxx_messageInfo_EmptyParam.DiscardUnknown(m)
 }
 
-func (m *UserBasicInfo) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
+var xxx_messageInfo_EmptyParam proto.InternalMessageInfo
+
+type IdList struct {
+	Data                 []int64  `protobuf:"varint,1,rep,packed,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *UserBasicInfo) GetMobile() string {
-	if m != nil {
-		return m.Mobile
-	}
-	return ""
-}
-
-func (m *UserBasicInfo) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *UserBasicInfo) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-func (m *UserBasicInfo) GetGender() int32 {
-	if m != nil {
-		return m.Gender
-	}
-	return 0
-}
-
-func (m *UserBasicInfo) GetCreateTime() string {
-	if m != nil {
-		return m.CreateTime
-	}
-	return ""
-}
-
-type UserBasicInfoList struct {
-	Data                 []*UserBasicInfo `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
-}
-
-func (m *UserBasicInfoList) Reset()         { *m = UserBasicInfoList{} }
-func (m *UserBasicInfoList) String() string { return proto.CompactTextString(m) }
-func (*UserBasicInfoList) ProtoMessage()    {}
-func (*UserBasicInfoList) Descriptor() ([]byte, []int) {
+func (m *IdList) Reset()         { *m = IdList{} }
+func (m *IdList) String() string { return proto.CompactTextString(m) }
+func (*IdList) ProtoMessage()    {}
+func (*IdList) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d28f1fa67868a9e4, []int{1}
 }
 
-func (m *UserBasicInfoList) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserBasicInfoList.Unmarshal(m, b)
+func (m *IdList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdList.Unmarshal(m, b)
 }
-func (m *UserBasicInfoList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserBasicInfoList.Marshal(b, m, deterministic)
+func (m *IdList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdList.Marshal(b, m, deterministic)
 }
-func (m *UserBasicInfoList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserBasicInfoList.Merge(m, src)
+func (m *IdList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdList.Merge(m, src)
 }
-func (m *UserBasicInfoList) XXX_Size() int {
-	return xxx_messageInfo_UserBasicInfoList.Size(m)
+func (m *IdList) XXX_Size() int {
+	return xxx_messageInfo_IdList.Size(m)
 }
-func (m *UserBasicInfoList) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserBasicInfoList.DiscardUnknown(m)
+func (m *IdList) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdList.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UserBasicInfoList proto.InternalMessageInfo
+var xxx_messageInfo_IdList proto.InternalMessageInfo
 
-func (m *UserBasicInfoList) GetData() []*UserBasicInfo {
+func (m *IdList) GetData() []int64 {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-type QueryUserParams struct {
-	FilterField          QueryUserField `protobuf:"varint,1,opt,name=filter_field,json=filterField,proto3,enum=pb.QueryUserField" json:"filter_field,omitempty"`
-	Id                   int64          `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	Email                string         `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Name                 string         `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+type Id struct {
+	Value                int64    `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *QueryUserParams) Reset()         { *m = QueryUserParams{} }
-func (m *QueryUserParams) String() string { return proto.CompactTextString(m) }
-func (*QueryUserParams) ProtoMessage()    {}
-func (*QueryUserParams) Descriptor() ([]byte, []int) {
+func (m *Id) Reset()         { *m = Id{} }
+func (m *Id) String() string { return proto.CompactTextString(m) }
+func (*Id) ProtoMessage()    {}
+func (*Id) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d28f1fa67868a9e4, []int{2}
 }
 
-func (m *QueryUserParams) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_QueryUserParams.Unmarshal(m, b)
+func (m *Id) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Id.Unmarshal(m, b)
 }
-func (m *QueryUserParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_QueryUserParams.Marshal(b, m, deterministic)
+func (m *Id) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Id.Marshal(b, m, deterministic)
 }
-func (m *QueryUserParams) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryUserParams.Merge(m, src)
+func (m *Id) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Id.Merge(m, src)
 }
-func (m *QueryUserParams) XXX_Size() int {
-	return xxx_messageInfo_QueryUserParams.Size(m)
+func (m *Id) XXX_Size() int {
+	return xxx_messageInfo_Id.Size(m)
 }
-func (m *QueryUserParams) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryUserParams.DiscardUnknown(m)
+func (m *Id) XXX_DiscardUnknown() {
+	xxx_messageInfo_Id.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryUserParams proto.InternalMessageInfo
+var xxx_messageInfo_Id proto.InternalMessageInfo
 
-func (m *QueryUserParams) GetFilterField() QueryUserField {
+func (m *Id) GetValue() int64 {
 	if m != nil {
-		return m.FilterField
-	}
-	return QueryUserField_ById
-}
-
-func (m *QueryUserParams) GetId() int64 {
-	if m != nil {
-		return m.Id
+		return m.Value
 	}
 	return 0
 }
 
-func (m *QueryUserParams) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
+type IdAndName struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *QueryUserParams) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-type UpdateUserParams struct {
-	UpdateField          UpdateUserField `protobuf:"varint,1,opt,name=update_field,json=updateField,proto3,enum=pb.UpdateUserField" json:"update_field,omitempty"`
-	Id                   int64           `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
-	Email                string          `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Name                 string          `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	Mobile               string          `protobuf:"bytes,5,opt,name=mobile,proto3" json:"mobile,omitempty"`
-	Password             string          `protobuf:"bytes,6,opt,name=password,proto3" json:"password,omitempty"`
-	Gender               int32           `protobuf:"varint,7,opt,name=gender,proto3" json:"gender,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
-}
-
-func (m *UpdateUserParams) Reset()         { *m = UpdateUserParams{} }
-func (m *UpdateUserParams) String() string { return proto.CompactTextString(m) }
-func (*UpdateUserParams) ProtoMessage()    {}
-func (*UpdateUserParams) Descriptor() ([]byte, []int) {
+func (m *IdAndName) Reset()         { *m = IdAndName{} }
+func (m *IdAndName) String() string { return proto.CompactTextString(m) }
+func (*IdAndName) ProtoMessage()    {}
+func (*IdAndName) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d28f1fa67868a9e4, []int{3}
 }
 
-func (m *UpdateUserParams) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateUserParams.Unmarshal(m, b)
+func (m *IdAndName) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdAndName.Unmarshal(m, b)
 }
-func (m *UpdateUserParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateUserParams.Marshal(b, m, deterministic)
+func (m *IdAndName) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdAndName.Marshal(b, m, deterministic)
 }
-func (m *UpdateUserParams) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateUserParams.Merge(m, src)
+func (m *IdAndName) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdAndName.Merge(m, src)
 }
-func (m *UpdateUserParams) XXX_Size() int {
-	return xxx_messageInfo_UpdateUserParams.Size(m)
+func (m *IdAndName) XXX_Size() int {
+	return xxx_messageInfo_IdAndName.Size(m)
 }
-func (m *UpdateUserParams) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateUserParams.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateUserParams proto.InternalMessageInfo
-
-func (m *UpdateUserParams) GetUpdateField() UpdateUserField {
-	if m != nil {
-		return m.UpdateField
-	}
-	return UpdateUserField_NameMobileGender
+func (m *IdAndName) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdAndName.DiscardUnknown(m)
 }
 
-func (m *UpdateUserParams) GetId() int64 {
+var xxx_messageInfo_IdAndName proto.InternalMessageInfo
+
+func (m *IdAndName) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *UpdateUserParams) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *UpdateUserParams) GetName() string {
+func (m *IdAndName) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *UpdateUserParams) GetMobile() string {
-	if m != nil {
-		return m.Mobile
-	}
-	return ""
+type IdAndIsDelete struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	IsDelete             bool     `protobuf:"varint,2,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *UpdateUserParams) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
+func (m *IdAndIsDelete) Reset()         { *m = IdAndIsDelete{} }
+func (m *IdAndIsDelete) String() string { return proto.CompactTextString(m) }
+func (*IdAndIsDelete) ProtoMessage()    {}
+func (*IdAndIsDelete) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{4}
 }
 
-func (m *UpdateUserParams) GetGender() int32 {
+func (m *IdAndIsDelete) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdAndIsDelete.Unmarshal(m, b)
+}
+func (m *IdAndIsDelete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdAndIsDelete.Marshal(b, m, deterministic)
+}
+func (m *IdAndIsDelete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdAndIsDelete.Merge(m, src)
+}
+func (m *IdAndIsDelete) XXX_Size() int {
+	return xxx_messageInfo_IdAndIsDelete.Size(m)
+}
+func (m *IdAndIsDelete) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdAndIsDelete.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_IdAndIsDelete proto.InternalMessageInfo
+
+func (m *IdAndIsDelete) GetId() int64 {
 	if m != nil {
-		return m.Gender
+		return m.Id
 	}
 	return 0
 }
 
-// message for operate the user more information
-type UserAvatar struct {
+func (m *IdAndIsDelete) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type NameAndIsDelete struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	IsDelete             bool     `protobuf:"varint,2,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *NameAndIsDelete) Reset()         { *m = NameAndIsDelete{} }
+func (m *NameAndIsDelete) String() string { return proto.CompactTextString(m) }
+func (*NameAndIsDelete) ProtoMessage()    {}
+func (*NameAndIsDelete) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{5}
+}
+
+func (m *NameAndIsDelete) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_NameAndIsDelete.Unmarshal(m, b)
+}
+func (m *NameAndIsDelete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_NameAndIsDelete.Marshal(b, m, deterministic)
+}
+func (m *NameAndIsDelete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_NameAndIsDelete.Merge(m, src)
+}
+func (m *NameAndIsDelete) XXX_Size() int {
+	return xxx_messageInfo_NameAndIsDelete.Size(m)
+}
+func (m *NameAndIsDelete) XXX_DiscardUnknown() {
+	xxx_messageInfo_NameAndIsDelete.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_NameAndIsDelete proto.InternalMessageInfo
+
+func (m *NameAndIsDelete) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *NameAndIsDelete) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type IdAndAvatar struct {
 	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Avatar               string   `protobuf:"bytes,2,opt,name=avatar,proto3" json:"avatar,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -363,46 +282,46 @@ type UserAvatar struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *UserAvatar) Reset()         { *m = UserAvatar{} }
-func (m *UserAvatar) String() string { return proto.CompactTextString(m) }
-func (*UserAvatar) ProtoMessage()    {}
-func (*UserAvatar) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{4}
+func (m *IdAndAvatar) Reset()         { *m = IdAndAvatar{} }
+func (m *IdAndAvatar) String() string { return proto.CompactTextString(m) }
+func (*IdAndAvatar) ProtoMessage()    {}
+func (*IdAndAvatar) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{6}
 }
 
-func (m *UserAvatar) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserAvatar.Unmarshal(m, b)
+func (m *IdAndAvatar) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdAndAvatar.Unmarshal(m, b)
 }
-func (m *UserAvatar) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserAvatar.Marshal(b, m, deterministic)
+func (m *IdAndAvatar) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdAndAvatar.Marshal(b, m, deterministic)
 }
-func (m *UserAvatar) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserAvatar.Merge(m, src)
+func (m *IdAndAvatar) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdAndAvatar.Merge(m, src)
 }
-func (m *UserAvatar) XXX_Size() int {
-	return xxx_messageInfo_UserAvatar.Size(m)
+func (m *IdAndAvatar) XXX_Size() int {
+	return xxx_messageInfo_IdAndAvatar.Size(m)
 }
-func (m *UserAvatar) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserAvatar.DiscardUnknown(m)
+func (m *IdAndAvatar) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdAndAvatar.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UserAvatar proto.InternalMessageInfo
+var xxx_messageInfo_IdAndAvatar proto.InternalMessageInfo
 
-func (m *UserAvatar) GetId() int64 {
+func (m *IdAndAvatar) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *UserAvatar) GetAvatar() string {
+func (m *IdAndAvatar) GetAvatar() string {
 	if m != nil {
 		return m.Avatar
 	}
 	return ""
 }
 
-type UserQRCode struct {
+type IdAndQrCode struct {
 	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	QrCode               string   `protobuf:"bytes,2,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -410,47 +329,423 @@ type UserQRCode struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *UserQRCode) Reset()         { *m = UserQRCode{} }
-func (m *UserQRCode) String() string { return proto.CompactTextString(m) }
-func (*UserQRCode) ProtoMessage()    {}
-func (*UserQRCode) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{5}
+func (m *IdAndQrCode) Reset()         { *m = IdAndQrCode{} }
+func (m *IdAndQrCode) String() string { return proto.CompactTextString(m) }
+func (*IdAndQrCode) ProtoMessage()    {}
+func (*IdAndQrCode) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{7}
 }
 
-func (m *UserQRCode) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UserQRCode.Unmarshal(m, b)
+func (m *IdAndQrCode) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdAndQrCode.Unmarshal(m, b)
 }
-func (m *UserQRCode) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UserQRCode.Marshal(b, m, deterministic)
+func (m *IdAndQrCode) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdAndQrCode.Marshal(b, m, deterministic)
 }
-func (m *UserQRCode) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserQRCode.Merge(m, src)
+func (m *IdAndQrCode) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdAndQrCode.Merge(m, src)
 }
-func (m *UserQRCode) XXX_Size() int {
-	return xxx_messageInfo_UserQRCode.Size(m)
+func (m *IdAndQrCode) XXX_Size() int {
+	return xxx_messageInfo_IdAndQrCode.Size(m)
 }
-func (m *UserQRCode) XXX_DiscardUnknown() {
-	xxx_messageInfo_UserQRCode.DiscardUnknown(m)
+func (m *IdAndQrCode) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdAndQrCode.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UserQRCode proto.InternalMessageInfo
+var xxx_messageInfo_IdAndQrCode proto.InternalMessageInfo
 
-func (m *UserQRCode) GetId() int64 {
+func (m *IdAndQrCode) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *UserQRCode) GetQrCode() string {
+func (m *IdAndQrCode) GetQrCode() string {
 	if m != nil {
 		return m.QrCode
 	}
 	return ""
 }
 
-// messages for operate the user's friendship information
-type Friendship struct {
+type UserBasic struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Email                string   `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Password             string   `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	Mobile               string   `protobuf:"bytes,5,opt,name=mobile,proto3" json:"mobile,omitempty"`
+	Gender               int32    `protobuf:"varint,6,opt,name=gender,proto3" json:"gender,omitempty"`
+	Avatar               string   `protobuf:"bytes,7,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	QrCode               string   `protobuf:"bytes,8,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
+	IsDelete             bool     `protobuf:"varint,9,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserBasic) Reset()         { *m = UserBasic{} }
+func (m *UserBasic) String() string { return proto.CompactTextString(m) }
+func (*UserBasic) ProtoMessage()    {}
+func (*UserBasic) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{8}
+}
+
+func (m *UserBasic) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserBasic.Unmarshal(m, b)
+}
+func (m *UserBasic) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserBasic.Marshal(b, m, deterministic)
+}
+func (m *UserBasic) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserBasic.Merge(m, src)
+}
+func (m *UserBasic) XXX_Size() int {
+	return xxx_messageInfo_UserBasic.Size(m)
+}
+func (m *UserBasic) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserBasic.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserBasic proto.InternalMessageInfo
+
+func (m *UserBasic) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *UserBasic) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *UserBasic) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *UserBasic) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+func (m *UserBasic) GetMobile() string {
+	if m != nil {
+		return m.Mobile
+	}
+	return ""
+}
+
+func (m *UserBasic) GetGender() int32 {
+	if m != nil {
+		return m.Gender
+	}
+	return 0
+}
+
+func (m *UserBasic) GetAvatar() string {
+	if m != nil {
+		return m.Avatar
+	}
+	return ""
+}
+
+func (m *UserBasic) GetQrCode() string {
+	if m != nil {
+		return m.QrCode
+	}
+	return ""
+}
+
+func (m *UserBasic) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type UserBasicList struct {
+	Data                 []*UserBasic `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+
+func (m *UserBasicList) Reset()         { *m = UserBasicList{} }
+func (m *UserBasicList) String() string { return proto.CompactTextString(m) }
+func (*UserBasicList) ProtoMessage()    {}
+func (*UserBasicList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{9}
+}
+
+func (m *UserBasicList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserBasicList.Unmarshal(m, b)
+}
+func (m *UserBasicList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserBasicList.Marshal(b, m, deterministic)
+}
+func (m *UserBasicList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserBasicList.Merge(m, src)
+}
+func (m *UserBasicList) XXX_Size() int {
+	return xxx_messageInfo_UserBasicList.Size(m)
+}
+func (m *UserBasicList) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserBasicList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserBasicList proto.InternalMessageInfo
+
+func (m *UserBasicList) GetData() []*UserBasic {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type EmailAndIsDelete struct {
+	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	IsDelete             bool     `protobuf:"varint,2,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *EmailAndIsDelete) Reset()         { *m = EmailAndIsDelete{} }
+func (m *EmailAndIsDelete) String() string { return proto.CompactTextString(m) }
+func (*EmailAndIsDelete) ProtoMessage()    {}
+func (*EmailAndIsDelete) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{10}
+}
+
+func (m *EmailAndIsDelete) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EmailAndIsDelete.Unmarshal(m, b)
+}
+func (m *EmailAndIsDelete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EmailAndIsDelete.Marshal(b, m, deterministic)
+}
+func (m *EmailAndIsDelete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EmailAndIsDelete.Merge(m, src)
+}
+func (m *EmailAndIsDelete) XXX_Size() int {
+	return xxx_messageInfo_EmailAndIsDelete.Size(m)
+}
+func (m *EmailAndIsDelete) XXX_DiscardUnknown() {
+	xxx_messageInfo_EmailAndIsDelete.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EmailAndIsDelete proto.InternalMessageInfo
+
+func (m *EmailAndIsDelete) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *EmailAndIsDelete) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type Password struct {
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Password) Reset()         { *m = Password{} }
+func (m *Password) String() string { return proto.CompactTextString(m) }
+func (*Password) ProtoMessage()    {}
+func (*Password) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{11}
+}
+
+func (m *Password) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Password.Unmarshal(m, b)
+}
+func (m *Password) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Password.Marshal(b, m, deterministic)
+}
+func (m *Password) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Password.Merge(m, src)
+}
+func (m *Password) XXX_Size() int {
+	return xxx_messageInfo_Password.Size(m)
+}
+func (m *Password) XXX_DiscardUnknown() {
+	xxx_messageInfo_Password.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Password proto.InternalMessageInfo
+
+func (m *Password) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+type Email struct {
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Email) Reset()         { *m = Email{} }
+func (m *Email) String() string { return proto.CompactTextString(m) }
+func (*Email) ProtoMessage()    {}
+func (*Email) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{12}
+}
+
+func (m *Email) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Email.Unmarshal(m, b)
+}
+func (m *Email) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Email.Marshal(b, m, deterministic)
+}
+func (m *Email) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Email.Merge(m, src)
+}
+func (m *Email) XXX_Size() int {
+	return xxx_messageInfo_Email.Size(m)
+}
+func (m *Email) XXX_DiscardUnknown() {
+	xxx_messageInfo_Email.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Email proto.InternalMessageInfo
+
+func (m *Email) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+type IdAndPassword struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *IdAndPassword) Reset()         { *m = IdAndPassword{} }
+func (m *IdAndPassword) String() string { return proto.CompactTextString(m) }
+func (*IdAndPassword) ProtoMessage()    {}
+func (*IdAndPassword) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{13}
+}
+
+func (m *IdAndPassword) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdAndPassword.Unmarshal(m, b)
+}
+func (m *IdAndPassword) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdAndPassword.Marshal(b, m, deterministic)
+}
+func (m *IdAndPassword) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdAndPassword.Merge(m, src)
+}
+func (m *IdAndPassword) XXX_Size() int {
+	return xxx_messageInfo_IdAndPassword.Size(m)
+}
+func (m *IdAndPassword) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdAndPassword.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_IdAndPassword proto.InternalMessageInfo
+
+func (m *IdAndPassword) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *IdAndPassword) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+type UserProfilePlus struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Mobile               string   `protobuf:"bytes,3,opt,name=mobile,proto3" json:"mobile,omitempty"`
+	Gender               int32    `protobuf:"varint,4,opt,name=gender,proto3" json:"gender,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserProfilePlus) Reset()         { *m = UserProfilePlus{} }
+func (m *UserProfilePlus) String() string { return proto.CompactTextString(m) }
+func (*UserProfilePlus) ProtoMessage()    {}
+func (*UserProfilePlus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{14}
+}
+
+func (m *UserProfilePlus) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserProfilePlus.Unmarshal(m, b)
+}
+func (m *UserProfilePlus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserProfilePlus.Marshal(b, m, deterministic)
+}
+func (m *UserProfilePlus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserProfilePlus.Merge(m, src)
+}
+func (m *UserProfilePlus) XXX_Size() int {
+	return xxx_messageInfo_UserProfilePlus.Size(m)
+}
+func (m *UserProfilePlus) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserProfilePlus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserProfilePlus proto.InternalMessageInfo
+
+func (m *UserProfilePlus) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *UserProfilePlus) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *UserProfilePlus) GetMobile() string {
+	if m != nil {
+		return m.Mobile
+	}
+	return ""
+}
+
+func (m *UserProfilePlus) GetGender() int32 {
+	if m != nil {
+		return m.Gender
+	}
+	return 0
+}
+
+type FriendshipBasic struct {
 	SelfId               int64    `protobuf:"varint,1,opt,name=self_id,json=selfId,proto3" json:"self_id,omitempty"`
 	FriendId             int64    `protobuf:"varint,2,opt,name=friend_id,json=friendId,proto3" json:"friend_id,omitempty"`
 	FriendNote           string   `protobuf:"bytes,3,opt,name=friend_note,json=friendNote,proto3" json:"friend_note,omitempty"`
@@ -462,271 +757,1395 @@ type Friendship struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Friendship) Reset()         { *m = Friendship{} }
-func (m *Friendship) String() string { return proto.CompactTextString(m) }
-func (*Friendship) ProtoMessage()    {}
-func (*Friendship) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{6}
+func (m *FriendshipBasic) Reset()         { *m = FriendshipBasic{} }
+func (m *FriendshipBasic) String() string { return proto.CompactTextString(m) }
+func (*FriendshipBasic) ProtoMessage()    {}
+func (*FriendshipBasic) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{15}
 }
 
-func (m *Friendship) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Friendship.Unmarshal(m, b)
+func (m *FriendshipBasic) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendshipBasic.Unmarshal(m, b)
 }
-func (m *Friendship) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Friendship.Marshal(b, m, deterministic)
+func (m *FriendshipBasic) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendshipBasic.Marshal(b, m, deterministic)
 }
-func (m *Friendship) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Friendship.Merge(m, src)
+func (m *FriendshipBasic) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendshipBasic.Merge(m, src)
 }
-func (m *Friendship) XXX_Size() int {
-	return xxx_messageInfo_Friendship.Size(m)
+func (m *FriendshipBasic) XXX_Size() int {
+	return xxx_messageInfo_FriendshipBasic.Size(m)
 }
-func (m *Friendship) XXX_DiscardUnknown() {
-	xxx_messageInfo_Friendship.DiscardUnknown(m)
+func (m *FriendshipBasic) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendshipBasic.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Friendship proto.InternalMessageInfo
+var xxx_messageInfo_FriendshipBasic proto.InternalMessageInfo
 
-func (m *Friendship) GetSelfId() int64 {
+func (m *FriendshipBasic) GetSelfId() int64 {
 	if m != nil {
 		return m.SelfId
 	}
 	return 0
 }
 
-func (m *Friendship) GetFriendId() int64 {
+func (m *FriendshipBasic) GetFriendId() int64 {
 	if m != nil {
 		return m.FriendId
 	}
 	return 0
 }
 
-func (m *Friendship) GetFriendNote() string {
+func (m *FriendshipBasic) GetFriendNote() string {
 	if m != nil {
 		return m.FriendNote
 	}
 	return ""
 }
 
-func (m *Friendship) GetIsAccept() bool {
+func (m *FriendshipBasic) GetIsAccept() bool {
 	if m != nil {
 		return m.IsAccept
 	}
 	return false
 }
 
-func (m *Friendship) GetIsBlack() bool {
+func (m *FriendshipBasic) GetIsBlack() bool {
 	if m != nil {
 		return m.IsBlack
 	}
 	return false
 }
 
-func (m *Friendship) GetIsDelete() bool {
+func (m *FriendshipBasic) GetIsDelete() bool {
 	if m != nil {
 		return m.IsDelete
 	}
 	return false
 }
 
-type FriendshipList struct {
-	Data                 []*Friendship `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+type FriendshipBasicList struct {
+	Data                 []*FriendshipBasic `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *FriendshipList) Reset()         { *m = FriendshipList{} }
-func (m *FriendshipList) String() string { return proto.CompactTextString(m) }
-func (*FriendshipList) ProtoMessage()    {}
-func (*FriendshipList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{7}
+func (m *FriendshipBasicList) Reset()         { *m = FriendshipBasicList{} }
+func (m *FriendshipBasicList) String() string { return proto.CompactTextString(m) }
+func (*FriendshipBasicList) ProtoMessage()    {}
+func (*FriendshipBasicList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{16}
 }
 
-func (m *FriendshipList) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FriendshipList.Unmarshal(m, b)
+func (m *FriendshipBasicList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendshipBasicList.Unmarshal(m, b)
 }
-func (m *FriendshipList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FriendshipList.Marshal(b, m, deterministic)
+func (m *FriendshipBasicList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendshipBasicList.Marshal(b, m, deterministic)
 }
-func (m *FriendshipList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FriendshipList.Merge(m, src)
+func (m *FriendshipBasicList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendshipBasicList.Merge(m, src)
 }
-func (m *FriendshipList) XXX_Size() int {
-	return xxx_messageInfo_FriendshipList.Size(m)
+func (m *FriendshipBasicList) XXX_Size() int {
+	return xxx_messageInfo_FriendshipBasicList.Size(m)
 }
-func (m *FriendshipList) XXX_DiscardUnknown() {
-	xxx_messageInfo_FriendshipList.DiscardUnknown(m)
+func (m *FriendshipBasicList) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendshipBasicList.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FriendshipList proto.InternalMessageInfo
+var xxx_messageInfo_FriendshipBasicList proto.InternalMessageInfo
 
-func (m *FriendshipList) GetData() []*Friendship {
+func (m *FriendshipBasicList) GetData() []*FriendshipBasic {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-type QueryFriendsParams struct {
-	SelfId               int64    `protobuf:"varint,1,opt,name=self_id,json=selfId,proto3" json:"self_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *QueryFriendsParams) Reset()         { *m = QueryFriendsParams{} }
-func (m *QueryFriendsParams) String() string { return proto.CompactTextString(m) }
-func (*QueryFriendsParams) ProtoMessage()    {}
-func (*QueryFriendsParams) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{8}
-}
-
-func (m *QueryFriendsParams) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_QueryFriendsParams.Unmarshal(m, b)
-}
-func (m *QueryFriendsParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_QueryFriendsParams.Marshal(b, m, deterministic)
-}
-func (m *QueryFriendsParams) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryFriendsParams.Merge(m, src)
-}
-func (m *QueryFriendsParams) XXX_Size() int {
-	return xxx_messageInfo_QueryFriendsParams.Size(m)
-}
-func (m *QueryFriendsParams) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryFriendsParams.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryFriendsParams proto.InternalMessageInfo
-
-func (m *QueryFriendsParams) GetSelfId() int64 {
-	if m != nil {
-		return m.SelfId
-	}
-	return 0
-}
-
-type FriendsBasicInfo struct {
-	FriendId             int64    `protobuf:"varint,1,opt,name=friend_id,json=friendId,proto3" json:"friend_id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+type FriendsInfoPlus struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Note                 string   `protobuf:"bytes,2,opt,name=note,proto3" json:"note,omitempty"`
 	Email                string   `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Mobile               string   `protobuf:"bytes,4,opt,name=mobile,proto3" json:"mobile,omitempty"`
-	Gender               int32    `protobuf:"varint,5,opt,name=gender,proto3" json:"gender,omitempty"`
-	Note                 string   `protobuf:"bytes,6,opt,name=note,proto3" json:"note,omitempty"`
-	IsBlack              bool     `protobuf:"varint,7,opt,name=is_black,json=isBlack,proto3" json:"is_black,omitempty"`
+	Name                 string   `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	Mobile               string   `protobuf:"bytes,5,opt,name=mobile,proto3" json:"mobile,omitempty"`
+	Gender               int32    `protobuf:"varint,6,opt,name=gender,proto3" json:"gender,omitempty"`
+	Avatar               string   `protobuf:"bytes,7,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	IsAccept             bool     `protobuf:"varint,8,opt,name=is_accept,json=isAccept,proto3" json:"is_accept,omitempty"`
+	IsBlack              bool     `protobuf:"varint,9,opt,name=is_black,json=isBlack,proto3" json:"is_black,omitempty"`
+	IsDelete             bool     `protobuf:"varint,10,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *FriendsBasicInfo) Reset()         { *m = FriendsBasicInfo{} }
-func (m *FriendsBasicInfo) String() string { return proto.CompactTextString(m) }
-func (*FriendsBasicInfo) ProtoMessage()    {}
-func (*FriendsBasicInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{9}
+func (m *FriendsInfoPlus) Reset()         { *m = FriendsInfoPlus{} }
+func (m *FriendsInfoPlus) String() string { return proto.CompactTextString(m) }
+func (*FriendsInfoPlus) ProtoMessage()    {}
+func (*FriendsInfoPlus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{17}
 }
 
-func (m *FriendsBasicInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FriendsBasicInfo.Unmarshal(m, b)
+func (m *FriendsInfoPlus) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendsInfoPlus.Unmarshal(m, b)
 }
-func (m *FriendsBasicInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FriendsBasicInfo.Marshal(b, m, deterministic)
+func (m *FriendsInfoPlus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendsInfoPlus.Marshal(b, m, deterministic)
 }
-func (m *FriendsBasicInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FriendsBasicInfo.Merge(m, src)
+func (m *FriendsInfoPlus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendsInfoPlus.Merge(m, src)
 }
-func (m *FriendsBasicInfo) XXX_Size() int {
-	return xxx_messageInfo_FriendsBasicInfo.Size(m)
+func (m *FriendsInfoPlus) XXX_Size() int {
+	return xxx_messageInfo_FriendsInfoPlus.Size(m)
 }
-func (m *FriendsBasicInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_FriendsBasicInfo.DiscardUnknown(m)
+func (m *FriendsInfoPlus) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendsInfoPlus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FriendsBasicInfo proto.InternalMessageInfo
+var xxx_messageInfo_FriendsInfoPlus proto.InternalMessageInfo
 
-func (m *FriendsBasicInfo) GetFriendId() int64 {
+func (m *FriendsInfoPlus) GetId() int64 {
 	if m != nil {
-		return m.FriendId
+		return m.Id
 	}
 	return 0
 }
 
-func (m *FriendsBasicInfo) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *FriendsBasicInfo) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *FriendsBasicInfo) GetMobile() string {
-	if m != nil {
-		return m.Mobile
-	}
-	return ""
-}
-
-func (m *FriendsBasicInfo) GetGender() int32 {
-	if m != nil {
-		return m.Gender
-	}
-	return 0
-}
-
-func (m *FriendsBasicInfo) GetNote() string {
+func (m *FriendsInfoPlus) GetNote() string {
 	if m != nil {
 		return m.Note
 	}
 	return ""
 }
 
-func (m *FriendsBasicInfo) GetIsBlack() bool {
+func (m *FriendsInfoPlus) GetEmail() string {
+	if m != nil {
+		return m.Email
+	}
+	return ""
+}
+
+func (m *FriendsInfoPlus) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *FriendsInfoPlus) GetMobile() string {
+	if m != nil {
+		return m.Mobile
+	}
+	return ""
+}
+
+func (m *FriendsInfoPlus) GetGender() int32 {
+	if m != nil {
+		return m.Gender
+	}
+	return 0
+}
+
+func (m *FriendsInfoPlus) GetAvatar() string {
+	if m != nil {
+		return m.Avatar
+	}
+	return ""
+}
+
+func (m *FriendsInfoPlus) GetIsAccept() bool {
+	if m != nil {
+		return m.IsAccept
+	}
+	return false
+}
+
+func (m *FriendsInfoPlus) GetIsBlack() bool {
 	if m != nil {
 		return m.IsBlack
 	}
 	return false
 }
 
-type FriendsBasicInfoList struct {
-	Data                 []*FriendsBasicInfo `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+func (m *FriendsInfoPlus) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
 }
 
-func (m *FriendsBasicInfoList) Reset()         { *m = FriendsBasicInfoList{} }
-func (m *FriendsBasicInfoList) String() string { return proto.CompactTextString(m) }
-func (*FriendsBasicInfoList) ProtoMessage()    {}
-func (*FriendsBasicInfoList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_d28f1fa67868a9e4, []int{10}
+type FriendsInfoListPlus struct {
+	Data                 []*FriendsInfoPlus `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
-func (m *FriendsBasicInfoList) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FriendsBasicInfoList.Unmarshal(m, b)
-}
-func (m *FriendsBasicInfoList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FriendsBasicInfoList.Marshal(b, m, deterministic)
-}
-func (m *FriendsBasicInfoList) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FriendsBasicInfoList.Merge(m, src)
-}
-func (m *FriendsBasicInfoList) XXX_Size() int {
-	return xxx_messageInfo_FriendsBasicInfoList.Size(m)
-}
-func (m *FriendsBasicInfoList) XXX_DiscardUnknown() {
-	xxx_messageInfo_FriendsBasicInfoList.DiscardUnknown(m)
+func (m *FriendsInfoListPlus) Reset()         { *m = FriendsInfoListPlus{} }
+func (m *FriendsInfoListPlus) String() string { return proto.CompactTextString(m) }
+func (*FriendsInfoListPlus) ProtoMessage()    {}
+func (*FriendsInfoListPlus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{18}
 }
 
-var xxx_messageInfo_FriendsBasicInfoList proto.InternalMessageInfo
+func (m *FriendsInfoListPlus) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FriendsInfoListPlus.Unmarshal(m, b)
+}
+func (m *FriendsInfoListPlus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FriendsInfoListPlus.Marshal(b, m, deterministic)
+}
+func (m *FriendsInfoListPlus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FriendsInfoListPlus.Merge(m, src)
+}
+func (m *FriendsInfoListPlus) XXX_Size() int {
+	return xxx_messageInfo_FriendsInfoListPlus.Size(m)
+}
+func (m *FriendsInfoListPlus) XXX_DiscardUnknown() {
+	xxx_messageInfo_FriendsInfoListPlus.DiscardUnknown(m)
+}
 
-func (m *FriendsBasicInfoList) GetData() []*FriendsBasicInfo {
+var xxx_messageInfo_FriendsInfoListPlus proto.InternalMessageInfo
+
+func (m *FriendsInfoListPlus) GetData() []*FriendsInfoPlus {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type GroupChatBasic struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	ManagerId            int64    `protobuf:"varint,3,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	Avatar               string   `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	QrCode               string   `protobuf:"bytes,5,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
+	IsDelete             bool     `protobuf:"varint,6,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GroupChatBasic) Reset()         { *m = GroupChatBasic{} }
+func (m *GroupChatBasic) String() string { return proto.CompactTextString(m) }
+func (*GroupChatBasic) ProtoMessage()    {}
+func (*GroupChatBasic) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{19}
+}
+
+func (m *GroupChatBasic) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GroupChatBasic.Unmarshal(m, b)
+}
+func (m *GroupChatBasic) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GroupChatBasic.Marshal(b, m, deterministic)
+}
+func (m *GroupChatBasic) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GroupChatBasic.Merge(m, src)
+}
+func (m *GroupChatBasic) XXX_Size() int {
+	return xxx_messageInfo_GroupChatBasic.Size(m)
+}
+func (m *GroupChatBasic) XXX_DiscardUnknown() {
+	xxx_messageInfo_GroupChatBasic.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GroupChatBasic proto.InternalMessageInfo
+
+func (m *GroupChatBasic) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *GroupChatBasic) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *GroupChatBasic) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
+}
+
+func (m *GroupChatBasic) GetAvatar() string {
+	if m != nil {
+		return m.Avatar
+	}
+	return ""
+}
+
+func (m *GroupChatBasic) GetQrCode() string {
+	if m != nil {
+		return m.QrCode
+	}
+	return ""
+}
+
+func (m *GroupChatBasic) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type GroupChatList struct {
+	Data                 []*GroupChatBasic `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *GroupChatList) Reset()         { *m = GroupChatList{} }
+func (m *GroupChatList) String() string { return proto.CompactTextString(m) }
+func (*GroupChatList) ProtoMessage()    {}
+func (*GroupChatList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{20}
+}
+
+func (m *GroupChatList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GroupChatList.Unmarshal(m, b)
+}
+func (m *GroupChatList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GroupChatList.Marshal(b, m, deterministic)
+}
+func (m *GroupChatList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GroupChatList.Merge(m, src)
+}
+func (m *GroupChatList) XXX_Size() int {
+	return xxx_messageInfo_GroupChatList.Size(m)
+}
+func (m *GroupChatList) XXX_DiscardUnknown() {
+	xxx_messageInfo_GroupChatList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GroupChatList proto.InternalMessageInfo
+
+func (m *GroupChatList) GetData() []*GroupChatBasic {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type GroupAndManagerId struct {
+	GroupId              int64    `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	ManagerId            int64    `protobuf:"varint,2,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GroupAndManagerId) Reset()         { *m = GroupAndManagerId{} }
+func (m *GroupAndManagerId) String() string { return proto.CompactTextString(m) }
+func (*GroupAndManagerId) ProtoMessage()    {}
+func (*GroupAndManagerId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{21}
+}
+
+func (m *GroupAndManagerId) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GroupAndManagerId.Unmarshal(m, b)
+}
+func (m *GroupAndManagerId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GroupAndManagerId.Marshal(b, m, deterministic)
+}
+func (m *GroupAndManagerId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GroupAndManagerId.Merge(m, src)
+}
+func (m *GroupAndManagerId) XXX_Size() int {
+	return xxx_messageInfo_GroupAndManagerId.Size(m)
+}
+func (m *GroupAndManagerId) XXX_DiscardUnknown() {
+	xxx_messageInfo_GroupAndManagerId.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GroupAndManagerId proto.InternalMessageInfo
+
+func (m *GroupAndManagerId) GetGroupId() int64 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *GroupAndManagerId) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
+}
+
+type UserGroupChatRelate struct {
+	GroupId              int64    `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId               int64    `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserNote             string   `protobuf:"bytes,3,opt,name=user_note,json=userNote,proto3" json:"user_note,omitempty"`
+	IsDelete             bool     `protobuf:"varint,4,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserGroupChatRelate) Reset()         { *m = UserGroupChatRelate{} }
+func (m *UserGroupChatRelate) String() string { return proto.CompactTextString(m) }
+func (*UserGroupChatRelate) ProtoMessage()    {}
+func (*UserGroupChatRelate) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{22}
+}
+
+func (m *UserGroupChatRelate) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserGroupChatRelate.Unmarshal(m, b)
+}
+func (m *UserGroupChatRelate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserGroupChatRelate.Marshal(b, m, deterministic)
+}
+func (m *UserGroupChatRelate) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserGroupChatRelate.Merge(m, src)
+}
+func (m *UserGroupChatRelate) XXX_Size() int {
+	return xxx_messageInfo_UserGroupChatRelate.Size(m)
+}
+func (m *UserGroupChatRelate) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserGroupChatRelate.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserGroupChatRelate proto.InternalMessageInfo
+
+func (m *UserGroupChatRelate) GetGroupId() int64 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *UserGroupChatRelate) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *UserGroupChatRelate) GetUserNote() string {
+	if m != nil {
+		return m.UserNote
+	}
+	return ""
+}
+
+func (m *UserGroupChatRelate) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type UserGroupChatRelateList struct {
+	Data                 []*UserGroupChatRelate `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
+	XXX_unrecognized     []byte                 `json:"-"`
+	XXX_sizecache        int32                  `json:"-"`
+}
+
+func (m *UserGroupChatRelateList) Reset()         { *m = UserGroupChatRelateList{} }
+func (m *UserGroupChatRelateList) String() string { return proto.CompactTextString(m) }
+func (*UserGroupChatRelateList) ProtoMessage()    {}
+func (*UserGroupChatRelateList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{23}
+}
+
+func (m *UserGroupChatRelateList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserGroupChatRelateList.Unmarshal(m, b)
+}
+func (m *UserGroupChatRelateList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserGroupChatRelateList.Marshal(b, m, deterministic)
+}
+func (m *UserGroupChatRelateList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserGroupChatRelateList.Merge(m, src)
+}
+func (m *UserGroupChatRelateList) XXX_Size() int {
+	return xxx_messageInfo_UserGroupChatRelateList.Size(m)
+}
+func (m *UserGroupChatRelateList) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserGroupChatRelateList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserGroupChatRelateList proto.InternalMessageInfo
+
+func (m *UserGroupChatRelateList) GetData() []*UserGroupChatRelate {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type UserAndGroupId struct {
+	GroupId              int64    `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId               int64    `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserAndGroupId) Reset()         { *m = UserAndGroupId{} }
+func (m *UserAndGroupId) String() string { return proto.CompactTextString(m) }
+func (*UserAndGroupId) ProtoMessage()    {}
+func (*UserAndGroupId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{24}
+}
+
+func (m *UserAndGroupId) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserAndGroupId.Unmarshal(m, b)
+}
+func (m *UserAndGroupId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserAndGroupId.Marshal(b, m, deterministic)
+}
+func (m *UserAndGroupId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserAndGroupId.Merge(m, src)
+}
+func (m *UserAndGroupId) XXX_Size() int {
+	return xxx_messageInfo_UserAndGroupId.Size(m)
+}
+func (m *UserAndGroupId) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserAndGroupId.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserAndGroupId proto.InternalMessageInfo
+
+func (m *UserAndGroupId) GetGroupId() int64 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *UserAndGroupId) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+type GroupChatInfoOfUser struct {
+	UserId               int64    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	GroupId              int64    `protobuf:"varint,2,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	GroupName            string   `protobuf:"bytes,3,opt,name=group_name,json=groupName,proto3" json:"group_name,omitempty"`
+	GroupAvatar          string   `protobuf:"bytes,4,opt,name=group_avatar,json=groupAvatar,proto3" json:"group_avatar,omitempty"`
+	GroupQrCode          string   `protobuf:"bytes,5,opt,name=group_qr_code,json=groupQrCode,proto3" json:"group_qr_code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GroupChatInfoOfUser) Reset()         { *m = GroupChatInfoOfUser{} }
+func (m *GroupChatInfoOfUser) String() string { return proto.CompactTextString(m) }
+func (*GroupChatInfoOfUser) ProtoMessage()    {}
+func (*GroupChatInfoOfUser) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{25}
+}
+
+func (m *GroupChatInfoOfUser) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GroupChatInfoOfUser.Unmarshal(m, b)
+}
+func (m *GroupChatInfoOfUser) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GroupChatInfoOfUser.Marshal(b, m, deterministic)
+}
+func (m *GroupChatInfoOfUser) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GroupChatInfoOfUser.Merge(m, src)
+}
+func (m *GroupChatInfoOfUser) XXX_Size() int {
+	return xxx_messageInfo_GroupChatInfoOfUser.Size(m)
+}
+func (m *GroupChatInfoOfUser) XXX_DiscardUnknown() {
+	xxx_messageInfo_GroupChatInfoOfUser.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GroupChatInfoOfUser proto.InternalMessageInfo
+
+func (m *GroupChatInfoOfUser) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *GroupChatInfoOfUser) GetGroupId() int64 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *GroupChatInfoOfUser) GetGroupName() string {
+	if m != nil {
+		return m.GroupName
+	}
+	return ""
+}
+
+func (m *GroupChatInfoOfUser) GetGroupAvatar() string {
+	if m != nil {
+		return m.GroupAvatar
+	}
+	return ""
+}
+
+func (m *GroupChatInfoOfUser) GetGroupQrCode() string {
+	if m != nil {
+		return m.GroupQrCode
+	}
+	return ""
+}
+
+type GroupChatInfoListOfUserPlus struct {
+	Data                 []*GroupChatInfoOfUser `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
+	XXX_unrecognized     []byte                 `json:"-"`
+	XXX_sizecache        int32                  `json:"-"`
+}
+
+func (m *GroupChatInfoListOfUserPlus) Reset()         { *m = GroupChatInfoListOfUserPlus{} }
+func (m *GroupChatInfoListOfUserPlus) String() string { return proto.CompactTextString(m) }
+func (*GroupChatInfoListOfUserPlus) ProtoMessage()    {}
+func (*GroupChatInfoListOfUserPlus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{26}
+}
+
+func (m *GroupChatInfoListOfUserPlus) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GroupChatInfoListOfUserPlus.Unmarshal(m, b)
+}
+func (m *GroupChatInfoListOfUserPlus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GroupChatInfoListOfUserPlus.Marshal(b, m, deterministic)
+}
+func (m *GroupChatInfoListOfUserPlus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GroupChatInfoListOfUserPlus.Merge(m, src)
+}
+func (m *GroupChatInfoListOfUserPlus) XXX_Size() int {
+	return xxx_messageInfo_GroupChatInfoListOfUserPlus.Size(m)
+}
+func (m *GroupChatInfoListOfUserPlus) XXX_DiscardUnknown() {
+	xxx_messageInfo_GroupChatInfoListOfUserPlus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GroupChatInfoListOfUserPlus proto.InternalMessageInfo
+
+func (m *GroupChatInfoListOfUserPlus) GetData() []*GroupChatInfoOfUser {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type UserInfoInGroupChat struct {
+	GroupId              int64    `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId               int64    `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserNote             string   `protobuf:"bytes,3,opt,name=user_note,json=userNote,proto3" json:"user_note,omitempty"`
+	UserName             string   `protobuf:"bytes,4,opt,name=user_name,json=userName,proto3" json:"user_name,omitempty"`
+	UserGender           int32    `protobuf:"varint,5,opt,name=user_gender,json=userGender,proto3" json:"user_gender,omitempty"`
+	UserEmail            string   `protobuf:"bytes,6,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	UserAvatar           string   `protobuf:"bytes,7,opt,name=user_avatar,json=userAvatar,proto3" json:"user_avatar,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserInfoInGroupChat) Reset()         { *m = UserInfoInGroupChat{} }
+func (m *UserInfoInGroupChat) String() string { return proto.CompactTextString(m) }
+func (*UserInfoInGroupChat) ProtoMessage()    {}
+func (*UserInfoInGroupChat) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{27}
+}
+
+func (m *UserInfoInGroupChat) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserInfoInGroupChat.Unmarshal(m, b)
+}
+func (m *UserInfoInGroupChat) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserInfoInGroupChat.Marshal(b, m, deterministic)
+}
+func (m *UserInfoInGroupChat) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserInfoInGroupChat.Merge(m, src)
+}
+func (m *UserInfoInGroupChat) XXX_Size() int {
+	return xxx_messageInfo_UserInfoInGroupChat.Size(m)
+}
+func (m *UserInfoInGroupChat) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserInfoInGroupChat.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserInfoInGroupChat proto.InternalMessageInfo
+
+func (m *UserInfoInGroupChat) GetGroupId() int64 {
+	if m != nil {
+		return m.GroupId
+	}
+	return 0
+}
+
+func (m *UserInfoInGroupChat) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *UserInfoInGroupChat) GetUserNote() string {
+	if m != nil {
+		return m.UserNote
+	}
+	return ""
+}
+
+func (m *UserInfoInGroupChat) GetUserName() string {
+	if m != nil {
+		return m.UserName
+	}
+	return ""
+}
+
+func (m *UserInfoInGroupChat) GetUserGender() int32 {
+	if m != nil {
+		return m.UserGender
+	}
+	return 0
+}
+
+func (m *UserInfoInGroupChat) GetUserEmail() string {
+	if m != nil {
+		return m.UserEmail
+	}
+	return ""
+}
+
+func (m *UserInfoInGroupChat) GetUserAvatar() string {
+	if m != nil {
+		return m.UserAvatar
+	}
+	return ""
+}
+
+type UserInfoInGroupChatListPlus struct {
+	Data                 []*UserInfoInGroupChat `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
+	XXX_unrecognized     []byte                 `json:"-"`
+	XXX_sizecache        int32                  `json:"-"`
+}
+
+func (m *UserInfoInGroupChatListPlus) Reset()         { *m = UserInfoInGroupChatListPlus{} }
+func (m *UserInfoInGroupChatListPlus) String() string { return proto.CompactTextString(m) }
+func (*UserInfoInGroupChatListPlus) ProtoMessage()    {}
+func (*UserInfoInGroupChatListPlus) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{28}
+}
+
+func (m *UserInfoInGroupChatListPlus) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserInfoInGroupChatListPlus.Unmarshal(m, b)
+}
+func (m *UserInfoInGroupChatListPlus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserInfoInGroupChatListPlus.Marshal(b, m, deterministic)
+}
+func (m *UserInfoInGroupChatListPlus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserInfoInGroupChatListPlus.Merge(m, src)
+}
+func (m *UserInfoInGroupChatListPlus) XXX_Size() int {
+	return xxx_messageInfo_UserInfoInGroupChatListPlus.Size(m)
+}
+func (m *UserInfoInGroupChatListPlus) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserInfoInGroupChatListPlus.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserInfoInGroupChatListPlus proto.InternalMessageInfo
+
+func (m *UserInfoInGroupChatListPlus) GetData() []*UserInfoInGroupChat {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type SubscriptionBasic struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	ManagerId            int64    `protobuf:"varint,3,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	Intro                string   `protobuf:"bytes,4,opt,name=intro,proto3" json:"intro,omitempty"`
+	Avatar               string   `protobuf:"bytes,5,opt,name=avatar,proto3" json:"avatar,omitempty"`
+	QrCode               string   `protobuf:"bytes,6,opt,name=qr_code,json=qrCode,proto3" json:"qr_code,omitempty"`
+	IsDelete             bool     `protobuf:"varint,7,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SubscriptionBasic) Reset()         { *m = SubscriptionBasic{} }
+func (m *SubscriptionBasic) String() string { return proto.CompactTextString(m) }
+func (*SubscriptionBasic) ProtoMessage()    {}
+func (*SubscriptionBasic) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{29}
+}
+
+func (m *SubscriptionBasic) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SubscriptionBasic.Unmarshal(m, b)
+}
+func (m *SubscriptionBasic) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SubscriptionBasic.Marshal(b, m, deterministic)
+}
+func (m *SubscriptionBasic) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubscriptionBasic.Merge(m, src)
+}
+func (m *SubscriptionBasic) XXX_Size() int {
+	return xxx_messageInfo_SubscriptionBasic.Size(m)
+}
+func (m *SubscriptionBasic) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubscriptionBasic.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SubscriptionBasic proto.InternalMessageInfo
+
+func (m *SubscriptionBasic) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *SubscriptionBasic) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *SubscriptionBasic) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
+}
+
+func (m *SubscriptionBasic) GetIntro() string {
+	if m != nil {
+		return m.Intro
+	}
+	return ""
+}
+
+func (m *SubscriptionBasic) GetAvatar() string {
+	if m != nil {
+		return m.Avatar
+	}
+	return ""
+}
+
+func (m *SubscriptionBasic) GetQrCode() string {
+	if m != nil {
+		return m.QrCode
+	}
+	return ""
+}
+
+func (m *SubscriptionBasic) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type SubscriptionBasicList struct {
+	Data                 []*SubscriptionBasic `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *SubscriptionBasicList) Reset()         { *m = SubscriptionBasicList{} }
+func (m *SubscriptionBasicList) String() string { return proto.CompactTextString(m) }
+func (*SubscriptionBasicList) ProtoMessage()    {}
+func (*SubscriptionBasicList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{30}
+}
+
+func (m *SubscriptionBasicList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SubscriptionBasicList.Unmarshal(m, b)
+}
+func (m *SubscriptionBasicList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SubscriptionBasicList.Marshal(b, m, deterministic)
+}
+func (m *SubscriptionBasicList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubscriptionBasicList.Merge(m, src)
+}
+func (m *SubscriptionBasicList) XXX_Size() int {
+	return xxx_messageInfo_SubscriptionBasicList.Size(m)
+}
+func (m *SubscriptionBasicList) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubscriptionBasicList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SubscriptionBasicList proto.InternalMessageInfo
+
+func (m *SubscriptionBasicList) GetData() []*SubscriptionBasic {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type SubsAndManagerId struct {
+	SubsId               int64    `protobuf:"varint,1,opt,name=subs_id,json=subsId,proto3" json:"subs_id,omitempty"`
+	ManagerId            int64    `protobuf:"varint,2,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SubsAndManagerId) Reset()         { *m = SubsAndManagerId{} }
+func (m *SubsAndManagerId) String() string { return proto.CompactTextString(m) }
+func (*SubsAndManagerId) ProtoMessage()    {}
+func (*SubsAndManagerId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{31}
+}
+
+func (m *SubsAndManagerId) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SubsAndManagerId.Unmarshal(m, b)
+}
+func (m *SubsAndManagerId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SubsAndManagerId.Marshal(b, m, deterministic)
+}
+func (m *SubsAndManagerId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubsAndManagerId.Merge(m, src)
+}
+func (m *SubsAndManagerId) XXX_Size() int {
+	return xxx_messageInfo_SubsAndManagerId.Size(m)
+}
+func (m *SubsAndManagerId) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubsAndManagerId.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SubsAndManagerId proto.InternalMessageInfo
+
+func (m *SubsAndManagerId) GetSubsId() int64 {
+	if m != nil {
+		return m.SubsId
+	}
+	return 0
+}
+
+func (m *SubsAndManagerId) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
+}
+
+type IdAndIntro struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Intro                string   `protobuf:"bytes,2,opt,name=intro,proto3" json:"intro,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *IdAndIntro) Reset()         { *m = IdAndIntro{} }
+func (m *IdAndIntro) String() string { return proto.CompactTextString(m) }
+func (*IdAndIntro) ProtoMessage()    {}
+func (*IdAndIntro) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{32}
+}
+
+func (m *IdAndIntro) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_IdAndIntro.Unmarshal(m, b)
+}
+func (m *IdAndIntro) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_IdAndIntro.Marshal(b, m, deterministic)
+}
+func (m *IdAndIntro) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_IdAndIntro.Merge(m, src)
+}
+func (m *IdAndIntro) XXX_Size() int {
+	return xxx_messageInfo_IdAndIntro.Size(m)
+}
+func (m *IdAndIntro) XXX_DiscardUnknown() {
+	xxx_messageInfo_IdAndIntro.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_IdAndIntro proto.InternalMessageInfo
+
+func (m *IdAndIntro) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *IdAndIntro) GetIntro() string {
+	if m != nil {
+		return m.Intro
+	}
+	return ""
+}
+
+type UserSubscriptionRelate struct {
+	SubsId               int64    `protobuf:"varint,1,opt,name=subs_id,json=subsId,proto3" json:"subs_id,omitempty"`
+	UserId               int64    `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	IsDelete             bool     `protobuf:"varint,3,opt,name=is_delete,json=isDelete,proto3" json:"is_delete,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserSubscriptionRelate) Reset()         { *m = UserSubscriptionRelate{} }
+func (m *UserSubscriptionRelate) String() string { return proto.CompactTextString(m) }
+func (*UserSubscriptionRelate) ProtoMessage()    {}
+func (*UserSubscriptionRelate) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{33}
+}
+
+func (m *UserSubscriptionRelate) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserSubscriptionRelate.Unmarshal(m, b)
+}
+func (m *UserSubscriptionRelate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserSubscriptionRelate.Marshal(b, m, deterministic)
+}
+func (m *UserSubscriptionRelate) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserSubscriptionRelate.Merge(m, src)
+}
+func (m *UserSubscriptionRelate) XXX_Size() int {
+	return xxx_messageInfo_UserSubscriptionRelate.Size(m)
+}
+func (m *UserSubscriptionRelate) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserSubscriptionRelate.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserSubscriptionRelate proto.InternalMessageInfo
+
+func (m *UserSubscriptionRelate) GetSubsId() int64 {
+	if m != nil {
+		return m.SubsId
+	}
+	return 0
+}
+
+func (m *UserSubscriptionRelate) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *UserSubscriptionRelate) GetIsDelete() bool {
+	if m != nil {
+		return m.IsDelete
+	}
+	return false
+}
+
+type UserSubscriptionRelateList struct {
+	Data                 []*UserSubscriptionRelate `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
+}
+
+func (m *UserSubscriptionRelateList) Reset()         { *m = UserSubscriptionRelateList{} }
+func (m *UserSubscriptionRelateList) String() string { return proto.CompactTextString(m) }
+func (*UserSubscriptionRelateList) ProtoMessage()    {}
+func (*UserSubscriptionRelateList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{34}
+}
+
+func (m *UserSubscriptionRelateList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserSubscriptionRelateList.Unmarshal(m, b)
+}
+func (m *UserSubscriptionRelateList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserSubscriptionRelateList.Marshal(b, m, deterministic)
+}
+func (m *UserSubscriptionRelateList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserSubscriptionRelateList.Merge(m, src)
+}
+func (m *UserSubscriptionRelateList) XXX_Size() int {
+	return xxx_messageInfo_UserSubscriptionRelateList.Size(m)
+}
+func (m *UserSubscriptionRelateList) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserSubscriptionRelateList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserSubscriptionRelateList proto.InternalMessageInfo
+
+func (m *UserSubscriptionRelateList) GetData() []*UserSubscriptionRelate {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type UserAndSubsId struct {
+	SubsId               int64    `protobuf:"varint,1,opt,name=subs_id,json=subsId,proto3" json:"subs_id,omitempty"`
+	UserId               int64    `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserAndSubsId) Reset()         { *m = UserAndSubsId{} }
+func (m *UserAndSubsId) String() string { return proto.CompactTextString(m) }
+func (*UserAndSubsId) ProtoMessage()    {}
+func (*UserAndSubsId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{35}
+}
+
+func (m *UserAndSubsId) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserAndSubsId.Unmarshal(m, b)
+}
+func (m *UserAndSubsId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserAndSubsId.Marshal(b, m, deterministic)
+}
+func (m *UserAndSubsId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserAndSubsId.Merge(m, src)
+}
+func (m *UserAndSubsId) XXX_Size() int {
+	return xxx_messageInfo_UserAndSubsId.Size(m)
+}
+func (m *UserAndSubsId) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserAndSubsId.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserAndSubsId proto.InternalMessageInfo
+
+func (m *UserAndSubsId) GetSubsId() int64 {
+	if m != nil {
+		return m.SubsId
+	}
+	return 0
+}
+
+func (m *UserAndSubsId) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+type UserInfoOfSubscription struct {
+	SubsId               int64    `protobuf:"varint,1,opt,name=subs_id,json=subsId,proto3" json:"subs_id,omitempty"`
+	UserId               int64    `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserEmail            string   `protobuf:"bytes,3,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
+	UserName             string   `protobuf:"bytes,4,opt,name=user_name,json=userName,proto3" json:"user_name,omitempty"`
+	UserGender           int32    `protobuf:"varint,5,opt,name=user_gender,json=userGender,proto3" json:"user_gender,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UserInfoOfSubscription) Reset()         { *m = UserInfoOfSubscription{} }
+func (m *UserInfoOfSubscription) String() string { return proto.CompactTextString(m) }
+func (*UserInfoOfSubscription) ProtoMessage()    {}
+func (*UserInfoOfSubscription) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{36}
+}
+
+func (m *UserInfoOfSubscription) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserInfoOfSubscription.Unmarshal(m, b)
+}
+func (m *UserInfoOfSubscription) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserInfoOfSubscription.Marshal(b, m, deterministic)
+}
+func (m *UserInfoOfSubscription) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserInfoOfSubscription.Merge(m, src)
+}
+func (m *UserInfoOfSubscription) XXX_Size() int {
+	return xxx_messageInfo_UserInfoOfSubscription.Size(m)
+}
+func (m *UserInfoOfSubscription) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserInfoOfSubscription.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserInfoOfSubscription proto.InternalMessageInfo
+
+func (m *UserInfoOfSubscription) GetSubsId() int64 {
+	if m != nil {
+		return m.SubsId
+	}
+	return 0
+}
+
+func (m *UserInfoOfSubscription) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *UserInfoOfSubscription) GetUserEmail() string {
+	if m != nil {
+		return m.UserEmail
+	}
+	return ""
+}
+
+func (m *UserInfoOfSubscription) GetUserName() string {
+	if m != nil {
+		return m.UserName
+	}
+	return ""
+}
+
+func (m *UserInfoOfSubscription) GetUserGender() int32 {
+	if m != nil {
+		return m.UserGender
+	}
+	return 0
+}
+
+type UserInfoOfSubscriptionList struct {
+	Data                 []*UserInfoOfSubscription `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
+}
+
+func (m *UserInfoOfSubscriptionList) Reset()         { *m = UserInfoOfSubscriptionList{} }
+func (m *UserInfoOfSubscriptionList) String() string { return proto.CompactTextString(m) }
+func (*UserInfoOfSubscriptionList) ProtoMessage()    {}
+func (*UserInfoOfSubscriptionList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{37}
+}
+
+func (m *UserInfoOfSubscriptionList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UserInfoOfSubscriptionList.Unmarshal(m, b)
+}
+func (m *UserInfoOfSubscriptionList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UserInfoOfSubscriptionList.Marshal(b, m, deterministic)
+}
+func (m *UserInfoOfSubscriptionList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserInfoOfSubscriptionList.Merge(m, src)
+}
+func (m *UserInfoOfSubscriptionList) XXX_Size() int {
+	return xxx_messageInfo_UserInfoOfSubscriptionList.Size(m)
+}
+func (m *UserInfoOfSubscriptionList) XXX_DiscardUnknown() {
+	xxx_messageInfo_UserInfoOfSubscriptionList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UserInfoOfSubscriptionList proto.InternalMessageInfo
+
+func (m *UserInfoOfSubscriptionList) GetData() []*UserInfoOfSubscription {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type SubscriptionInfoOfUser struct {
+	UserId               int64    `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	SubsId               int64    `protobuf:"varint,2,opt,name=subs_id,json=subsId,proto3" json:"subs_id,omitempty"`
+	SubsName             string   `protobuf:"bytes,3,opt,name=subs_name,json=subsName,proto3" json:"subs_name,omitempty"`
+	SubsIntro            string   `protobuf:"bytes,4,opt,name=subs_intro,json=subsIntro,proto3" json:"subs_intro,omitempty"`
+	SubsAvatar           string   `protobuf:"bytes,5,opt,name=subs_avatar,json=subsAvatar,proto3" json:"subs_avatar,omitempty"`
+	SubsQrCode           string   `protobuf:"bytes,6,opt,name=subs_qr_code,json=subsQrCode,proto3" json:"subs_qr_code,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SubscriptionInfoOfUser) Reset()         { *m = SubscriptionInfoOfUser{} }
+func (m *SubscriptionInfoOfUser) String() string { return proto.CompactTextString(m) }
+func (*SubscriptionInfoOfUser) ProtoMessage()    {}
+func (*SubscriptionInfoOfUser) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{38}
+}
+
+func (m *SubscriptionInfoOfUser) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SubscriptionInfoOfUser.Unmarshal(m, b)
+}
+func (m *SubscriptionInfoOfUser) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SubscriptionInfoOfUser.Marshal(b, m, deterministic)
+}
+func (m *SubscriptionInfoOfUser) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubscriptionInfoOfUser.Merge(m, src)
+}
+func (m *SubscriptionInfoOfUser) XXX_Size() int {
+	return xxx_messageInfo_SubscriptionInfoOfUser.Size(m)
+}
+func (m *SubscriptionInfoOfUser) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubscriptionInfoOfUser.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SubscriptionInfoOfUser proto.InternalMessageInfo
+
+func (m *SubscriptionInfoOfUser) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
+func (m *SubscriptionInfoOfUser) GetSubsId() int64 {
+	if m != nil {
+		return m.SubsId
+	}
+	return 0
+}
+
+func (m *SubscriptionInfoOfUser) GetSubsName() string {
+	if m != nil {
+		return m.SubsName
+	}
+	return ""
+}
+
+func (m *SubscriptionInfoOfUser) GetSubsIntro() string {
+	if m != nil {
+		return m.SubsIntro
+	}
+	return ""
+}
+
+func (m *SubscriptionInfoOfUser) GetSubsAvatar() string {
+	if m != nil {
+		return m.SubsAvatar
+	}
+	return ""
+}
+
+func (m *SubscriptionInfoOfUser) GetSubsQrCode() string {
+	if m != nil {
+		return m.SubsQrCode
+	}
+	return ""
+}
+
+type SubscriptionInfoOfUserList struct {
+	Data                 []*SubscriptionInfoOfUser `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
+}
+
+func (m *SubscriptionInfoOfUserList) Reset()         { *m = SubscriptionInfoOfUserList{} }
+func (m *SubscriptionInfoOfUserList) String() string { return proto.CompactTextString(m) }
+func (*SubscriptionInfoOfUserList) ProtoMessage()    {}
+func (*SubscriptionInfoOfUserList) Descriptor() ([]byte, []int) {
+	return fileDescriptor_d28f1fa67868a9e4, []int{39}
+}
+
+func (m *SubscriptionInfoOfUserList) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SubscriptionInfoOfUserList.Unmarshal(m, b)
+}
+func (m *SubscriptionInfoOfUserList) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SubscriptionInfoOfUserList.Marshal(b, m, deterministic)
+}
+func (m *SubscriptionInfoOfUserList) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SubscriptionInfoOfUserList.Merge(m, src)
+}
+func (m *SubscriptionInfoOfUserList) XXX_Size() int {
+	return xxx_messageInfo_SubscriptionInfoOfUserList.Size(m)
+}
+func (m *SubscriptionInfoOfUserList) XXX_DiscardUnknown() {
+	xxx_messageInfo_SubscriptionInfoOfUserList.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SubscriptionInfoOfUserList proto.InternalMessageInfo
+
+func (m *SubscriptionInfoOfUserList) GetData() []*SubscriptionInfoOfUser {
 	if m != nil {
 		return m.Data
 	}
@@ -734,79 +2153,181 @@ func (m *FriendsBasicInfoList) GetData() []*FriendsBasicInfo {
 }
 
 func init() {
-	proto.RegisterEnum("pb.QueryUserField", QueryUserField_name, QueryUserField_value)
-	proto.RegisterEnum("pb.UpdateUserField", UpdateUserField_name, UpdateUserField_value)
-	proto.RegisterType((*UserBasicInfo)(nil), "pb.UserBasicInfo")
-	proto.RegisterType((*UserBasicInfoList)(nil), "pb.UserBasicInfoList")
-	proto.RegisterType((*QueryUserParams)(nil), "pb.QueryUserParams")
-	proto.RegisterType((*UpdateUserParams)(nil), "pb.UpdateUserParams")
-	proto.RegisterType((*UserAvatar)(nil), "pb.UserAvatar")
-	proto.RegisterType((*UserQRCode)(nil), "pb.UserQRCode")
-	proto.RegisterType((*Friendship)(nil), "pb.Friendship")
-	proto.RegisterType((*FriendshipList)(nil), "pb.FriendshipList")
-	proto.RegisterType((*QueryFriendsParams)(nil), "pb.QueryFriendsParams")
-	proto.RegisterType((*FriendsBasicInfo)(nil), "pb.FriendsBasicInfo")
-	proto.RegisterType((*FriendsBasicInfoList)(nil), "pb.FriendsBasicInfoList")
+	proto.RegisterType((*EmptyParam)(nil), "pb.EmptyParam")
+	proto.RegisterType((*IdList)(nil), "pb.IdList")
+	proto.RegisterType((*Id)(nil), "pb.Id")
+	proto.RegisterType((*IdAndName)(nil), "pb.IdAndName")
+	proto.RegisterType((*IdAndIsDelete)(nil), "pb.IdAndIsDelete")
+	proto.RegisterType((*NameAndIsDelete)(nil), "pb.NameAndIsDelete")
+	proto.RegisterType((*IdAndAvatar)(nil), "pb.IdAndAvatar")
+	proto.RegisterType((*IdAndQrCode)(nil), "pb.IdAndQrCode")
+	proto.RegisterType((*UserBasic)(nil), "pb.UserBasic")
+	proto.RegisterType((*UserBasicList)(nil), "pb.UserBasicList")
+	proto.RegisterType((*EmailAndIsDelete)(nil), "pb.EmailAndIsDelete")
+	proto.RegisterType((*Password)(nil), "pb.Password")
+	proto.RegisterType((*Email)(nil), "pb.Email")
+	proto.RegisterType((*IdAndPassword)(nil), "pb.IdAndPassword")
+	proto.RegisterType((*UserProfilePlus)(nil), "pb.UserProfilePlus")
+	proto.RegisterType((*FriendshipBasic)(nil), "pb.FriendshipBasic")
+	proto.RegisterType((*FriendshipBasicList)(nil), "pb.FriendshipBasicList")
+	proto.RegisterType((*FriendsInfoPlus)(nil), "pb.FriendsInfoPlus")
+	proto.RegisterType((*FriendsInfoListPlus)(nil), "pb.FriendsInfoListPlus")
+	proto.RegisterType((*GroupChatBasic)(nil), "pb.GroupChatBasic")
+	proto.RegisterType((*GroupChatList)(nil), "pb.GroupChatList")
+	proto.RegisterType((*GroupAndManagerId)(nil), "pb.GroupAndManagerId")
+	proto.RegisterType((*UserGroupChatRelate)(nil), "pb.UserGroupChatRelate")
+	proto.RegisterType((*UserGroupChatRelateList)(nil), "pb.UserGroupChatRelateList")
+	proto.RegisterType((*UserAndGroupId)(nil), "pb.UserAndGroupId")
+	proto.RegisterType((*GroupChatInfoOfUser)(nil), "pb.GroupChatInfoOfUser")
+	proto.RegisterType((*GroupChatInfoListOfUserPlus)(nil), "pb.GroupChatInfoListOfUserPlus")
+	proto.RegisterType((*UserInfoInGroupChat)(nil), "pb.UserInfoInGroupChat")
+	proto.RegisterType((*UserInfoInGroupChatListPlus)(nil), "pb.UserInfoInGroupChatListPlus")
+	proto.RegisterType((*SubscriptionBasic)(nil), "pb.SubscriptionBasic")
+	proto.RegisterType((*SubscriptionBasicList)(nil), "pb.SubscriptionBasicList")
+	proto.RegisterType((*SubsAndManagerId)(nil), "pb.SubsAndManagerId")
+	proto.RegisterType((*IdAndIntro)(nil), "pb.IdAndIntro")
+	proto.RegisterType((*UserSubscriptionRelate)(nil), "pb.UserSubscriptionRelate")
+	proto.RegisterType((*UserSubscriptionRelateList)(nil), "pb.UserSubscriptionRelateList")
+	proto.RegisterType((*UserAndSubsId)(nil), "pb.UserAndSubsId")
+	proto.RegisterType((*UserInfoOfSubscription)(nil), "pb.UserInfoOfSubscription")
+	proto.RegisterType((*UserInfoOfSubscriptionList)(nil), "pb.UserInfoOfSubscriptionList")
+	proto.RegisterType((*SubscriptionInfoOfUser)(nil), "pb.SubscriptionInfoOfUser")
+	proto.RegisterType((*SubscriptionInfoOfUserList)(nil), "pb.SubscriptionInfoOfUserList")
 }
 
 func init() { proto.RegisterFile("mysqlBind.proto", fileDescriptor_d28f1fa67868a9e4) }
 
 var fileDescriptor_d28f1fa67868a9e4 = []byte{
-	// 861 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0x6d, 0x6f, 0xe3, 0x44,
-	0x10, 0x3e, 0xa7, 0x89, 0xe3, 0x9b, 0x94, 0xc4, 0xdd, 0x86, 0x62, 0xc2, 0x07, 0x2a, 0x4b, 0x48,
-	0xd1, 0x49, 0x54, 0xba, 0xb4, 0x45, 0x08, 0x10, 0xd0, 0x00, 0xad, 0x22, 0xdd, 0xf5, 0xc5, 0xc7,
-	0x7d, 0x8e, 0x36, 0xd9, 0x0d, 0xac, 0xf0, 0x4b, 0x6a, 0xbb, 0x57, 0xe5, 0x2b, 0xff, 0x82, 0x3f,
-	0x82, 0xf8, 0x19, 0xfc, 0x24, 0xb4, 0xb3, 0x1b, 0xdb, 0xeb, 0xa4, 0x6a, 0x2b, 0xbe, 0x65, 0x66,
-	0xe7, 0x19, 0xcf, 0x3c, 0xf3, 0xcc, 0x28, 0xd0, 0x8b, 0x56, 0xd9, 0x6d, 0x38, 0x16, 0x31, 0x3b,
-	0x5a, 0xa6, 0x49, 0x9e, 0x90, 0xc6, 0x72, 0xe6, 0xff, 0x6d, 0xc1, 0x47, 0xef, 0x33, 0x9e, 0x8e,
-	0x69, 0x26, 0xe6, 0x93, 0x78, 0x91, 0x90, 0x2e, 0x34, 0x04, 0xf3, 0xac, 0x43, 0x6b, 0xb8, 0x13,
-	0x34, 0x04, 0x23, 0x04, 0x9a, 0x31, 0x8d, 0xb8, 0xd7, 0x38, 0xb4, 0x86, 0x2f, 0x03, 0xfc, 0x4d,
-	0x0e, 0xc0, 0x8e, 0x92, 0x99, 0x08, 0xb9, 0xb7, 0x83, 0x5e, 0x6d, 0x91, 0x3e, 0xb4, 0x78, 0x44,
-	0x45, 0xe8, 0x35, 0xd1, 0xad, 0x0c, 0x32, 0x00, 0x67, 0x49, 0xb3, 0xec, 0x3e, 0x49, 0x99, 0xd7,
-	0xc2, 0x87, 0xc2, 0x96, 0x99, 0x7e, 0xe3, 0x31, 0xe3, 0xa9, 0x67, 0x1f, 0x5a, 0xc3, 0x56, 0xa0,
-	0x2d, 0xf2, 0x39, 0x74, 0xe6, 0x29, 0xa7, 0x39, 0x9f, 0xe6, 0x22, 0xe2, 0x5e, 0x1b, 0x61, 0xa0,
-	0x5c, 0xbf, 0x8a, 0x88, 0xfb, 0xdf, 0xc0, 0x9e, 0x51, 0xf7, 0x1b, 0x91, 0xe5, 0xe4, 0x0b, 0x68,
-	0x32, 0x9a, 0x53, 0xcf, 0x3a, 0xdc, 0x19, 0x76, 0x46, 0x7b, 0x47, 0xcb, 0xd9, 0x91, 0x11, 0x14,
-	0xe0, 0xb3, 0xff, 0xa7, 0x05, 0xbd, 0x9b, 0x3b, 0x9e, 0xae, 0xe4, 0xe3, 0x35, 0x4d, 0x69, 0x94,
-	0x91, 0x53, 0xd8, 0x5d, 0x88, 0x30, 0xe7, 0xe9, 0x74, 0x21, 0x78, 0xa8, 0x08, 0xe8, 0x8e, 0x88,
-	0x4c, 0x51, 0x84, 0x9e, 0xcb, 0x97, 0xa0, 0xa3, 0xe2, 0xd0, 0xd0, 0x6c, 0x35, 0x0a, 0xb6, 0x0a,
-	0x06, 0x76, 0xaa, 0x0c, 0xac, 0x39, 0x6c, 0x96, 0x1c, 0xfa, 0xff, 0x5a, 0xe0, 0xbe, 0x5f, 0x32,
-	0x9a, 0xf3, 0x4a, 0x15, 0x5f, 0xc1, 0xee, 0x1d, 0xfa, 0x8c, 0x2a, 0xf6, 0xb1, 0x91, 0x22, 0x56,
-	0x97, 0xa1, 0x02, 0xff, 0x67, 0x19, 0x95, 0x51, 0xb6, 0x8c, 0x51, 0x56, 0x87, 0x66, 0x3f, 0x38,
-	0xb4, 0x76, 0x75, 0x68, 0xfe, 0x09, 0x80, 0xac, 0xef, 0xec, 0x03, 0xcd, 0x69, 0xba, 0x21, 0xa4,
-	0x03, 0xb0, 0x29, 0xbe, 0x68, 0x29, 0x69, 0xcb, 0x3f, 0x55, 0xa8, 0x9b, 0xe0, 0xa7, 0x84, 0xf1,
-	0x0d, 0xd4, 0x27, 0xd0, 0xbe, 0x4d, 0xa7, 0xf3, 0x84, 0xad, 0x15, 0x68, 0xdf, 0xa6, 0x32, 0xd0,
-	0xff, 0xc7, 0x02, 0x38, 0x4f, 0x05, 0x8f, 0x59, 0xf6, 0xbb, 0x58, 0xca, 0xb8, 0x8c, 0x87, 0x8b,
-	0x69, 0x01, 0xb6, 0xa5, 0x39, 0x61, 0xe4, 0x33, 0x78, 0xb9, 0xc0, 0xb0, 0x69, 0xc1, 0x90, 0xa3,
-	0x1c, 0x13, 0x26, 0x65, 0xa6, 0x1f, 0xe3, 0x24, 0x5f, 0xab, 0x19, 0x94, 0xeb, 0x32, 0xc9, 0xb9,
-	0x44, 0x8b, 0x6c, 0x4a, 0xe7, 0x73, 0xbe, 0xcc, 0x91, 0x37, 0x27, 0x70, 0x44, 0x76, 0x86, 0x36,
-	0xf9, 0x14, 0x1c, 0x91, 0x4d, 0x67, 0x21, 0x9d, 0xff, 0x81, 0xec, 0x39, 0x41, 0x5b, 0x64, 0x63,
-	0x69, 0x6a, 0x1c, 0xe3, 0x21, 0xcf, 0x39, 0xf2, 0x87, 0xb8, 0x9f, 0xd1, 0xf6, 0x4f, 0xa0, 0x5b,
-	0x56, 0x8e, 0xc2, 0xf5, 0x0d, 0xe1, 0x76, 0xe5, 0xbc, 0xcb, 0x08, 0xad, 0xda, 0x2f, 0x81, 0xa0,
-	0x12, 0xf5, 0x83, 0x56, 0xcc, 0x43, 0x7d, 0x4b, 0x7e, 0x5c, 0x1d, 0x5a, 0x2e, 0xb7, 0x41, 0x86,
-	0x55, 0x23, 0x63, 0xdb, 0xa6, 0x6f, 0x17, 0x52, 0x29, 0x9a, 0xa6, 0x21, 0x9a, 0x52, 0x18, 0x2d,
-	0x63, 0x9b, 0x65, 0xe6, 0x44, 0x13, 0x21, 0x33, 0x4b, 0x66, 0xab, 0xe4, 0xb5, 0x0d, 0xf2, 0xfc,
-	0x1f, 0xa1, 0x5f, 0xaf, 0x1c, 0x59, 0x1a, 0x1a, 0x2c, 0xf5, 0x2b, 0x2c, 0xd5, 0x36, 0xfc, 0xd5,
-	0x31, 0x74, 0xcd, 0xad, 0x25, 0x0e, 0x34, 0xc7, 0xab, 0x09, 0x73, 0x5f, 0x90, 0x0e, 0xb4, 0xc7,
-	0xab, 0x5f, 0x64, 0x1f, 0xae, 0x45, 0x00, 0xec, 0xf1, 0xea, 0x92, 0x46, 0xdc, 0x6d, 0xbc, 0x3a,
-	0x85, 0x5e, 0x6d, 0xc9, 0x48, 0x1f, 0x5c, 0xf9, 0xf8, 0x16, 0xdb, 0xbb, 0xc0, 0x66, 0xdc, 0x17,
-	0x64, 0x17, 0x9c, 0x6b, 0xbd, 0x0b, 0xae, 0x35, 0xfa, 0xcb, 0x01, 0xf7, 0xed, 0xea, 0xdd, 0xcd,
-	0x1b, 0x79, 0x5a, 0xdf, 0xf1, 0xf4, 0x83, 0x98, 0x73, 0x32, 0x02, 0xb8, 0xe4, 0xf7, 0x57, 0x31,
-	0xe6, 0x22, 0x9b, 0x97, 0x68, 0xb0, 0xe9, 0x22, 0xa7, 0xd0, 0xb9, 0xe0, 0x39, 0xfa, 0x56, 0x13,
-	0x46, 0xf6, 0x8d, 0xdb, 0xa3, 0xc6, 0xbd, 0x0d, 0xf6, 0x35, 0x74, 0x0b, 0x18, 0xb6, 0xf5, 0x64,
-	0xe4, 0x77, 0x05, 0x32, 0x53, 0x24, 0x6c, 0x47, 0x7e, 0xbc, 0x81, 0xc4, 0x69, 0x7c, 0x0b, 0xee,
-	0xf5, 0x5d, 0x5e, 0xf8, 0xb1, 0xe6, 0xbe, 0x79, 0xa9, 0x1e, 0xfe, 0xf4, 0xf7, 0xb0, 0xaf, 0xc1,
-	0x6b, 0x26, 0x9f, 0x87, 0x3f, 0x83, 0x83, 0x0d, 0xbc, 0x6a, 0xfe, 0xc9, 0x29, 0x8e, 0x61, 0x4f,
-	0x77, 0xaf, 0x0e, 0x16, 0x16, 0xd0, 0x5d, 0xc7, 0x29, 0xdf, 0xa0, 0x66, 0x4b, 0x90, 0xfe, 0xee,
-	0xf3, 0x40, 0xfa, 0x4b, 0xea, 0xc8, 0x99, 0x20, 0xe5, 0x1b, 0xd4, 0xec, 0xca, 0x97, 0x9e, 0x01,
-	0x7a, 0x0d, 0xbd, 0x33, 0xc6, 0xae, 0x62, 0x7e, 0xc9, 0xef, 0xd5, 0x6a, 0x90, 0xda, 0x31, 0x19,
-	0xd4, 0x6c, 0x32, 0xc2, 0x31, 0x5e, 0xc5, 0xfc, 0xbc, 0xbc, 0x7a, 0x8f, 0x61, 0x4e, 0x80, 0xa8,
-	0x13, 0xf8, 0xac, 0x2f, 0x9d, 0x00, 0xb9, 0xbe, 0xcb, 0x95, 0x03, 0x17, 0x3d, 0x94, 0x32, 0x7a,
-	0x0c, 0xf5, 0x1a, 0x7a, 0xea, 0x6c, 0x16, 0x25, 0x3e, 0x0a, 0xf9, 0x01, 0xf9, 0x2e, 0x1d, 0x38,
-	0xee, 0x83, 0x42, 0xda, 0xc6, 0x01, 0x1d, 0x10, 0x13, 0x8c, 0xd2, 0xbe, 0x80, 0xfd, 0x32, 0x41,
-	0xa9, 0x98, 0x87, 0x52, 0x78, 0xdb, 0x2e, 0x91, 0x4c, 0x34, 0xb3, 0xf1, 0x9f, 0xd6, 0xf1, 0x7f,
-	0x01, 0x00, 0x00, 0xff, 0xff, 0xbe, 0x49, 0x81, 0x85, 0x7c, 0x09, 0x00, 0x00,
+	// 2064 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x5a, 0x5f, 0x4f, 0xe4, 0xc8,
+	0x11, 0xd7, 0xcc, 0x30, 0xc3, 0x4c, 0xb1, 0xfc, 0x33, 0x2c, 0x03, 0x66, 0x59, 0x58, 0x47, 0xca,
+	0x11, 0x9d, 0xb4, 0x91, 0xb8, 0x5c, 0x76, 0x93, 0xe5, 0xee, 0x76, 0x86, 0x7f, 0x9a, 0xbd, 0x5d,
+	0xe0, 0x20, 0x27, 0xdd, 0x1b, 0x32, 0xd8, 0xec, 0x59, 0x31, 0xf6, 0xac, 0xed, 0x61, 0xc5, 0x73,
+	0x3e, 0x49, 0x9e, 0xf2, 0x98, 0xe7, 0x44, 0xca, 0x07, 0xc8, 0xa7, 0xc8, 0x4b, 0x3e, 0x46, 0x1e,
+	0xa2, 0xae, 0xee, 0xb6, 0xbb, 0xdb, 0xdd, 0x66, 0x06, 0x92, 0x27, 0xa6, 0xab, 0xbb, 0xaa, 0xab,
+	0x7e, 0xfd, 0xab, 0x2a, 0x77, 0x0b, 0x98, 0xbf, 0xb9, 0x4b, 0x3f, 0x85, 0xfd, 0x20, 0xf2, 0x5e,
+	0x0e, 0x93, 0x38, 0x8b, 0xad, 0xfa, 0xf0, 0xd2, 0x79, 0x02, 0x70, 0x70, 0x33, 0xcc, 0xee, 0x4e,
+	0xdd, 0xc4, 0xbd, 0x71, 0x9e, 0x41, 0x6b, 0xe0, 0xbd, 0x0f, 0xd2, 0xcc, 0xb2, 0x60, 0xca, 0x73,
+	0x33, 0x77, 0xb5, 0xb6, 0xd5, 0xd8, 0x6e, 0x9c, 0xe1, 0x6f, 0xc7, 0x86, 0xfa, 0xc0, 0xb3, 0x96,
+	0xa1, 0x79, 0xeb, 0x86, 0x23, 0x7f, 0xb5, 0xb6, 0x55, 0xdb, 0x6e, 0x9c, 0xd1, 0x81, 0xf3, 0x6b,
+	0xe8, 0x0c, 0xbc, 0x5e, 0xe4, 0x1d, 0xbb, 0x37, 0xbe, 0x35, 0x07, 0xf5, 0xc0, 0x63, 0xf3, 0xf5,
+	0xc0, 0x23, 0xc6, 0x22, 0xf7, 0xc6, 0x5f, 0xad, 0x6f, 0xd5, 0xb6, 0x3b, 0x67, 0xf8, 0xdb, 0xd9,
+	0x85, 0x59, 0x54, 0x18, 0xa4, 0xfb, 0x7e, 0xe8, 0x67, 0x65, 0xa5, 0x75, 0xe8, 0x04, 0xe9, 0x85,
+	0x87, 0x93, 0xa8, 0xd9, 0x3e, 0x6b, 0x07, 0x6c, 0xb1, 0xd3, 0x87, 0x79, 0xb2, 0x93, 0xa8, 0xcf,
+	0x37, 0xa9, 0x15, 0x9b, 0x54, 0xdb, 0xf8, 0x1a, 0x66, 0xd0, 0x83, 0xde, 0xad, 0x9b, 0xb9, 0x49,
+	0x69, 0xff, 0x15, 0x68, 0xb9, 0x38, 0xc3, 0xdc, 0x66, 0x23, 0xe7, 0xb7, 0x4c, 0xed, 0x87, 0x64,
+	0x2f, 0xf6, 0xca, 0x6e, 0x77, 0x61, 0xfa, 0x53, 0x72, 0x71, 0x15, 0x7b, 0x3c, 0xdc, 0xd6, 0x27,
+	0x5c, 0xe8, 0xfc, 0xab, 0x06, 0x9d, 0x1f, 0x53, 0x3f, 0xe9, 0xbb, 0x69, 0x70, 0x55, 0x52, 0x5b,
+	0x86, 0xa6, 0x7f, 0xe3, 0x06, 0x21, 0x53, 0xa2, 0x83, 0x3c, 0xa6, 0x86, 0x10, 0x93, 0x0d, 0xed,
+	0xa1, 0x9b, 0xa6, 0x9f, 0xe3, 0xc4, 0x5b, 0x9d, 0x42, 0x79, 0x3e, 0x26, 0x3e, 0xdf, 0xc4, 0x97,
+	0x41, 0xe8, 0xaf, 0x36, 0xe9, 0xde, 0x74, 0x44, 0xe4, 0x1f, 0xfd, 0xc8, 0xf3, 0x93, 0xd5, 0xd6,
+	0x56, 0x6d, 0xbb, 0x79, 0xc6, 0x46, 0x42, 0x8c, 0xd3, 0x62, 0x8c, 0x62, 0x10, 0x6d, 0x31, 0x08,
+	0x19, 0xd0, 0x8e, 0x02, 0xe8, 0x0e, 0xcc, 0xe6, 0x01, 0x22, 0x89, 0x5e, 0x08, 0x24, 0x9a, 0xd9,
+	0x99, 0x7d, 0x39, 0xbc, 0x7c, 0x99, 0x2f, 0x60, 0x9c, 0x3a, 0x80, 0x85, 0x03, 0x12, 0xaa, 0x78,
+	0x92, 0x39, 0x16, 0x35, 0x11, 0x8b, 0xca, 0xb3, 0xdc, 0x82, 0xf6, 0x29, 0x07, 0x41, 0x22, 0x68,
+	0x87, 0x13, 0x74, 0x03, 0x9a, 0xb8, 0x91, 0x61, 0xfa, 0x0d, 0xa3, 0x63, 0x6e, 0x45, 0x3d, 0x20,
+	0x11, 0xf6, 0xba, 0x0c, 0xbb, 0xe3, 0xc3, 0x3c, 0x89, 0xeb, 0x34, 0x89, 0xaf, 0x83, 0xd0, 0x3f,
+	0x0d, 0x47, 0xe9, 0x38, 0x29, 0x20, 0x9c, 0x56, 0xc3, 0x70, 0x5a, 0x53, 0xe2, 0x69, 0x39, 0xff,
+	0xa8, 0xc1, 0xfc, 0x61, 0x12, 0xf8, 0x91, 0x97, 0xfe, 0x1c, 0x0c, 0x29, 0x8f, 0xba, 0x30, 0x9d,
+	0xfa, 0xe1, 0xf5, 0x45, 0xbe, 0x59, 0x8b, 0x0c, 0x07, 0x98, 0x3e, 0xd7, 0xb8, 0x96, 0x4c, 0xd5,
+	0x71, 0xaa, 0x4d, 0x05, 0x03, 0xcf, 0xda, 0x84, 0x19, 0x36, 0x19, 0xc5, 0x19, 0xdf, 0x1e, 0xa8,
+	0xe8, 0x38, 0xce, 0xf8, 0x39, 0xbb, 0x57, 0x57, 0xfe, 0x30, 0x43, 0x2f, 0x10, 0xec, 0x1e, 0x8e,
+	0xad, 0x35, 0x68, 0x07, 0xe9, 0xc5, 0x65, 0xe8, 0x5e, 0xfd, 0x11, 0x79, 0xd6, 0x3e, 0x9b, 0x0e,
+	0xd2, 0x3e, 0x19, 0xca, 0x87, 0xd4, 0x52, 0x0e, 0xe9, 0x5b, 0x58, 0x52, 0xdc, 0x47, 0x96, 0x7c,
+	0x21, 0xb1, 0x64, 0x89, 0xb0, 0x44, 0x59, 0xc6, 0xb8, 0xf2, 0x9f, 0x22, 0xfe, 0x41, 0x74, 0x1d,
+	0x1b, 0x71, 0x8e, 0xb3, 0x02, 0xe7, 0x58, 0xe4, 0x53, 0x43, 0x97, 0x5b, 0x53, 0xda, 0x13, 0x79,
+	0x5c, 0xfe, 0x48, 0xf0, 0xb5, 0x2b, 0xe0, 0xeb, 0x54, 0xc0, 0x07, 0x46, 0xf8, 0x48, 0xf4, 0x04,
+	0x3a, 0x44, 0xc0, 0x0c, 0x1f, 0x07, 0x89, 0xc1, 0xf7, 0xe7, 0x1a, 0xcc, 0x1d, 0x25, 0xf1, 0x68,
+	0xb8, 0xf7, 0xb3, 0x9b, 0xe9, 0xab, 0x90, 0x8e, 0xa5, 0x1b, 0x00, 0x37, 0x6e, 0xe4, 0x7e, 0xf4,
+	0x13, 0xc2, 0xa4, 0x06, 0xae, 0xed, 0x30, 0xc9, 0x40, 0x2c, 0x93, 0x53, 0xa6, 0x12, 0xd2, 0x34,
+	0x97, 0x10, 0x95, 0x22, 0xaf, 0x60, 0x36, 0x77, 0x11, 0xc9, 0xf1, 0x4b, 0x29, 0x3a, 0x8b, 0x44,
+	0x27, 0xc7, 0xc0, 0x82, 0xfb, 0x00, 0x8b, 0x28, 0xef, 0x45, 0xde, 0x87, 0xdc, 0xb7, 0x35, 0x68,
+	0x7f, 0x24, 0xc2, 0x22, 0x3b, 0xa6, 0x71, 0x3c, 0xf0, 0x94, 0xa8, 0xea, 0x4a, 0x54, 0xce, 0x9f,
+	0x6a, 0xb0, 0x44, 0x52, 0x3a, 0xdf, 0xeb, 0xcc, 0x0f, 0xdd, 0xcc, 0xaf, 0xb2, 0xd8, 0x85, 0xe9,
+	0x51, 0x2a, 0x9a, 0x6b, 0x91, 0x21, 0xcd, 0x44, 0x9c, 0x10, 0x52, 0xad, 0x4d, 0x04, 0x42, 0xa2,
+	0x31, 0x34, 0xa6, 0x14, 0x34, 0x0e, 0xa1, 0xab, 0x71, 0x02, 0x71, 0xf9, 0x52, 0xc2, 0xa5, 0xcb,
+	0x4b, 0xab, 0xb2, 0x94, 0x81, 0xb3, 0x0f, 0x73, 0x64, 0xb2, 0x17, 0x79, 0x47, 0xcc, 0xd9, 0x07,
+	0xc4, 0xe1, 0xfc, 0xb5, 0x06, 0x4b, 0xb9, 0x7d, 0xc2, 0xad, 0x93, 0x6b, 0x62, 0x55, 0x54, 0xa8,
+	0x49, 0x81, 0x8b, 0x9b, 0xd4, 0x4b, 0xf0, 0xd3, 0x29, 0xa1, 0xbd, 0x75, 0x50, 0x82, 0x1f, 0x10,
+	0x2f, 0xe0, 0x09, 0x9d, 0x96, 0xa8, 0x35, 0x83, 0x32, 0xd6, 0xae, 0x1d, 0x98, 0xa5, 0x4b, 0x64,
+	0x96, 0xd1, 0x35, 0xb4, 0x37, 0x3b, 0xef, 0x60, 0x5d, 0x72, 0x98, 0x20, 0x47, 0x9d, 0xc6, 0xcc,
+	0xd1, 0x60, 0xa8, 0x89, 0x8f, 0x61, 0xf8, 0x6f, 0xc6, 0x08, 0x32, 0x31, 0x88, 0xf2, 0x75, 0xff,
+	0x17, 0x46, 0xd0, 0xc9, 0xa2, 0x38, 0xd1, 0x49, 0x02, 0xcc, 0x26, 0xcc, 0xe0, 0x24, 0xab, 0x46,
+	0x4d, 0xac, 0x46, 0x40, 0x44, 0x47, 0xb4, 0x22, 0x6d, 0x00, 0x8e, 0x2e, 0x68, 0xc1, 0x6b, 0x51,
+	0x60, 0x89, 0x84, 0x36, 0x3f, 0xae, 0x2f, 0x55, 0x2d, 0xd4, 0xa0, 0xb0, 0x12, 0xc8, 0x34, 0x51,
+	0xe6, 0xc5, 0xc6, 0x40, 0x3b, 0x65, 0x39, 0x83, 0xec, 0xef, 0x35, 0x58, 0x3c, 0x1f, 0x5d, 0xa6,
+	0x57, 0x49, 0x30, 0xcc, 0x82, 0x38, 0xfa, 0x9f, 0xd5, 0x9c, 0x65, 0x68, 0x06, 0x51, 0x96, 0xc4,
+	0x0c, 0x1e, 0x3a, 0x10, 0x2a, 0x51, 0xd3, 0x54, 0x89, 0x5a, 0xe6, 0x4a, 0x34, 0x5d, 0xfa, 0xc2,
+	0x7c, 0x5a, 0xf2, 0x1d, 0x33, 0xef, 0x57, 0x12, 0x04, 0x4f, 0x09, 0x04, 0xa5, 0x85, 0x0c, 0x80,
+	0x77, 0xb0, 0x40, 0xa6, 0xa4, 0x9a, 0x44, 0x1a, 0xf6, 0xe8, 0x32, 0x15, 0x1b, 0xf6, 0xe8, 0x32,
+	0xbd, 0xbf, 0x22, 0xed, 0x00, 0xd0, 0xef, 0x65, 0x8c, 0x55, 0xf3, 0xf9, 0x48, 0x11, 0xa9, 0x0b,
+	0x88, 0x38, 0x1f, 0x61, 0x85, 0x9c, 0x8e, 0xe8, 0x1e, 0xab, 0x63, 0x46, 0x2f, 0xaa, 0x38, 0x5b,
+	0x80, 0xd5, 0x50, 0xc0, 0x7a, 0x0f, 0xb6, 0x7e, 0x23, 0x44, 0xec, 0xa5, 0x84, 0x98, 0xcd, 0x49,
+	0x53, 0x5e, 0xcd, 0x60, 0xeb, 0xd1, 0xef, 0xc8, 0x5e, 0xe4, 0x9d, 0xe7, 0x4e, 0x4d, 0xe6, 0xad,
+	0xf3, 0x97, 0x1a, 0x0d, 0x9d, 0xa6, 0xb1, 0xb8, 0xd3, 0x03, 0x42, 0x97, 0x73, 0xaa, 0xa1, 0xe6,
+	0xd4, 0xa3, 0x12, 0x96, 0x43, 0x57, 0x76, 0xb4, 0x0a, 0xba, 0xf2, 0x6a, 0x06, 0xdd, 0x3f, 0x6b,
+	0xb0, 0x22, 0x8a, 0xc7, 0x29, 0xd3, 0x02, 0x20, 0x75, 0x09, 0x90, 0x75, 0xe8, 0xe0, 0x84, 0x50,
+	0xa3, 0xdb, 0x44, 0x70, 0xcc, 0x52, 0x94, 0x6a, 0x09, 0x89, 0x88, 0xcb, 0x29, 0x41, 0x37, 0x61,
+	0x06, 0xa7, 0xa5, 0x8c, 0x44, 0x0d, 0x56, 0xbf, 0xb7, 0xe0, 0x09, 0x2e, 0x90, 0x53, 0x13, 0x57,
+	0xb0, 0xea, 0xfd, 0x1e, 0x6c, 0x7d, 0x28, 0x26, 0x64, 0xf4, 0xab, 0x29, 0x32, 0x3b, 0x7f, 0xfb,
+	0x02, 0x16, 0x3e, 0xdc, 0x9d, 0xff, 0xf0, 0x9e, 0x5c, 0x80, 0xcf, 0xfd, 0xe4, 0x36, 0xb8, 0xf2,
+	0xad, 0x1d, 0xb0, 0x4e, 0xe3, 0x34, 0x3b, 0x77, 0x6f, 0xfd, 0x93, 0xc8, 0x3f, 0xf6, 0x3f, 0x23,
+	0x52, 0xf2, 0x45, 0xc5, 0x96, 0x87, 0xd6, 0x2f, 0x60, 0x91, 0xb2, 0xfe, 0x24, 0xf2, 0xd1, 0xbe,
+	0xef, 0x86, 0x56, 0x8b, 0xac, 0x19, 0x78, 0x36, 0xfb, 0x6b, 0xed, 0xc0, 0xdc, 0x91, 0x9f, 0xb1,
+	0x15, 0xfd, 0xbb, 0x81, 0x67, 0x2d, 0xd2, 0x19, 0xe1, 0x9e, 0xa3, 0x1a, 0x7e, 0x0d, 0x8b, 0xa2,
+	0x0e, 0xbb, 0xad, 0x90, 0x35, 0xea, 0x0d, 0x49, 0xd5, 0x7c, 0x83, 0x9a, 0x1c, 0x9a, 0xfe, 0x1d,
+	0x1e, 0x10, 0x7e, 0x09, 0x2a, 0x97, 0x64, 0x7b, 0x51, 0x52, 0x64, 0x40, 0xae, 0x14, 0xdb, 0xf2,
+	0xeb, 0x0f, 0xba, 0xcc, 0x83, 0x7a, 0x42, 0xfe, 0xe6, 0x17, 0xa3, 0xdf, 0xc0, 0x9a, 0x6e, 0x3d,
+	0x75, 0xb7, 0x93, 0xbb, 0xab, 0x68, 0x7d, 0x85, 0x80, 0xf4, 0xc2, 0x30, 0x3f, 0xc0, 0x39, 0xba,
+	0x94, 0xbf, 0x3d, 0xe8, 0x5c, 0xfb, 0x1a, 0x16, 0x4f, 0x47, 0x18, 0x17, 0x25, 0x0d, 0x7a, 0x35,
+	0x9f, 0x03, 0x49, 0x85, 0xb6, 0x2a, 0x10, 0xd4, 0x28, 0x93, 0x14, 0x35, 0x2a, 0xb4, 0x55, 0x81,
+	0xf5, 0x06, 0x96, 0x98, 0x9a, 0x84, 0x42, 0x71, 0x70, 0x5c, 0x6c, 0x97, 0x45, 0x82, 0x32, 0xc7,
+	0xda, 0x74, 0xea, 0x65, 0x91, 0xd5, 0x87, 0x15, 0xbe, 0x33, 0xbd, 0x42, 0x12, 0x5d, 0xec, 0xb7,
+	0x4b, 0x1c, 0x14, 0xe1, 0x6e, 0x69, 0xeb, 0x84, 0xd6, 0x3e, 0xac, 0xca, 0x54, 0x2e, 0xee, 0x50,
+	0x96, 0xee, 0x4e, 0x65, 0xeb, 0x84, 0x26, 0x2b, 0x85, 0x2f, 0x63, 0x59, 0xd9, 0x83, 0x2e, 0x4b,
+	0x91, 0x63, 0xbf, 0x98, 0xc3, 0x44, 0x19, 0xdf, 0xc8, 0x2e, 0x2c, 0x50, 0x9e, 0x3d, 0x28, 0x90,
+	0x5d, 0x64, 0x29, 0xbf, 0x08, 0x79, 0x34, 0x2f, 0x4e, 0xb0, 0x34, 0x18, 0x22, 0x01, 0x7a, 0x2e,
+	0x48, 0xbc, 0xef, 0x60, 0x99, 0xb2, 0xb5, 0x58, 0xa4, 0xe5, 0x6c, 0x57, 0x63, 0x08, 0x17, 0xbe,
+	0x82, 0x17, 0x47, 0x7e, 0x76, 0x70, 0x7d, 0xed, 0x5f, 0x65, 0xc1, 0xad, 0xaf, 0xf8, 0xc1, 0x0e,
+	0x97, 0xe7, 0x97, 0xb8, 0x33, 0x55, 0xc4, 0xdb, 0x60, 0x18, 0xa4, 0xd9, 0xf8, 0x8a, 0xaf, 0xe1,
+	0xa9, 0xe4, 0x72, 0x7e, 0x43, 0xe6, 0x8b, 0xbb, 0xca, 0xcd, 0x30, 0xff, 0xa6, 0xfb, 0x16, 0xd6,
+	0x75, 0xbe, 0x4e, 0xa8, 0x5f, 0x72, 0x79, 0x6c, 0xfd, 0x5d, 0x58, 0x38, 0x1d, 0x15, 0x07, 0x8d,
+	0x1f, 0xc1, 0xe3, 0x1f, 0xf4, 0x5b, 0x58, 0x16, 0xb5, 0x07, 0xfc, 0x96, 0x3d, 0xbe, 0x85, 0xef,
+	0x30, 0x75, 0x05, 0x0b, 0xf4, 0x2e, 0xfe, 0x08, 0x17, 0x58, 0x5a, 0x8f, 0x6f, 0xe1, 0x00, 0xd6,
+	0x4e, 0x47, 0x19, 0xf5, 0xfc, 0x11, 0x79, 0x47, 0xeb, 0x48, 0xde, 0x9d, 0x1e, 0x64, 0xa3, 0x07,
+	0x5d, 0xb9, 0x02, 0x14, 0x57, 0x1d, 0xcd, 0xed, 0xdb, 0xd6, 0xc8, 0xac, 0x03, 0x58, 0x37, 0x98,
+	0x40, 0x5f, 0xc6, 0x35, 0xb3, 0x0d, 0x2b, 0x79, 0x28, 0xc2, 0xbd, 0x56, 0xd3, 0x6d, 0x77, 0x61,
+	0x89, 0x96, 0x8a, 0xc2, 0x82, 0xa1, 0xf8, 0xea, 0xf6, 0x79, 0x8b, 0x0d, 0x50, 0xba, 0xeb, 0xdc,
+	0xdb, 0x42, 0xe5, 0x47, 0x8a, 0x3d, 0xcc, 0x00, 0xc5, 0x42, 0xf1, 0xc9, 0x6f, 0x6a, 0x02, 0xb2,
+	0x91, 0xd7, 0x18, 0x44, 0x2f, 0x0c, 0x65, 0xb1, 0xb6, 0x4d, 0xca, 0x4b, 0x5e, 0x41, 0x97, 0xf2,
+	0x2f, 0x17, 0x13, 0x9f, 0x11, 0x82, 0xd9, 0x7c, 0x6b, 0x22, 0xb2, 0xe5, 0xa1, 0xf5, 0x0e, 0x6c,
+	0x45, 0x91, 0x39, 0x8d, 0xba, 0x4f, 0xf3, 0x9d, 0xc4, 0x0b, 0x8c, 0xad, 0x17, 0x5b, 0xdf, 0x20,
+	0x85, 0x45, 0x5b, 0x13, 0xf5, 0xec, 0xb2, 0xfa, 0x44, 0xbd, 0x7b, 0x0f, 0xd6, 0x15, 0xf5, 0x07,
+	0xb4, 0xe1, 0x13, 0x95, 0xb7, 0xd2, 0x8b, 0x8a, 0x65, 0x7a, 0x64, 0xb1, 0x4d, 0x13, 0xd6, 0x3e,
+	0xd8, 0xd2, 0xa7, 0xa2, 0xcc, 0x62, 0x8b, 0xab, 0x15, 0xef, 0x32, 0xb6, 0x46, 0x66, 0xf5, 0x39,
+	0xbb, 0x65, 0x77, 0x74, 0xea, 0x46, 0x4f, 0x0e, 0xa1, 0x5b, 0x7c, 0x7e, 0x55, 0x13, 0x6c, 0xdd,
+	0x60, 0x03, 0x17, 0x9f, 0xc0, 0x06, 0xfb, 0xd2, 0x54, 0xd8, 0xce, 0x9d, 0xd5, 0x20, 0x5d, 0x69,
+	0xf0, 0x18, 0x9e, 0xe9, 0x0d, 0xfe, 0x98, 0x9a, 0x72, 0xa7, 0xd2, 0xde, 0xef, 0x60, 0x95, 0xd9,
+	0xa3, 0x7d, 0xf1, 0xe4, 0xba, 0x40, 0x4c, 0x63, 0x4b, 0xec, 0xa0, 0x54, 0xb5, 0x20, 0x90, 0x57,
+	0x3c, 0x17, 0xdd, 0xa7, 0xba, 0x8f, 0x5f, 0x1b, 0xb9, 0x2a, 0x51, 0x29, 0x37, 0xc0, 0x4d, 0xc3,
+	0x6b, 0x49, 0xde, 0x08, 0xa9, 0x15, 0x29, 0x32, 0x83, 0x95, 0xaa, 0x57, 0xad, 0xef, 0x79, 0x35,
+	0x90, 0x0c, 0x61, 0x57, 0x9d, 0x9c, 0xc1, 0x27, 0x3c, 0xaf, 0xa4, 0xc9, 0x3c, 0x63, 0x26, 0x37,
+	0x48, 0x4a, 0x8e, 0x94, 0x63, 0xd2, 0xdd, 0x5c, 0xff, 0x9a, 0x62, 0xeb, 0xc5, 0xd6, 0x31, 0x3c,
+	0x37, 0xdb, 0x42, 0x2c, 0x26, 0xb3, 0xf7, 0x25, 0xac, 0xe5, 0xe9, 0x2a, 0x3f, 0x4e, 0x68, 0x7a,
+	0x4e, 0x9f, 0x5f, 0x9b, 0x24, 0x3b, 0x86, 0x62, 0x63, 0xd8, 0xf0, 0x10, 0x19, 0x57, 0xb2, 0x61,
+	0xee, 0x3d, 0x66, 0x20, 0x8e, 0xfc, 0x4c, 0x7d, 0x3c, 0xb8, 0xa7, 0x05, 0xad, 0x69, 0x6d, 0x21,
+	0x9d, 0x7f, 0xcf, 0xfb, 0x82, 0x38, 0x3d, 0x66, 0x4f, 0xf9, 0x1e, 0x36, 0xca, 0xba, 0x62, 0x5b,
+	0x59, 0xe6, 0xfb, 0x4a, 0x5d, 0x45, 0x2b, 0xb5, 0xbe, 0xe1, 0xf4, 0x93, 0xaf, 0xf6, 0x59, 0x12,
+	0xa3, 0xa9, 0xb9, 0x22, 0x2a, 0x22, 0xb3, 0x95, 0xb1, 0xf5, 0x16, 0x9e, 0x95, 0xd5, 0x27, 0x6a,
+	0x4b, 0x5a, 0x0b, 0x13, 0x75, 0xa6, 0x43, 0x78, 0xae, 0x09, 0x61, 0xf2, 0xe6, 0xf4, 0x93, 0x4a,
+	0x76, 0xf5, 0x09, 0xcd, 0xaa, 0x78, 0x58, 0xb3, 0x2b, 0xe6, 0xac, 0x03, 0xd8, 0x90, 0xba, 0x54,
+	0x89, 0xfa, 0x8b, 0x42, 0xa7, 0xa1, 0x2f, 0x72, 0x76, 0x59, 0x64, 0x1d, 0x89, 0xef, 0x08, 0x92,
+	0x63, 0x1a, 0xfd, 0x2a, 0x7f, 0xfe, 0x00, 0x9b, 0xac, 0x0c, 0x96, 0x19, 0xcd, 0xf6, 0xd2, 0x40,
+	0xf6, 0xdc, 0x6c, 0x11, 0x39, 0x5d, 0x65, 0xd5, 0xdc, 0x6b, 0xee, 0xb3, 0xba, 0x8b, 0x5f, 0x7e,
+	0x62, 0xbb, 0x29, 0x47, 0x6e, 0x6e, 0x1b, 0x54, 0x5b, 0x22, 0xc6, 0x04, 0x4d, 0xe7, 0x10, 0x5b,
+	0xa7, 0xa8, 0xad, 0xef, 0x3b, 0xcf, 0xcd, 0xaf, 0x86, 0x82, 0x1d, 0x35, 0x48, 0x83, 0x9d, 0x8a,
+	0x17, 0xb9, 0x9f, 0x38, 0xd3, 0x55, 0x53, 0x39, 0x87, 0x1f, 0xc8, 0xd0, 0xcb, 0x16, 0xfe, 0xbf,
+	0xca, 0x57, 0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0xa3, 0x0e, 0xfc, 0xdd, 0xc2, 0x22, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -821,24 +2342,82 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MySQLBindServiceClient interface {
-	NewOneUser(ctx context.Context, in *UserBasicInfo, opts ...grpc.CallOption) (*UserBasicInfo, error)
-	GetUserById(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
-	GetUserByEmail(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
-	GetUsersByName(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfoList, error)
-	PutUserBasicById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
-	PutUserPasswordById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
-	PutUserPasswordByEmail(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error)
-	GetUserAvatarById(ctx context.Context, in *UserAvatar, opts ...grpc.CallOption) (*UserAvatar, error)
-	PutUserAvatarById(ctx context.Context, in *UserAvatar, opts ...grpc.CallOption) (*UserAvatar, error)
-	GetUserQRCodeById(ctx context.Context, in *UserQRCode, opts ...grpc.CallOption) (*UserQRCode, error)
-	PutUserQRCodeById(ctx context.Context, in *UserQRCode, opts ...grpc.CallOption) (*UserQRCode, error)
-	AddOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
-	PutOneFriendNote(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
-	AcceptOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
-	PutFriendBlacklist(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
-	DeleteOneFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error)
-	GetFriendshipInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendshipList, error)
-	GetFriendsBasicInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendsBasicInfoList, error)
+	PostSaveOneNewUser(ctx context.Context, in *UserBasic, opts ...grpc.CallOption) (*UserBasic, error)
+	DeleteOneUserReal(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Id, error)
+	GetOneUserById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserBasic, error)
+	GetOneUserByEmail(ctx context.Context, in *EmailAndIsDelete, opts ...grpc.CallOption) (*UserBasic, error)
+	GetUserListByName(ctx context.Context, in *NameAndIsDelete, opts ...grpc.CallOption) (*UserBasicList, error)
+	GetOneUserPasswordById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Password, error)
+	GetOneUserPasswordByEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*Password, error)
+	GetAllUserList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*UserBasicList, error)
+	PutUserAvatarById(ctx context.Context, in *IdAndAvatar, opts ...grpc.CallOption) (*IdAndAvatar, error)
+	PutUserQrCodeById(ctx context.Context, in *IdAndQrCode, opts ...grpc.CallOption) (*IdAndQrCode, error)
+	PutUserPasswordById(ctx context.Context, in *IdAndPassword, opts ...grpc.CallOption) (*IdAndPassword, error)
+	PutUserIsDeleteById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdAndIsDelete, error)
+	PutUserProfileByIdPlus(ctx context.Context, in *UserProfilePlus, opts ...grpc.CallOption) (*UserProfilePlus, error)
+	PostSaveOneNewFriendship(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PostSaveOneNewFriendPlus(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	DeleteONeFriendshipReal(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	GetOneFriendship(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	GetFriendsIdListByOptions(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*IdList, error)
+	GetAllFriendshipList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*FriendshipBasicList, error)
+	GetEffectiveFriendsIdListByIdPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*IdList, error)
+	GetBlacklistFriendsIdListByIdPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*IdList, error)
+	GetAllFriendsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FriendsInfoListPlus, error)
+	GetEffectiveFriendsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FriendsInfoListPlus, error)
+	GetBlacklistFriendsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FriendsInfoListPlus, error)
+	PutOneFriendNote(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PutOneFriendIsAccept(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PutOneFriendIsBlack(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PutOneFriendIsDelete(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PutAcceptOneNewFriendPlus(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PutDeleteOneFriendPlus(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error)
+	PostSaveOneNewGroupChat(ctx context.Context, in *GroupChatBasic, opts ...grpc.CallOption) (*GroupChatBasic, error)
+	PostSaveOneNewGroupChatPlus(ctx context.Context, in *GroupChatBasic, opts ...grpc.CallOption) (*GroupChatBasic, error)
+	DeleteOneGroupChatReal(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Id, error)
+	GetOneGroupChatById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*GroupChatBasic, error)
+	GetGroupChatListByName(ctx context.Context, in *NameAndIsDelete, opts ...grpc.CallOption) (*GroupChatList, error)
+	GetGroupChatListByManagerId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*GroupChatList, error)
+	GetAllGroupChatList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*GroupChatList, error)
+	PutOneGroupChatNameById(ctx context.Context, in *IdAndName, opts ...grpc.CallOption) (*IdAndName, error)
+	PutOneGroupChatManagerById(ctx context.Context, in *GroupAndManagerId, opts ...grpc.CallOption) (*GroupAndManagerId, error)
+	PutOneGroupChatAvatarById(ctx context.Context, in *IdAndAvatar, opts ...grpc.CallOption) (*IdAndAvatar, error)
+	PutOneGroupChatQrCodeById(ctx context.Context, in *IdAndQrCode, opts ...grpc.CallOption) (*IdAndQrCode, error)
+	PutOneGroupChatIsDeleteById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdAndIsDelete, error)
+	PostSaveOneNewUserGroupChat(ctx context.Context, in *UserGroupChatRelate, opts ...grpc.CallOption) (*UserGroupChatRelate, error)
+	DeleteOneUserGroupChatReal(ctx context.Context, in *UserAndGroupId, opts ...grpc.CallOption) (*UserAndGroupId, error)
+	GetOneUserGroupChat(ctx context.Context, in *UserAndGroupId, opts ...grpc.CallOption) (*UserGroupChatRelate, error)
+	GetAllUserGroupChatList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*UserGroupChatRelateList, error)
+	GetUserGroupChatListByGroupId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserGroupChatRelateList, error)
+	GetUserGroupChatListByUserId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserGroupChatRelateList, error)
+	GetUserIdListOfGroupChat(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error)
+	GetGroupChatIdListOfUser(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error)
+	GetGroupChatUsersInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserInfoInGroupChatListPlus, error)
+	GetUserGroupChatsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GroupChatInfoListOfUserPlus, error)
+	PutOneUserGroupChatNote(ctx context.Context, in *UserGroupChatRelate, opts ...grpc.CallOption) (*UserGroupChatRelate, error)
+	PutOneUserGroupChatIsDelete(ctx context.Context, in *UserGroupChatRelate, opts ...grpc.CallOption) (*UserGroupChatRelate, error)
+	PostSaveOneNewSubscription(ctx context.Context, in *SubscriptionBasic, opts ...grpc.CallOption) (*SubscriptionBasic, error)
+	PostSaveOneNewSubscriptionPlus(ctx context.Context, in *SubscriptionBasic, opts ...grpc.CallOption) (*SubscriptionBasic, error)
+	DeleteOneSubscriptionReal(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Id, error)
+	GetOneSubscriptionById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*SubscriptionBasic, error)
+	GetOneSubscriptionByName(ctx context.Context, in *NameAndIsDelete, opts ...grpc.CallOption) (*SubscriptionBasic, error)
+	GetSubscriptionListByManagerId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*SubscriptionBasicList, error)
+	PutOneSubscriptionNameById(ctx context.Context, in *IdAndName, opts ...grpc.CallOption) (*IdAndName, error)
+	PutOneSubscriptionManagerById(ctx context.Context, in *SubsAndManagerId, opts ...grpc.CallOption) (*SubsAndManagerId, error)
+	PutOneSubscriptionIntroById(ctx context.Context, in *IdAndIntro, opts ...grpc.CallOption) (*IdAndIntro, error)
+	PutOneSubscriptionAvatarById(ctx context.Context, in *IdAndAvatar, opts ...grpc.CallOption) (*IdAndAvatar, error)
+	PutOneSubscriptionQrCodeById(ctx context.Context, in *IdAndQrCode, opts ...grpc.CallOption) (*IdAndQrCode, error)
+	PutOneSubscriptionIsDeleteById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdAndIsDelete, error)
+	PostSaveOneNewUserSubscription(ctx context.Context, in *UserSubscriptionRelate, opts ...grpc.CallOption) (*UserSubscriptionRelate, error)
+	DeleteOneUserSubscriptionReal(ctx context.Context, in *UserAndSubsId, opts ...grpc.CallOption) (*UserAndSubsId, error)
+	GetOneUserSubscription(ctx context.Context, in *UserAndSubsId, opts ...grpc.CallOption) (*UserSubscriptionRelate, error)
+	GetUserSubscriptionListBySubsId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserSubscriptionRelateList, error)
+	GetUserSubscriptionListByUserId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserSubscriptionRelateList, error)
+	GetUserIdListOfSubscription(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error)
+	GetSubscriptionIdListOfUser(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error)
+	GetSubscriptionUsersInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserInfoOfSubscriptionList, error)
+	GetUserSubscriptionsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*SubscriptionInfoOfUserList, error)
+	PutOneUserSubscriptionIsDelete(ctx context.Context, in *UserSubscriptionRelate, opts ...grpc.CallOption) (*UserSubscriptionRelate, error)
 }
 
 type mySQLBindServiceClient struct {
@@ -849,80 +2428,80 @@ func NewMySQLBindServiceClient(cc *grpc.ClientConn) MySQLBindServiceClient {
 	return &mySQLBindServiceClient{cc}
 }
 
-func (c *mySQLBindServiceClient) NewOneUser(ctx context.Context, in *UserBasicInfo, opts ...grpc.CallOption) (*UserBasicInfo, error) {
-	out := new(UserBasicInfo)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/NewOneUser", in, out, opts...)
+func (c *mySQLBindServiceClient) PostSaveOneNewUser(ctx context.Context, in *UserBasic, opts ...grpc.CallOption) (*UserBasic, error) {
+	out := new(UserBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetUserById(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
-	out := new(UserBasicInfo)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserById", in, out, opts...)
+func (c *mySQLBindServiceClient) DeleteOneUserReal(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Id, error) {
+	out := new(Id)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneUserReal", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetUserByEmail(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
-	out := new(UserBasicInfo)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserByEmail", in, out, opts...)
+func (c *mySQLBindServiceClient) GetOneUserById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserBasic, error) {
+	out := new(UserBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneUserById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetUsersByName(ctx context.Context, in *QueryUserParams, opts ...grpc.CallOption) (*UserBasicInfoList, error) {
-	out := new(UserBasicInfoList)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUsersByName", in, out, opts...)
+func (c *mySQLBindServiceClient) GetOneUserByEmail(ctx context.Context, in *EmailAndIsDelete, opts ...grpc.CallOption) (*UserBasic, error) {
+	out := new(UserBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneUserByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutUserBasicById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
-	out := new(UserBasicInfo)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserBasicById", in, out, opts...)
+func (c *mySQLBindServiceClient) GetUserListByName(ctx context.Context, in *NameAndIsDelete, opts ...grpc.CallOption) (*UserBasicList, error) {
+	out := new(UserBasicList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserListByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutUserPasswordById(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
-	out := new(UserBasicInfo)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserPasswordById", in, out, opts...)
+func (c *mySQLBindServiceClient) GetOneUserPasswordById(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Password, error) {
+	out := new(Password)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneUserPasswordById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutUserPasswordByEmail(ctx context.Context, in *UpdateUserParams, opts ...grpc.CallOption) (*UserBasicInfo, error) {
-	out := new(UserBasicInfo)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserPasswordByEmail", in, out, opts...)
+func (c *mySQLBindServiceClient) GetOneUserPasswordByEmail(ctx context.Context, in *Email, opts ...grpc.CallOption) (*Password, error) {
+	out := new(Password)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneUserPasswordByEmail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetUserAvatarById(ctx context.Context, in *UserAvatar, opts ...grpc.CallOption) (*UserAvatar, error) {
-	out := new(UserAvatar)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserAvatarById", in, out, opts...)
+func (c *mySQLBindServiceClient) GetAllUserList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*UserBasicList, error) {
+	out := new(UserBasicList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetAllUserList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutUserAvatarById(ctx context.Context, in *UserAvatar, opts ...grpc.CallOption) (*UserAvatar, error) {
-	out := new(UserAvatar)
+func (c *mySQLBindServiceClient) PutUserAvatarById(ctx context.Context, in *IdAndAvatar, opts ...grpc.CallOption) (*IdAndAvatar, error) {
+	out := new(IdAndAvatar)
 	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserAvatarById", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -930,35 +2509,143 @@ func (c *mySQLBindServiceClient) PutUserAvatarById(ctx context.Context, in *User
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetUserQRCodeById(ctx context.Context, in *UserQRCode, opts ...grpc.CallOption) (*UserQRCode, error) {
-	out := new(UserQRCode)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserQRCodeById", in, out, opts...)
+func (c *mySQLBindServiceClient) PutUserQrCodeById(ctx context.Context, in *IdAndQrCode, opts ...grpc.CallOption) (*IdAndQrCode, error) {
+	out := new(IdAndQrCode)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserQrCodeById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutUserQRCodeById(ctx context.Context, in *UserQRCode, opts ...grpc.CallOption) (*UserQRCode, error) {
-	out := new(UserQRCode)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserQRCodeById", in, out, opts...)
+func (c *mySQLBindServiceClient) PutUserPasswordById(ctx context.Context, in *IdAndPassword, opts ...grpc.CallOption) (*IdAndPassword, error) {
+	out := new(IdAndPassword)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserPasswordById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) AddOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
-	out := new(Friendship)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/AddOneNewFriend", in, out, opts...)
+func (c *mySQLBindServiceClient) PutUserIsDeleteById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdAndIsDelete, error) {
+	out := new(IdAndIsDelete)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserIsDeleteById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutOneFriendNote(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
-	out := new(Friendship)
+func (c *mySQLBindServiceClient) PutUserProfileByIdPlus(ctx context.Context, in *UserProfilePlus, opts ...grpc.CallOption) (*UserProfilePlus, error) {
+	out := new(UserProfilePlus)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutUserProfileByIdPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewFriendship(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewFriendship", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewFriendPlus(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewFriendPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) DeleteONeFriendshipReal(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteONeFriendshipReal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetOneFriendship(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneFriendship", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetFriendsIdListByOptions(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetFriendsIdListByOptions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetAllFriendshipList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*FriendshipBasicList, error) {
+	out := new(FriendshipBasicList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetAllFriendshipList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetEffectiveFriendsIdListByIdPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetEffectiveFriendsIdListByIdPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetBlacklistFriendsIdListByIdPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetBlacklistFriendsIdListByIdPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetAllFriendsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FriendsInfoListPlus, error) {
+	out := new(FriendsInfoListPlus)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetAllFriendsInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetEffectiveFriendsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FriendsInfoListPlus, error) {
+	out := new(FriendsInfoListPlus)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetEffectiveFriendsInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetBlacklistFriendsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*FriendsInfoListPlus, error) {
+	out := new(FriendsInfoListPlus)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetBlacklistFriendsInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneFriendNote(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
 	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneFriendNote", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -966,45 +2653,459 @@ func (c *mySQLBindServiceClient) PutOneFriendNote(ctx context.Context, in *Frien
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) AcceptOneNewFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
-	out := new(Friendship)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/AcceptOneNewFriend", in, out, opts...)
+func (c *mySQLBindServiceClient) PutOneFriendIsAccept(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneFriendIsAccept", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) PutFriendBlacklist(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
-	out := new(Friendship)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutFriendBlacklist", in, out, opts...)
+func (c *mySQLBindServiceClient) PutOneFriendIsBlack(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneFriendIsBlack", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) DeleteOneFriend(ctx context.Context, in *Friendship, opts ...grpc.CallOption) (*Friendship, error) {
-	out := new(Friendship)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneFriend", in, out, opts...)
+func (c *mySQLBindServiceClient) PutOneFriendIsDelete(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneFriendIsDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetFriendshipInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendshipList, error) {
-	out := new(FriendshipList)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetFriendshipInfo", in, out, opts...)
+func (c *mySQLBindServiceClient) PutAcceptOneNewFriendPlus(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutAcceptOneNewFriendPlus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *mySQLBindServiceClient) GetFriendsBasicInfo(ctx context.Context, in *QueryFriendsParams, opts ...grpc.CallOption) (*FriendsBasicInfoList, error) {
-	out := new(FriendsBasicInfoList)
-	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetFriendsBasicInfo", in, out, opts...)
+func (c *mySQLBindServiceClient) PutDeleteOneFriendPlus(ctx context.Context, in *FriendshipBasic, opts ...grpc.CallOption) (*FriendshipBasic, error) {
+	out := new(FriendshipBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutDeleteOneFriendPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewGroupChat(ctx context.Context, in *GroupChatBasic, opts ...grpc.CallOption) (*GroupChatBasic, error) {
+	out := new(GroupChatBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewGroupChat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewGroupChatPlus(ctx context.Context, in *GroupChatBasic, opts ...grpc.CallOption) (*GroupChatBasic, error) {
+	out := new(GroupChatBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewGroupChatPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) DeleteOneGroupChatReal(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Id, error) {
+	out := new(Id)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneGroupChatReal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetOneGroupChatById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*GroupChatBasic, error) {
+	out := new(GroupChatBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneGroupChatById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetGroupChatListByName(ctx context.Context, in *NameAndIsDelete, opts ...grpc.CallOption) (*GroupChatList, error) {
+	out := new(GroupChatList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetGroupChatListByName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetGroupChatListByManagerId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*GroupChatList, error) {
+	out := new(GroupChatList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetGroupChatListByManagerId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetAllGroupChatList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*GroupChatList, error) {
+	out := new(GroupChatList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetAllGroupChatList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneGroupChatNameById(ctx context.Context, in *IdAndName, opts ...grpc.CallOption) (*IdAndName, error) {
+	out := new(IdAndName)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneGroupChatNameById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneGroupChatManagerById(ctx context.Context, in *GroupAndManagerId, opts ...grpc.CallOption) (*GroupAndManagerId, error) {
+	out := new(GroupAndManagerId)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneGroupChatManagerById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneGroupChatAvatarById(ctx context.Context, in *IdAndAvatar, opts ...grpc.CallOption) (*IdAndAvatar, error) {
+	out := new(IdAndAvatar)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneGroupChatAvatarById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneGroupChatQrCodeById(ctx context.Context, in *IdAndQrCode, opts ...grpc.CallOption) (*IdAndQrCode, error) {
+	out := new(IdAndQrCode)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneGroupChatQrCodeById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneGroupChatIsDeleteById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdAndIsDelete, error) {
+	out := new(IdAndIsDelete)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneGroupChatIsDeleteById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewUserGroupChat(ctx context.Context, in *UserGroupChatRelate, opts ...grpc.CallOption) (*UserGroupChatRelate, error) {
+	out := new(UserGroupChatRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewUserGroupChat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) DeleteOneUserGroupChatReal(ctx context.Context, in *UserAndGroupId, opts ...grpc.CallOption) (*UserAndGroupId, error) {
+	out := new(UserAndGroupId)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneUserGroupChatReal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetOneUserGroupChat(ctx context.Context, in *UserAndGroupId, opts ...grpc.CallOption) (*UserGroupChatRelate, error) {
+	out := new(UserGroupChatRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneUserGroupChat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetAllUserGroupChatList(ctx context.Context, in *EmptyParam, opts ...grpc.CallOption) (*UserGroupChatRelateList, error) {
+	out := new(UserGroupChatRelateList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetAllUserGroupChatList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserGroupChatListByGroupId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserGroupChatRelateList, error) {
+	out := new(UserGroupChatRelateList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserGroupChatListByGroupId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserGroupChatListByUserId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserGroupChatRelateList, error) {
+	out := new(UserGroupChatRelateList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserGroupChatListByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserIdListOfGroupChat(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserIdListOfGroupChat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetGroupChatIdListOfUser(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetGroupChatIdListOfUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetGroupChatUsersInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserInfoInGroupChatListPlus, error) {
+	out := new(UserInfoInGroupChatListPlus)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetGroupChatUsersInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserGroupChatsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GroupChatInfoListOfUserPlus, error) {
+	out := new(GroupChatInfoListOfUserPlus)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserGroupChatsInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneUserGroupChatNote(ctx context.Context, in *UserGroupChatRelate, opts ...grpc.CallOption) (*UserGroupChatRelate, error) {
+	out := new(UserGroupChatRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneUserGroupChatNote", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneUserGroupChatIsDelete(ctx context.Context, in *UserGroupChatRelate, opts ...grpc.CallOption) (*UserGroupChatRelate, error) {
+	out := new(UserGroupChatRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneUserGroupChatIsDelete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewSubscription(ctx context.Context, in *SubscriptionBasic, opts ...grpc.CallOption) (*SubscriptionBasic, error) {
+	out := new(SubscriptionBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewSubscriptionPlus(ctx context.Context, in *SubscriptionBasic, opts ...grpc.CallOption) (*SubscriptionBasic, error) {
+	out := new(SubscriptionBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewSubscriptionPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) DeleteOneSubscriptionReal(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Id, error) {
+	out := new(Id)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneSubscriptionReal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetOneSubscriptionById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*SubscriptionBasic, error) {
+	out := new(SubscriptionBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneSubscriptionById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetOneSubscriptionByName(ctx context.Context, in *NameAndIsDelete, opts ...grpc.CallOption) (*SubscriptionBasic, error) {
+	out := new(SubscriptionBasic)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneSubscriptionByName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetSubscriptionListByManagerId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*SubscriptionBasicList, error) {
+	out := new(SubscriptionBasicList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetSubscriptionListByManagerId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneSubscriptionNameById(ctx context.Context, in *IdAndName, opts ...grpc.CallOption) (*IdAndName, error) {
+	out := new(IdAndName)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneSubscriptionNameById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneSubscriptionManagerById(ctx context.Context, in *SubsAndManagerId, opts ...grpc.CallOption) (*SubsAndManagerId, error) {
+	out := new(SubsAndManagerId)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneSubscriptionManagerById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneSubscriptionIntroById(ctx context.Context, in *IdAndIntro, opts ...grpc.CallOption) (*IdAndIntro, error) {
+	out := new(IdAndIntro)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneSubscriptionIntroById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneSubscriptionAvatarById(ctx context.Context, in *IdAndAvatar, opts ...grpc.CallOption) (*IdAndAvatar, error) {
+	out := new(IdAndAvatar)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneSubscriptionAvatarById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneSubscriptionQrCodeById(ctx context.Context, in *IdAndQrCode, opts ...grpc.CallOption) (*IdAndQrCode, error) {
+	out := new(IdAndQrCode)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneSubscriptionQrCodeById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneSubscriptionIsDeleteById(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdAndIsDelete, error) {
+	out := new(IdAndIsDelete)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneSubscriptionIsDeleteById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PostSaveOneNewUserSubscription(ctx context.Context, in *UserSubscriptionRelate, opts ...grpc.CallOption) (*UserSubscriptionRelate, error) {
+	out := new(UserSubscriptionRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PostSaveOneNewUserSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) DeleteOneUserSubscriptionReal(ctx context.Context, in *UserAndSubsId, opts ...grpc.CallOption) (*UserAndSubsId, error) {
+	out := new(UserAndSubsId)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/DeleteOneUserSubscriptionReal", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetOneUserSubscription(ctx context.Context, in *UserAndSubsId, opts ...grpc.CallOption) (*UserSubscriptionRelate, error) {
+	out := new(UserSubscriptionRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetOneUserSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserSubscriptionListBySubsId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserSubscriptionRelateList, error) {
+	out := new(UserSubscriptionRelateList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserSubscriptionListBySubsId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserSubscriptionListByUserId(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*UserSubscriptionRelateList, error) {
+	out := new(UserSubscriptionRelateList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserSubscriptionListByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserIdListOfSubscription(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserIdListOfSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetSubscriptionIdListOfUser(ctx context.Context, in *IdAndIsDelete, opts ...grpc.CallOption) (*IdList, error) {
+	out := new(IdList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetSubscriptionIdListOfUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetSubscriptionUsersInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserInfoOfSubscriptionList, error) {
+	out := new(UserInfoOfSubscriptionList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetSubscriptionUsersInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) GetUserSubscriptionsInfoPlus(ctx context.Context, in *Id, opts ...grpc.CallOption) (*SubscriptionInfoOfUserList, error) {
+	out := new(SubscriptionInfoOfUserList)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/GetUserSubscriptionsInfoPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mySQLBindServiceClient) PutOneUserSubscriptionIsDelete(ctx context.Context, in *UserSubscriptionRelate, opts ...grpc.CallOption) (*UserSubscriptionRelate, error) {
+	out := new(UserSubscriptionRelate)
+	err := c.cc.Invoke(ctx, "/pb.MySQLBindService/PutOneUserSubscriptionIsDelete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1013,235 +3114,467 @@ func (c *mySQLBindServiceClient) GetFriendsBasicInfo(ctx context.Context, in *Qu
 
 // MySQLBindServiceServer is the server API for MySQLBindService service.
 type MySQLBindServiceServer interface {
-	NewOneUser(context.Context, *UserBasicInfo) (*UserBasicInfo, error)
-	GetUserById(context.Context, *QueryUserParams) (*UserBasicInfo, error)
-	GetUserByEmail(context.Context, *QueryUserParams) (*UserBasicInfo, error)
-	GetUsersByName(context.Context, *QueryUserParams) (*UserBasicInfoList, error)
-	PutUserBasicById(context.Context, *UpdateUserParams) (*UserBasicInfo, error)
-	PutUserPasswordById(context.Context, *UpdateUserParams) (*UserBasicInfo, error)
-	PutUserPasswordByEmail(context.Context, *UpdateUserParams) (*UserBasicInfo, error)
-	GetUserAvatarById(context.Context, *UserAvatar) (*UserAvatar, error)
-	PutUserAvatarById(context.Context, *UserAvatar) (*UserAvatar, error)
-	GetUserQRCodeById(context.Context, *UserQRCode) (*UserQRCode, error)
-	PutUserQRCodeById(context.Context, *UserQRCode) (*UserQRCode, error)
-	AddOneNewFriend(context.Context, *Friendship) (*Friendship, error)
-	PutOneFriendNote(context.Context, *Friendship) (*Friendship, error)
-	AcceptOneNewFriend(context.Context, *Friendship) (*Friendship, error)
-	PutFriendBlacklist(context.Context, *Friendship) (*Friendship, error)
-	DeleteOneFriend(context.Context, *Friendship) (*Friendship, error)
-	GetFriendshipInfo(context.Context, *QueryFriendsParams) (*FriendshipList, error)
-	GetFriendsBasicInfo(context.Context, *QueryFriendsParams) (*FriendsBasicInfoList, error)
+	PostSaveOneNewUser(context.Context, *UserBasic) (*UserBasic, error)
+	DeleteOneUserReal(context.Context, *Id) (*Id, error)
+	GetOneUserById(context.Context, *IdAndIsDelete) (*UserBasic, error)
+	GetOneUserByEmail(context.Context, *EmailAndIsDelete) (*UserBasic, error)
+	GetUserListByName(context.Context, *NameAndIsDelete) (*UserBasicList, error)
+	GetOneUserPasswordById(context.Context, *Id) (*Password, error)
+	GetOneUserPasswordByEmail(context.Context, *Email) (*Password, error)
+	GetAllUserList(context.Context, *EmptyParam) (*UserBasicList, error)
+	PutUserAvatarById(context.Context, *IdAndAvatar) (*IdAndAvatar, error)
+	PutUserQrCodeById(context.Context, *IdAndQrCode) (*IdAndQrCode, error)
+	PutUserPasswordById(context.Context, *IdAndPassword) (*IdAndPassword, error)
+	PutUserIsDeleteById(context.Context, *IdAndIsDelete) (*IdAndIsDelete, error)
+	PutUserProfileByIdPlus(context.Context, *UserProfilePlus) (*UserProfilePlus, error)
+	PostSaveOneNewFriendship(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PostSaveOneNewFriendPlus(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	DeleteONeFriendshipReal(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	GetOneFriendship(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	GetFriendsIdListByOptions(context.Context, *FriendshipBasic) (*IdList, error)
+	GetAllFriendshipList(context.Context, *EmptyParam) (*FriendshipBasicList, error)
+	GetEffectiveFriendsIdListByIdPlus(context.Context, *Id) (*IdList, error)
+	GetBlacklistFriendsIdListByIdPlus(context.Context, *Id) (*IdList, error)
+	GetAllFriendsInfoPlus(context.Context, *Id) (*FriendsInfoListPlus, error)
+	GetEffectiveFriendsInfoPlus(context.Context, *Id) (*FriendsInfoListPlus, error)
+	GetBlacklistFriendsInfoPlus(context.Context, *Id) (*FriendsInfoListPlus, error)
+	PutOneFriendNote(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PutOneFriendIsAccept(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PutOneFriendIsBlack(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PutOneFriendIsDelete(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PutAcceptOneNewFriendPlus(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PutDeleteOneFriendPlus(context.Context, *FriendshipBasic) (*FriendshipBasic, error)
+	PostSaveOneNewGroupChat(context.Context, *GroupChatBasic) (*GroupChatBasic, error)
+	PostSaveOneNewGroupChatPlus(context.Context, *GroupChatBasic) (*GroupChatBasic, error)
+	DeleteOneGroupChatReal(context.Context, *Id) (*Id, error)
+	GetOneGroupChatById(context.Context, *IdAndIsDelete) (*GroupChatBasic, error)
+	GetGroupChatListByName(context.Context, *NameAndIsDelete) (*GroupChatList, error)
+	GetGroupChatListByManagerId(context.Context, *IdAndIsDelete) (*GroupChatList, error)
+	GetAllGroupChatList(context.Context, *EmptyParam) (*GroupChatList, error)
+	PutOneGroupChatNameById(context.Context, *IdAndName) (*IdAndName, error)
+	PutOneGroupChatManagerById(context.Context, *GroupAndManagerId) (*GroupAndManagerId, error)
+	PutOneGroupChatAvatarById(context.Context, *IdAndAvatar) (*IdAndAvatar, error)
+	PutOneGroupChatQrCodeById(context.Context, *IdAndQrCode) (*IdAndQrCode, error)
+	PutOneGroupChatIsDeleteById(context.Context, *IdAndIsDelete) (*IdAndIsDelete, error)
+	PostSaveOneNewUserGroupChat(context.Context, *UserGroupChatRelate) (*UserGroupChatRelate, error)
+	DeleteOneUserGroupChatReal(context.Context, *UserAndGroupId) (*UserAndGroupId, error)
+	GetOneUserGroupChat(context.Context, *UserAndGroupId) (*UserGroupChatRelate, error)
+	GetAllUserGroupChatList(context.Context, *EmptyParam) (*UserGroupChatRelateList, error)
+	GetUserGroupChatListByGroupId(context.Context, *IdAndIsDelete) (*UserGroupChatRelateList, error)
+	GetUserGroupChatListByUserId(context.Context, *IdAndIsDelete) (*UserGroupChatRelateList, error)
+	GetUserIdListOfGroupChat(context.Context, *IdAndIsDelete) (*IdList, error)
+	GetGroupChatIdListOfUser(context.Context, *IdAndIsDelete) (*IdList, error)
+	GetGroupChatUsersInfoPlus(context.Context, *Id) (*UserInfoInGroupChatListPlus, error)
+	GetUserGroupChatsInfoPlus(context.Context, *Id) (*GroupChatInfoListOfUserPlus, error)
+	PutOneUserGroupChatNote(context.Context, *UserGroupChatRelate) (*UserGroupChatRelate, error)
+	PutOneUserGroupChatIsDelete(context.Context, *UserGroupChatRelate) (*UserGroupChatRelate, error)
+	PostSaveOneNewSubscription(context.Context, *SubscriptionBasic) (*SubscriptionBasic, error)
+	PostSaveOneNewSubscriptionPlus(context.Context, *SubscriptionBasic) (*SubscriptionBasic, error)
+	DeleteOneSubscriptionReal(context.Context, *Id) (*Id, error)
+	GetOneSubscriptionById(context.Context, *IdAndIsDelete) (*SubscriptionBasic, error)
+	GetOneSubscriptionByName(context.Context, *NameAndIsDelete) (*SubscriptionBasic, error)
+	GetSubscriptionListByManagerId(context.Context, *IdAndIsDelete) (*SubscriptionBasicList, error)
+	PutOneSubscriptionNameById(context.Context, *IdAndName) (*IdAndName, error)
+	PutOneSubscriptionManagerById(context.Context, *SubsAndManagerId) (*SubsAndManagerId, error)
+	PutOneSubscriptionIntroById(context.Context, *IdAndIntro) (*IdAndIntro, error)
+	PutOneSubscriptionAvatarById(context.Context, *IdAndAvatar) (*IdAndAvatar, error)
+	PutOneSubscriptionQrCodeById(context.Context, *IdAndQrCode) (*IdAndQrCode, error)
+	PutOneSubscriptionIsDeleteById(context.Context, *IdAndIsDelete) (*IdAndIsDelete, error)
+	PostSaveOneNewUserSubscription(context.Context, *UserSubscriptionRelate) (*UserSubscriptionRelate, error)
+	DeleteOneUserSubscriptionReal(context.Context, *UserAndSubsId) (*UserAndSubsId, error)
+	GetOneUserSubscription(context.Context, *UserAndSubsId) (*UserSubscriptionRelate, error)
+	GetUserSubscriptionListBySubsId(context.Context, *IdAndIsDelete) (*UserSubscriptionRelateList, error)
+	GetUserSubscriptionListByUserId(context.Context, *IdAndIsDelete) (*UserSubscriptionRelateList, error)
+	GetUserIdListOfSubscription(context.Context, *IdAndIsDelete) (*IdList, error)
+	GetSubscriptionIdListOfUser(context.Context, *IdAndIsDelete) (*IdList, error)
+	GetSubscriptionUsersInfoPlus(context.Context, *Id) (*UserInfoOfSubscriptionList, error)
+	GetUserSubscriptionsInfoPlus(context.Context, *Id) (*SubscriptionInfoOfUserList, error)
+	PutOneUserSubscriptionIsDelete(context.Context, *UserSubscriptionRelate) (*UserSubscriptionRelate, error)
 }
 
 // UnimplementedMySQLBindServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedMySQLBindServiceServer struct {
 }
 
-func (*UnimplementedMySQLBindServiceServer) NewOneUser(ctx context.Context, req *UserBasicInfo) (*UserBasicInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewOneUser not implemented")
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewUser(ctx context.Context, req *UserBasic) (*UserBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewUser not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetUserById(ctx context.Context, req *QueryUserParams) (*UserBasicInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
+func (*UnimplementedMySQLBindServiceServer) DeleteOneUserReal(ctx context.Context, req *Id) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneUserReal not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetUserByEmail(ctx context.Context, req *QueryUserParams) (*UserBasicInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserByEmail not implemented")
+func (*UnimplementedMySQLBindServiceServer) GetOneUserById(ctx context.Context, req *IdAndIsDelete) (*UserBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneUserById not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetUsersByName(ctx context.Context, req *QueryUserParams) (*UserBasicInfoList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUsersByName not implemented")
+func (*UnimplementedMySQLBindServiceServer) GetOneUserByEmail(ctx context.Context, req *EmailAndIsDelete) (*UserBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneUserByEmail not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutUserBasicById(ctx context.Context, req *UpdateUserParams) (*UserBasicInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutUserBasicById not implemented")
+func (*UnimplementedMySQLBindServiceServer) GetUserListByName(ctx context.Context, req *NameAndIsDelete) (*UserBasicList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserListByName not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutUserPasswordById(ctx context.Context, req *UpdateUserParams) (*UserBasicInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutUserPasswordById not implemented")
+func (*UnimplementedMySQLBindServiceServer) GetOneUserPasswordById(ctx context.Context, req *Id) (*Password, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneUserPasswordById not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutUserPasswordByEmail(ctx context.Context, req *UpdateUserParams) (*UserBasicInfo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutUserPasswordByEmail not implemented")
+func (*UnimplementedMySQLBindServiceServer) GetOneUserPasswordByEmail(ctx context.Context, req *Email) (*Password, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneUserPasswordByEmail not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetUserAvatarById(ctx context.Context, req *UserAvatar) (*UserAvatar, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserAvatarById not implemented")
+func (*UnimplementedMySQLBindServiceServer) GetAllUserList(ctx context.Context, req *EmptyParam) (*UserBasicList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllUserList not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutUserAvatarById(ctx context.Context, req *UserAvatar) (*UserAvatar, error) {
+func (*UnimplementedMySQLBindServiceServer) PutUserAvatarById(ctx context.Context, req *IdAndAvatar) (*IdAndAvatar, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutUserAvatarById not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetUserQRCodeById(ctx context.Context, req *UserQRCode) (*UserQRCode, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserQRCodeById not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutUserQrCodeById(ctx context.Context, req *IdAndQrCode) (*IdAndQrCode, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserQrCodeById not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutUserQRCodeById(ctx context.Context, req *UserQRCode) (*UserQRCode, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutUserQRCodeById not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutUserPasswordById(ctx context.Context, req *IdAndPassword) (*IdAndPassword, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserPasswordById not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) AddOneNewFriend(ctx context.Context, req *Friendship) (*Friendship, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddOneNewFriend not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutUserIsDeleteById(ctx context.Context, req *IdAndIsDelete) (*IdAndIsDelete, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserIsDeleteById not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutOneFriendNote(ctx context.Context, req *Friendship) (*Friendship, error) {
+func (*UnimplementedMySQLBindServiceServer) PutUserProfileByIdPlus(ctx context.Context, req *UserProfilePlus) (*UserProfilePlus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutUserProfileByIdPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewFriendship(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewFriendship not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewFriendPlus(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewFriendPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) DeleteONeFriendshipReal(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteONeFriendshipReal not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetOneFriendship(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneFriendship not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetFriendsIdListByOptions(ctx context.Context, req *FriendshipBasic) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriendsIdListByOptions not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetAllFriendshipList(ctx context.Context, req *EmptyParam) (*FriendshipBasicList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllFriendshipList not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetEffectiveFriendsIdListByIdPlus(ctx context.Context, req *Id) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEffectiveFriendsIdListByIdPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetBlacklistFriendsIdListByIdPlus(ctx context.Context, req *Id) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBlacklistFriendsIdListByIdPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetAllFriendsInfoPlus(ctx context.Context, req *Id) (*FriendsInfoListPlus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllFriendsInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetEffectiveFriendsInfoPlus(ctx context.Context, req *Id) (*FriendsInfoListPlus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEffectiveFriendsInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetBlacklistFriendsInfoPlus(ctx context.Context, req *Id) (*FriendsInfoListPlus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBlacklistFriendsInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneFriendNote(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutOneFriendNote not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) AcceptOneNewFriend(ctx context.Context, req *Friendship) (*Friendship, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AcceptOneNewFriend not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutOneFriendIsAccept(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneFriendIsAccept not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) PutFriendBlacklist(ctx context.Context, req *Friendship) (*Friendship, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutFriendBlacklist not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutOneFriendIsBlack(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneFriendIsBlack not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) DeleteOneFriend(ctx context.Context, req *Friendship) (*Friendship, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneFriend not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutOneFriendIsDelete(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneFriendIsDelete not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetFriendshipInfo(ctx context.Context, req *QueryFriendsParams) (*FriendshipList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFriendshipInfo not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutAcceptOneNewFriendPlus(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutAcceptOneNewFriendPlus not implemented")
 }
-func (*UnimplementedMySQLBindServiceServer) GetFriendsBasicInfo(ctx context.Context, req *QueryFriendsParams) (*FriendsBasicInfoList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFriendsBasicInfo not implemented")
+func (*UnimplementedMySQLBindServiceServer) PutDeleteOneFriendPlus(ctx context.Context, req *FriendshipBasic) (*FriendshipBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutDeleteOneFriendPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewGroupChat(ctx context.Context, req *GroupChatBasic) (*GroupChatBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewGroupChat not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewGroupChatPlus(ctx context.Context, req *GroupChatBasic) (*GroupChatBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewGroupChatPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) DeleteOneGroupChatReal(ctx context.Context, req *Id) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneGroupChatReal not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetOneGroupChatById(ctx context.Context, req *IdAndIsDelete) (*GroupChatBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneGroupChatById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetGroupChatListByName(ctx context.Context, req *NameAndIsDelete) (*GroupChatList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGroupChatListByName not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetGroupChatListByManagerId(ctx context.Context, req *IdAndIsDelete) (*GroupChatList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGroupChatListByManagerId not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetAllGroupChatList(ctx context.Context, req *EmptyParam) (*GroupChatList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllGroupChatList not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneGroupChatNameById(ctx context.Context, req *IdAndName) (*IdAndName, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneGroupChatNameById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneGroupChatManagerById(ctx context.Context, req *GroupAndManagerId) (*GroupAndManagerId, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneGroupChatManagerById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneGroupChatAvatarById(ctx context.Context, req *IdAndAvatar) (*IdAndAvatar, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneGroupChatAvatarById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneGroupChatQrCodeById(ctx context.Context, req *IdAndQrCode) (*IdAndQrCode, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneGroupChatQrCodeById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneGroupChatIsDeleteById(ctx context.Context, req *IdAndIsDelete) (*IdAndIsDelete, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneGroupChatIsDeleteById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewUserGroupChat(ctx context.Context, req *UserGroupChatRelate) (*UserGroupChatRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewUserGroupChat not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) DeleteOneUserGroupChatReal(ctx context.Context, req *UserAndGroupId) (*UserAndGroupId, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneUserGroupChatReal not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetOneUserGroupChat(ctx context.Context, req *UserAndGroupId) (*UserGroupChatRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneUserGroupChat not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetAllUserGroupChatList(ctx context.Context, req *EmptyParam) (*UserGroupChatRelateList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllUserGroupChatList not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserGroupChatListByGroupId(ctx context.Context, req *IdAndIsDelete) (*UserGroupChatRelateList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserGroupChatListByGroupId not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserGroupChatListByUserId(ctx context.Context, req *IdAndIsDelete) (*UserGroupChatRelateList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserGroupChatListByUserId not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserIdListOfGroupChat(ctx context.Context, req *IdAndIsDelete) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserIdListOfGroupChat not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetGroupChatIdListOfUser(ctx context.Context, req *IdAndIsDelete) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGroupChatIdListOfUser not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetGroupChatUsersInfoPlus(ctx context.Context, req *Id) (*UserInfoInGroupChatListPlus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGroupChatUsersInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserGroupChatsInfoPlus(ctx context.Context, req *Id) (*GroupChatInfoListOfUserPlus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserGroupChatsInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneUserGroupChatNote(ctx context.Context, req *UserGroupChatRelate) (*UserGroupChatRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneUserGroupChatNote not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneUserGroupChatIsDelete(ctx context.Context, req *UserGroupChatRelate) (*UserGroupChatRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneUserGroupChatIsDelete not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewSubscription(ctx context.Context, req *SubscriptionBasic) (*SubscriptionBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewSubscription not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewSubscriptionPlus(ctx context.Context, req *SubscriptionBasic) (*SubscriptionBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewSubscriptionPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) DeleteOneSubscriptionReal(ctx context.Context, req *Id) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneSubscriptionReal not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetOneSubscriptionById(ctx context.Context, req *IdAndIsDelete) (*SubscriptionBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneSubscriptionById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetOneSubscriptionByName(ctx context.Context, req *NameAndIsDelete) (*SubscriptionBasic, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneSubscriptionByName not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetSubscriptionListByManagerId(ctx context.Context, req *IdAndIsDelete) (*SubscriptionBasicList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionListByManagerId not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneSubscriptionNameById(ctx context.Context, req *IdAndName) (*IdAndName, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneSubscriptionNameById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneSubscriptionManagerById(ctx context.Context, req *SubsAndManagerId) (*SubsAndManagerId, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneSubscriptionManagerById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneSubscriptionIntroById(ctx context.Context, req *IdAndIntro) (*IdAndIntro, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneSubscriptionIntroById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneSubscriptionAvatarById(ctx context.Context, req *IdAndAvatar) (*IdAndAvatar, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneSubscriptionAvatarById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneSubscriptionQrCodeById(ctx context.Context, req *IdAndQrCode) (*IdAndQrCode, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneSubscriptionQrCodeById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneSubscriptionIsDeleteById(ctx context.Context, req *IdAndIsDelete) (*IdAndIsDelete, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneSubscriptionIsDeleteById not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PostSaveOneNewUserSubscription(ctx context.Context, req *UserSubscriptionRelate) (*UserSubscriptionRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostSaveOneNewUserSubscription not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) DeleteOneUserSubscriptionReal(ctx context.Context, req *UserAndSubsId) (*UserAndSubsId, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteOneUserSubscriptionReal not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetOneUserSubscription(ctx context.Context, req *UserAndSubsId) (*UserSubscriptionRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOneUserSubscription not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserSubscriptionListBySubsId(ctx context.Context, req *IdAndIsDelete) (*UserSubscriptionRelateList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserSubscriptionListBySubsId not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserSubscriptionListByUserId(ctx context.Context, req *IdAndIsDelete) (*UserSubscriptionRelateList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserSubscriptionListByUserId not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserIdListOfSubscription(ctx context.Context, req *IdAndIsDelete) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserIdListOfSubscription not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetSubscriptionIdListOfUser(ctx context.Context, req *IdAndIsDelete) (*IdList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionIdListOfUser not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetSubscriptionUsersInfoPlus(ctx context.Context, req *Id) (*UserInfoOfSubscriptionList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionUsersInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) GetUserSubscriptionsInfoPlus(ctx context.Context, req *Id) (*SubscriptionInfoOfUserList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserSubscriptionsInfoPlus not implemented")
+}
+func (*UnimplementedMySQLBindServiceServer) PutOneUserSubscriptionIsDelete(ctx context.Context, req *UserSubscriptionRelate) (*UserSubscriptionRelate, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutOneUserSubscriptionIsDelete not implemented")
 }
 
 func RegisterMySQLBindServiceServer(s *grpc.Server, srv MySQLBindServiceServer) {
 	s.RegisterService(&_MySQLBindService_serviceDesc, srv)
 }
 
-func _MySQLBindService_NewOneUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserBasicInfo)
+func _MySQLBindService_PostSaveOneNewUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).NewOneUser(ctx, in)
+		return srv.(MySQLBindServiceServer).PostSaveOneNewUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/NewOneUser",
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).NewOneUser(ctx, req.(*UserBasicInfo))
+		return srv.(MySQLBindServiceServer).PostSaveOneNewUser(ctx, req.(*UserBasic))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryUserParams)
+func _MySQLBindService_DeleteOneUserReal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetUserById(ctx, in)
+		return srv.(MySQLBindServiceServer).DeleteOneUserReal(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetUserById",
+		FullMethod: "/pb.MySQLBindService/DeleteOneUserReal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetUserById(ctx, req.(*QueryUserParams))
+		return srv.(MySQLBindServiceServer).DeleteOneUserReal(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetUserByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryUserParams)
+func _MySQLBindService_GetOneUserById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetUserByEmail(ctx, in)
+		return srv.(MySQLBindServiceServer).GetOneUserById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetUserByEmail",
+		FullMethod: "/pb.MySQLBindService/GetOneUserById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetUserByEmail(ctx, req.(*QueryUserParams))
+		return srv.(MySQLBindServiceServer).GetOneUserById(ctx, req.(*IdAndIsDelete))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetUsersByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryUserParams)
+func _MySQLBindService_GetOneUserByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailAndIsDelete)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetUsersByName(ctx, in)
+		return srv.(MySQLBindServiceServer).GetOneUserByEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetUsersByName",
+		FullMethod: "/pb.MySQLBindService/GetOneUserByEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetUsersByName(ctx, req.(*QueryUserParams))
+		return srv.(MySQLBindServiceServer).GetOneUserByEmail(ctx, req.(*EmailAndIsDelete))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_PutUserBasicById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserParams)
+func _MySQLBindService_GetUserListByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NameAndIsDelete)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).PutUserBasicById(ctx, in)
+		return srv.(MySQLBindServiceServer).GetUserListByName(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/PutUserBasicById",
+		FullMethod: "/pb.MySQLBindService/GetUserListByName",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutUserBasicById(ctx, req.(*UpdateUserParams))
+		return srv.(MySQLBindServiceServer).GetUserListByName(ctx, req.(*NameAndIsDelete))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_PutUserPasswordById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserParams)
+func _MySQLBindService_GetOneUserPasswordById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).PutUserPasswordById(ctx, in)
+		return srv.(MySQLBindServiceServer).GetOneUserPasswordById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/PutUserPasswordById",
+		FullMethod: "/pb.MySQLBindService/GetOneUserPasswordById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutUserPasswordById(ctx, req.(*UpdateUserParams))
+		return srv.(MySQLBindServiceServer).GetOneUserPasswordById(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_PutUserPasswordByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserParams)
+func _MySQLBindService_GetOneUserPasswordByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Email)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).PutUserPasswordByEmail(ctx, in)
+		return srv.(MySQLBindServiceServer).GetOneUserPasswordByEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/PutUserPasswordByEmail",
+		FullMethod: "/pb.MySQLBindService/GetOneUserPasswordByEmail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutUserPasswordByEmail(ctx, req.(*UpdateUserParams))
+		return srv.(MySQLBindServiceServer).GetOneUserPasswordByEmail(ctx, req.(*Email))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetUserAvatarById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserAvatar)
+func _MySQLBindService_GetAllUserList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyParam)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetUserAvatarById(ctx, in)
+		return srv.(MySQLBindServiceServer).GetAllUserList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetUserAvatarById",
+		FullMethod: "/pb.MySQLBindService/GetAllUserList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetUserAvatarById(ctx, req.(*UserAvatar))
+		return srv.(MySQLBindServiceServer).GetAllUserList(ctx, req.(*EmptyParam))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MySQLBindService_PutUserAvatarById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserAvatar)
+	in := new(IdAndAvatar)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1253,67 +3586,283 @@ func _MySQLBindService_PutUserAvatarById_Handler(srv interface{}, ctx context.Co
 		FullMethod: "/pb.MySQLBindService/PutUserAvatarById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutUserAvatarById(ctx, req.(*UserAvatar))
+		return srv.(MySQLBindServiceServer).PutUserAvatarById(ctx, req.(*IdAndAvatar))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetUserQRCodeById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserQRCode)
+func _MySQLBindService_PutUserQrCodeById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndQrCode)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetUserQRCodeById(ctx, in)
+		return srv.(MySQLBindServiceServer).PutUserQrCodeById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetUserQRCodeById",
+		FullMethod: "/pb.MySQLBindService/PutUserQrCodeById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetUserQRCodeById(ctx, req.(*UserQRCode))
+		return srv.(MySQLBindServiceServer).PutUserQrCodeById(ctx, req.(*IdAndQrCode))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_PutUserQRCodeById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserQRCode)
+func _MySQLBindService_PutUserPasswordById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndPassword)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).PutUserQRCodeById(ctx, in)
+		return srv.(MySQLBindServiceServer).PutUserPasswordById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/PutUserQRCodeById",
+		FullMethod: "/pb.MySQLBindService/PutUserPasswordById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutUserQRCodeById(ctx, req.(*UserQRCode))
+		return srv.(MySQLBindServiceServer).PutUserPasswordById(ctx, req.(*IdAndPassword))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_AddOneNewFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Friendship)
+func _MySQLBindService_PutUserIsDeleteById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).AddOneNewFriend(ctx, in)
+		return srv.(MySQLBindServiceServer).PutUserIsDeleteById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/AddOneNewFriend",
+		FullMethod: "/pb.MySQLBindService/PutUserIsDeleteById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).AddOneNewFriend(ctx, req.(*Friendship))
+		return srv.(MySQLBindServiceServer).PutUserIsDeleteById(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutUserProfileByIdPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserProfilePlus)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutUserProfileByIdPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutUserProfileByIdPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutUserProfileByIdPlus(ctx, req.(*UserProfilePlus))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewFriendship",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewFriendship(ctx, req.(*FriendshipBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewFriendPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewFriendPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewFriendPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewFriendPlus(ctx, req.(*FriendshipBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_DeleteONeFriendshipReal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).DeleteONeFriendshipReal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/DeleteONeFriendshipReal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).DeleteONeFriendshipReal(ctx, req.(*FriendshipBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetOneFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetOneFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetOneFriendship",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetOneFriendship(ctx, req.(*FriendshipBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetFriendsIdListByOptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetFriendsIdListByOptions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetFriendsIdListByOptions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetFriendsIdListByOptions(ctx, req.(*FriendshipBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetAllFriendshipList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyParam)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetAllFriendshipList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetAllFriendshipList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetAllFriendshipList(ctx, req.(*EmptyParam))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetEffectiveFriendsIdListByIdPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetEffectiveFriendsIdListByIdPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetEffectiveFriendsIdListByIdPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetEffectiveFriendsIdListByIdPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetBlacklistFriendsIdListByIdPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetBlacklistFriendsIdListByIdPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetBlacklistFriendsIdListByIdPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetBlacklistFriendsIdListByIdPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetAllFriendsInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetAllFriendsInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetAllFriendsInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetAllFriendsInfoPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetEffectiveFriendsInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetEffectiveFriendsInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetEffectiveFriendsInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetEffectiveFriendsInfoPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetBlacklistFriendsInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetBlacklistFriendsInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetBlacklistFriendsInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetBlacklistFriendsInfoPlus(ctx, req.(*Id))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _MySQLBindService_PutOneFriendNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Friendship)
+	in := new(FriendshipBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1325,97 +3874,925 @@ func _MySQLBindService_PutOneFriendNote_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/pb.MySQLBindService/PutOneFriendNote",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutOneFriendNote(ctx, req.(*Friendship))
+		return srv.(MySQLBindServiceServer).PutOneFriendNote(ctx, req.(*FriendshipBasic))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_AcceptOneNewFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Friendship)
+func _MySQLBindService_PutOneFriendIsAccept_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).AcceptOneNewFriend(ctx, in)
+		return srv.(MySQLBindServiceServer).PutOneFriendIsAccept(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/AcceptOneNewFriend",
+		FullMethod: "/pb.MySQLBindService/PutOneFriendIsAccept",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).AcceptOneNewFriend(ctx, req.(*Friendship))
+		return srv.(MySQLBindServiceServer).PutOneFriendIsAccept(ctx, req.(*FriendshipBasic))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_PutFriendBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Friendship)
+func _MySQLBindService_PutOneFriendIsBlack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).PutFriendBlacklist(ctx, in)
+		return srv.(MySQLBindServiceServer).PutOneFriendIsBlack(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/PutFriendBlacklist",
+		FullMethod: "/pb.MySQLBindService/PutOneFriendIsBlack",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).PutFriendBlacklist(ctx, req.(*Friendship))
+		return srv.(MySQLBindServiceServer).PutOneFriendIsBlack(ctx, req.(*FriendshipBasic))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_DeleteOneFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Friendship)
+func _MySQLBindService_PutOneFriendIsDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).DeleteOneFriend(ctx, in)
+		return srv.(MySQLBindServiceServer).PutOneFriendIsDelete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/DeleteOneFriend",
+		FullMethod: "/pb.MySQLBindService/PutOneFriendIsDelete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).DeleteOneFriend(ctx, req.(*Friendship))
+		return srv.(MySQLBindServiceServer).PutOneFriendIsDelete(ctx, req.(*FriendshipBasic))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetFriendshipInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryFriendsParams)
+func _MySQLBindService_PutAcceptOneNewFriendPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetFriendshipInfo(ctx, in)
+		return srv.(MySQLBindServiceServer).PutAcceptOneNewFriendPlus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetFriendshipInfo",
+		FullMethod: "/pb.MySQLBindService/PutAcceptOneNewFriendPlus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetFriendshipInfo(ctx, req.(*QueryFriendsParams))
+		return srv.(MySQLBindServiceServer).PutAcceptOneNewFriendPlus(ctx, req.(*FriendshipBasic))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MySQLBindService_GetFriendsBasicInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryFriendsParams)
+func _MySQLBindService_PutDeleteOneFriendPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendshipBasic)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MySQLBindServiceServer).GetFriendsBasicInfo(ctx, in)
+		return srv.(MySQLBindServiceServer).PutDeleteOneFriendPlus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.MySQLBindService/GetFriendsBasicInfo",
+		FullMethod: "/pb.MySQLBindService/PutDeleteOneFriendPlus",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MySQLBindServiceServer).GetFriendsBasicInfo(ctx, req.(*QueryFriendsParams))
+		return srv.(MySQLBindServiceServer).PutDeleteOneFriendPlus(ctx, req.(*FriendshipBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewGroupChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupChatBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewGroupChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewGroupChat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewGroupChat(ctx, req.(*GroupChatBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewGroupChatPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupChatBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewGroupChatPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewGroupChatPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewGroupChatPlus(ctx, req.(*GroupChatBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_DeleteOneGroupChatReal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).DeleteOneGroupChatReal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/DeleteOneGroupChatReal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).DeleteOneGroupChatReal(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetOneGroupChatById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetOneGroupChatById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetOneGroupChatById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetOneGroupChatById(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetGroupChatListByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NameAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetGroupChatListByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetGroupChatListByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetGroupChatListByName(ctx, req.(*NameAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetGroupChatListByManagerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetGroupChatListByManagerId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetGroupChatListByManagerId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetGroupChatListByManagerId(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetAllGroupChatList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyParam)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetAllGroupChatList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetAllGroupChatList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetAllGroupChatList(ctx, req.(*EmptyParam))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneGroupChatNameById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndName)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatNameById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneGroupChatNameById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatNameById(ctx, req.(*IdAndName))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneGroupChatManagerById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupAndManagerId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatManagerById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneGroupChatManagerById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatManagerById(ctx, req.(*GroupAndManagerId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneGroupChatAvatarById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndAvatar)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatAvatarById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneGroupChatAvatarById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatAvatarById(ctx, req.(*IdAndAvatar))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneGroupChatQrCodeById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndQrCode)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatQrCodeById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneGroupChatQrCodeById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatQrCodeById(ctx, req.(*IdAndQrCode))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneGroupChatIsDeleteById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatIsDeleteById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneGroupChatIsDeleteById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneGroupChatIsDeleteById(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewUserGroupChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserGroupChatRelate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewUserGroupChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewUserGroupChat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewUserGroupChat(ctx, req.(*UserGroupChatRelate))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_DeleteOneUserGroupChatReal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAndGroupId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).DeleteOneUserGroupChatReal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/DeleteOneUserGroupChatReal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).DeleteOneUserGroupChatReal(ctx, req.(*UserAndGroupId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetOneUserGroupChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAndGroupId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetOneUserGroupChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetOneUserGroupChat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetOneUserGroupChat(ctx, req.(*UserAndGroupId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetAllUserGroupChatList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyParam)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetAllUserGroupChatList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetAllUserGroupChatList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetAllUserGroupChatList(ctx, req.(*EmptyParam))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserGroupChatListByGroupId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserGroupChatListByGroupId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserGroupChatListByGroupId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserGroupChatListByGroupId(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserGroupChatListByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserGroupChatListByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserGroupChatListByUserId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserGroupChatListByUserId(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserIdListOfGroupChat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserIdListOfGroupChat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserIdListOfGroupChat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserIdListOfGroupChat(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetGroupChatIdListOfUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetGroupChatIdListOfUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetGroupChatIdListOfUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetGroupChatIdListOfUser(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetGroupChatUsersInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetGroupChatUsersInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetGroupChatUsersInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetGroupChatUsersInfoPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserGroupChatsInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserGroupChatsInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserGroupChatsInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserGroupChatsInfoPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneUserGroupChatNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserGroupChatRelate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneUserGroupChatNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneUserGroupChatNote",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneUserGroupChatNote(ctx, req.(*UserGroupChatRelate))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneUserGroupChatIsDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserGroupChatRelate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneUserGroupChatIsDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneUserGroupChatIsDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneUserGroupChatIsDelete(ctx, req.(*UserGroupChatRelate))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubscriptionBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewSubscription(ctx, req.(*SubscriptionBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewSubscriptionPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubscriptionBasic)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewSubscriptionPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewSubscriptionPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewSubscriptionPlus(ctx, req.(*SubscriptionBasic))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_DeleteOneSubscriptionReal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).DeleteOneSubscriptionReal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/DeleteOneSubscriptionReal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).DeleteOneSubscriptionReal(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetOneSubscriptionById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetOneSubscriptionById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetOneSubscriptionById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetOneSubscriptionById(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetOneSubscriptionByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NameAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetOneSubscriptionByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetOneSubscriptionByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetOneSubscriptionByName(ctx, req.(*NameAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetSubscriptionListByManagerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetSubscriptionListByManagerId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetSubscriptionListByManagerId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetSubscriptionListByManagerId(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneSubscriptionNameById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndName)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionNameById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneSubscriptionNameById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionNameById(ctx, req.(*IdAndName))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneSubscriptionManagerById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubsAndManagerId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionManagerById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneSubscriptionManagerById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionManagerById(ctx, req.(*SubsAndManagerId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneSubscriptionIntroById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIntro)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionIntroById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneSubscriptionIntroById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionIntroById(ctx, req.(*IdAndIntro))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneSubscriptionAvatarById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndAvatar)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionAvatarById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneSubscriptionAvatarById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionAvatarById(ctx, req.(*IdAndAvatar))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneSubscriptionQrCodeById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndQrCode)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionQrCodeById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneSubscriptionQrCodeById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionQrCodeById(ctx, req.(*IdAndQrCode))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneSubscriptionIsDeleteById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionIsDeleteById(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneSubscriptionIsDeleteById",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneSubscriptionIsDeleteById(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PostSaveOneNewUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSubscriptionRelate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PostSaveOneNewUserSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PostSaveOneNewUserSubscription(ctx, req.(*UserSubscriptionRelate))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_DeleteOneUserSubscriptionReal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAndSubsId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).DeleteOneUserSubscriptionReal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/DeleteOneUserSubscriptionReal",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).DeleteOneUserSubscriptionReal(ctx, req.(*UserAndSubsId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetOneUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAndSubsId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetOneUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetOneUserSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetOneUserSubscription(ctx, req.(*UserAndSubsId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserSubscriptionListBySubsId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserSubscriptionListBySubsId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserSubscriptionListBySubsId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserSubscriptionListBySubsId(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserSubscriptionListByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserSubscriptionListByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserSubscriptionListByUserId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserSubscriptionListByUserId(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserIdListOfSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserIdListOfSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserIdListOfSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserIdListOfSubscription(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetSubscriptionIdListOfUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdAndIsDelete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetSubscriptionIdListOfUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetSubscriptionIdListOfUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetSubscriptionIdListOfUser(ctx, req.(*IdAndIsDelete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetSubscriptionUsersInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetSubscriptionUsersInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetSubscriptionUsersInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetSubscriptionUsersInfoPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_GetUserSubscriptionsInfoPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).GetUserSubscriptionsInfoPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/GetUserSubscriptionsInfoPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).GetUserSubscriptionsInfoPlus(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MySQLBindService_PutOneUserSubscriptionIsDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSubscriptionRelate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MySQLBindServiceServer).PutOneUserSubscriptionIsDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MySQLBindService/PutOneUserSubscriptionIsDelete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MySQLBindServiceServer).PutOneUserSubscriptionIsDelete(ctx, req.(*UserSubscriptionRelate))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1425,76 +4802,308 @@ var _MySQLBindService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*MySQLBindServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "NewOneUser",
-			Handler:    _MySQLBindService_NewOneUser_Handler,
+			MethodName: "PostSaveOneNewUser",
+			Handler:    _MySQLBindService_PostSaveOneNewUser_Handler,
 		},
 		{
-			MethodName: "GetUserById",
-			Handler:    _MySQLBindService_GetUserById_Handler,
+			MethodName: "DeleteOneUserReal",
+			Handler:    _MySQLBindService_DeleteOneUserReal_Handler,
 		},
 		{
-			MethodName: "GetUserByEmail",
-			Handler:    _MySQLBindService_GetUserByEmail_Handler,
+			MethodName: "GetOneUserById",
+			Handler:    _MySQLBindService_GetOneUserById_Handler,
 		},
 		{
-			MethodName: "GetUsersByName",
-			Handler:    _MySQLBindService_GetUsersByName_Handler,
+			MethodName: "GetOneUserByEmail",
+			Handler:    _MySQLBindService_GetOneUserByEmail_Handler,
 		},
 		{
-			MethodName: "PutUserBasicById",
-			Handler:    _MySQLBindService_PutUserBasicById_Handler,
+			MethodName: "GetUserListByName",
+			Handler:    _MySQLBindService_GetUserListByName_Handler,
 		},
 		{
-			MethodName: "PutUserPasswordById",
-			Handler:    _MySQLBindService_PutUserPasswordById_Handler,
+			MethodName: "GetOneUserPasswordById",
+			Handler:    _MySQLBindService_GetOneUserPasswordById_Handler,
 		},
 		{
-			MethodName: "PutUserPasswordByEmail",
-			Handler:    _MySQLBindService_PutUserPasswordByEmail_Handler,
+			MethodName: "GetOneUserPasswordByEmail",
+			Handler:    _MySQLBindService_GetOneUserPasswordByEmail_Handler,
 		},
 		{
-			MethodName: "GetUserAvatarById",
-			Handler:    _MySQLBindService_GetUserAvatarById_Handler,
+			MethodName: "GetAllUserList",
+			Handler:    _MySQLBindService_GetAllUserList_Handler,
 		},
 		{
 			MethodName: "PutUserAvatarById",
 			Handler:    _MySQLBindService_PutUserAvatarById_Handler,
 		},
 		{
-			MethodName: "GetUserQRCodeById",
-			Handler:    _MySQLBindService_GetUserQRCodeById_Handler,
+			MethodName: "PutUserQrCodeById",
+			Handler:    _MySQLBindService_PutUserQrCodeById_Handler,
 		},
 		{
-			MethodName: "PutUserQRCodeById",
-			Handler:    _MySQLBindService_PutUserQRCodeById_Handler,
+			MethodName: "PutUserPasswordById",
+			Handler:    _MySQLBindService_PutUserPasswordById_Handler,
 		},
 		{
-			MethodName: "AddOneNewFriend",
-			Handler:    _MySQLBindService_AddOneNewFriend_Handler,
+			MethodName: "PutUserIsDeleteById",
+			Handler:    _MySQLBindService_PutUserIsDeleteById_Handler,
+		},
+		{
+			MethodName: "PutUserProfileByIdPlus",
+			Handler:    _MySQLBindService_PutUserProfileByIdPlus_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewFriendship",
+			Handler:    _MySQLBindService_PostSaveOneNewFriendship_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewFriendPlus",
+			Handler:    _MySQLBindService_PostSaveOneNewFriendPlus_Handler,
+		},
+		{
+			MethodName: "DeleteONeFriendshipReal",
+			Handler:    _MySQLBindService_DeleteONeFriendshipReal_Handler,
+		},
+		{
+			MethodName: "GetOneFriendship",
+			Handler:    _MySQLBindService_GetOneFriendship_Handler,
+		},
+		{
+			MethodName: "GetFriendsIdListByOptions",
+			Handler:    _MySQLBindService_GetFriendsIdListByOptions_Handler,
+		},
+		{
+			MethodName: "GetAllFriendshipList",
+			Handler:    _MySQLBindService_GetAllFriendshipList_Handler,
+		},
+		{
+			MethodName: "GetEffectiveFriendsIdListByIdPlus",
+			Handler:    _MySQLBindService_GetEffectiveFriendsIdListByIdPlus_Handler,
+		},
+		{
+			MethodName: "GetBlacklistFriendsIdListByIdPlus",
+			Handler:    _MySQLBindService_GetBlacklistFriendsIdListByIdPlus_Handler,
+		},
+		{
+			MethodName: "GetAllFriendsInfoPlus",
+			Handler:    _MySQLBindService_GetAllFriendsInfoPlus_Handler,
+		},
+		{
+			MethodName: "GetEffectiveFriendsInfoPlus",
+			Handler:    _MySQLBindService_GetEffectiveFriendsInfoPlus_Handler,
+		},
+		{
+			MethodName: "GetBlacklistFriendsInfoPlus",
+			Handler:    _MySQLBindService_GetBlacklistFriendsInfoPlus_Handler,
 		},
 		{
 			MethodName: "PutOneFriendNote",
 			Handler:    _MySQLBindService_PutOneFriendNote_Handler,
 		},
 		{
-			MethodName: "AcceptOneNewFriend",
-			Handler:    _MySQLBindService_AcceptOneNewFriend_Handler,
+			MethodName: "PutOneFriendIsAccept",
+			Handler:    _MySQLBindService_PutOneFriendIsAccept_Handler,
 		},
 		{
-			MethodName: "PutFriendBlacklist",
-			Handler:    _MySQLBindService_PutFriendBlacklist_Handler,
+			MethodName: "PutOneFriendIsBlack",
+			Handler:    _MySQLBindService_PutOneFriendIsBlack_Handler,
 		},
 		{
-			MethodName: "DeleteOneFriend",
-			Handler:    _MySQLBindService_DeleteOneFriend_Handler,
+			MethodName: "PutOneFriendIsDelete",
+			Handler:    _MySQLBindService_PutOneFriendIsDelete_Handler,
 		},
 		{
-			MethodName: "GetFriendshipInfo",
-			Handler:    _MySQLBindService_GetFriendshipInfo_Handler,
+			MethodName: "PutAcceptOneNewFriendPlus",
+			Handler:    _MySQLBindService_PutAcceptOneNewFriendPlus_Handler,
 		},
 		{
-			MethodName: "GetFriendsBasicInfo",
-			Handler:    _MySQLBindService_GetFriendsBasicInfo_Handler,
+			MethodName: "PutDeleteOneFriendPlus",
+			Handler:    _MySQLBindService_PutDeleteOneFriendPlus_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewGroupChat",
+			Handler:    _MySQLBindService_PostSaveOneNewGroupChat_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewGroupChatPlus",
+			Handler:    _MySQLBindService_PostSaveOneNewGroupChatPlus_Handler,
+		},
+		{
+			MethodName: "DeleteOneGroupChatReal",
+			Handler:    _MySQLBindService_DeleteOneGroupChatReal_Handler,
+		},
+		{
+			MethodName: "GetOneGroupChatById",
+			Handler:    _MySQLBindService_GetOneGroupChatById_Handler,
+		},
+		{
+			MethodName: "GetGroupChatListByName",
+			Handler:    _MySQLBindService_GetGroupChatListByName_Handler,
+		},
+		{
+			MethodName: "GetGroupChatListByManagerId",
+			Handler:    _MySQLBindService_GetGroupChatListByManagerId_Handler,
+		},
+		{
+			MethodName: "GetAllGroupChatList",
+			Handler:    _MySQLBindService_GetAllGroupChatList_Handler,
+		},
+		{
+			MethodName: "PutOneGroupChatNameById",
+			Handler:    _MySQLBindService_PutOneGroupChatNameById_Handler,
+		},
+		{
+			MethodName: "PutOneGroupChatManagerById",
+			Handler:    _MySQLBindService_PutOneGroupChatManagerById_Handler,
+		},
+		{
+			MethodName: "PutOneGroupChatAvatarById",
+			Handler:    _MySQLBindService_PutOneGroupChatAvatarById_Handler,
+		},
+		{
+			MethodName: "PutOneGroupChatQrCodeById",
+			Handler:    _MySQLBindService_PutOneGroupChatQrCodeById_Handler,
+		},
+		{
+			MethodName: "PutOneGroupChatIsDeleteById",
+			Handler:    _MySQLBindService_PutOneGroupChatIsDeleteById_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewUserGroupChat",
+			Handler:    _MySQLBindService_PostSaveOneNewUserGroupChat_Handler,
+		},
+		{
+			MethodName: "DeleteOneUserGroupChatReal",
+			Handler:    _MySQLBindService_DeleteOneUserGroupChatReal_Handler,
+		},
+		{
+			MethodName: "GetOneUserGroupChat",
+			Handler:    _MySQLBindService_GetOneUserGroupChat_Handler,
+		},
+		{
+			MethodName: "GetAllUserGroupChatList",
+			Handler:    _MySQLBindService_GetAllUserGroupChatList_Handler,
+		},
+		{
+			MethodName: "GetUserGroupChatListByGroupId",
+			Handler:    _MySQLBindService_GetUserGroupChatListByGroupId_Handler,
+		},
+		{
+			MethodName: "GetUserGroupChatListByUserId",
+			Handler:    _MySQLBindService_GetUserGroupChatListByUserId_Handler,
+		},
+		{
+			MethodName: "GetUserIdListOfGroupChat",
+			Handler:    _MySQLBindService_GetUserIdListOfGroupChat_Handler,
+		},
+		{
+			MethodName: "GetGroupChatIdListOfUser",
+			Handler:    _MySQLBindService_GetGroupChatIdListOfUser_Handler,
+		},
+		{
+			MethodName: "GetGroupChatUsersInfoPlus",
+			Handler:    _MySQLBindService_GetGroupChatUsersInfoPlus_Handler,
+		},
+		{
+			MethodName: "GetUserGroupChatsInfoPlus",
+			Handler:    _MySQLBindService_GetUserGroupChatsInfoPlus_Handler,
+		},
+		{
+			MethodName: "PutOneUserGroupChatNote",
+			Handler:    _MySQLBindService_PutOneUserGroupChatNote_Handler,
+		},
+		{
+			MethodName: "PutOneUserGroupChatIsDelete",
+			Handler:    _MySQLBindService_PutOneUserGroupChatIsDelete_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewSubscription",
+			Handler:    _MySQLBindService_PostSaveOneNewSubscription_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewSubscriptionPlus",
+			Handler:    _MySQLBindService_PostSaveOneNewSubscriptionPlus_Handler,
+		},
+		{
+			MethodName: "DeleteOneSubscriptionReal",
+			Handler:    _MySQLBindService_DeleteOneSubscriptionReal_Handler,
+		},
+		{
+			MethodName: "GetOneSubscriptionById",
+			Handler:    _MySQLBindService_GetOneSubscriptionById_Handler,
+		},
+		{
+			MethodName: "GetOneSubscriptionByName",
+			Handler:    _MySQLBindService_GetOneSubscriptionByName_Handler,
+		},
+		{
+			MethodName: "GetSubscriptionListByManagerId",
+			Handler:    _MySQLBindService_GetSubscriptionListByManagerId_Handler,
+		},
+		{
+			MethodName: "PutOneSubscriptionNameById",
+			Handler:    _MySQLBindService_PutOneSubscriptionNameById_Handler,
+		},
+		{
+			MethodName: "PutOneSubscriptionManagerById",
+			Handler:    _MySQLBindService_PutOneSubscriptionManagerById_Handler,
+		},
+		{
+			MethodName: "PutOneSubscriptionIntroById",
+			Handler:    _MySQLBindService_PutOneSubscriptionIntroById_Handler,
+		},
+		{
+			MethodName: "PutOneSubscriptionAvatarById",
+			Handler:    _MySQLBindService_PutOneSubscriptionAvatarById_Handler,
+		},
+		{
+			MethodName: "PutOneSubscriptionQrCodeById",
+			Handler:    _MySQLBindService_PutOneSubscriptionQrCodeById_Handler,
+		},
+		{
+			MethodName: "PutOneSubscriptionIsDeleteById",
+			Handler:    _MySQLBindService_PutOneSubscriptionIsDeleteById_Handler,
+		},
+		{
+			MethodName: "PostSaveOneNewUserSubscription",
+			Handler:    _MySQLBindService_PostSaveOneNewUserSubscription_Handler,
+		},
+		{
+			MethodName: "DeleteOneUserSubscriptionReal",
+			Handler:    _MySQLBindService_DeleteOneUserSubscriptionReal_Handler,
+		},
+		{
+			MethodName: "GetOneUserSubscription",
+			Handler:    _MySQLBindService_GetOneUserSubscription_Handler,
+		},
+		{
+			MethodName: "GetUserSubscriptionListBySubsId",
+			Handler:    _MySQLBindService_GetUserSubscriptionListBySubsId_Handler,
+		},
+		{
+			MethodName: "GetUserSubscriptionListByUserId",
+			Handler:    _MySQLBindService_GetUserSubscriptionListByUserId_Handler,
+		},
+		{
+			MethodName: "GetUserIdListOfSubscription",
+			Handler:    _MySQLBindService_GetUserIdListOfSubscription_Handler,
+		},
+		{
+			MethodName: "GetSubscriptionIdListOfUser",
+			Handler:    _MySQLBindService_GetSubscriptionIdListOfUser_Handler,
+		},
+		{
+			MethodName: "GetSubscriptionUsersInfoPlus",
+			Handler:    _MySQLBindService_GetSubscriptionUsersInfoPlus_Handler,
+		},
+		{
+			MethodName: "GetUserSubscriptionsInfoPlus",
+			Handler:    _MySQLBindService_GetUserSubscriptionsInfoPlus_Handler,
+		},
+		{
+			MethodName: "PutOneUserSubscriptionIsDelete",
+			Handler:    _MySQLBindService_PutOneUserSubscriptionIsDelete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
