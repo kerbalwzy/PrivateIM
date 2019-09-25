@@ -879,8 +879,7 @@ func DeleteOneUserSubscriptionReal(subsId, userId int64) error {
 const (
 	SelectUserSubscriptionBaseSQL = `SELECT subs_id, user_id, is_delete FROM tb_user_subscription`
 
-	SelectOneUserSubscriptionByIdsSQL = SelectUserSubscriptionBaseSQL + ` WHERE subs_id= ? AND user_id= ? 
-AND is_delete= ?`
+	SelectOneUserSubscriptionByIdsSQL = SelectUserSubscriptionBaseSQL + ` WHERE subs_id= ? AND user_id= ?`
 
 	SelectManyUserSubscriptionBySubsIdSQL = SelectUserSubscriptionBaseSQL + ` WHERE subs_id= ? AND is_delete= ?`
 	SelectManyUserSubscriptionByUserIdSQL = SelectUserSubscriptionBaseSQL + ` WHERE user_id= ? AND is_delete= ?`
@@ -891,8 +890,8 @@ AND is_delete= ?`
 )
 
 // Select one row data from 'tb_user_subscription' table by 'subs_id' and 'user_id'
-func SelectOneUserSubscriptionByIds(subsId, userId int64, isDelete bool) (*TableUserSubscription, error) {
-	row := MySQLClient.QueryRow(SelectOneUserSubscriptionByIdsSQL, subsId, userId, isDelete)
+func SelectOneUserSubscription(subsId, userId int64) (*TableUserSubscription, error) {
+	row := MySQLClient.QueryRow(SelectOneUserSubscriptionByIdsSQL, subsId, userId)
 	temp := new(TableUserSubscription)
 	err := row.Scan(&(temp.SubsId), &(temp.UserId), &(temp.IsDelete))
 	if nil != err {

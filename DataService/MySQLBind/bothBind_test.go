@@ -942,7 +942,7 @@ func TestInsertOneNewSubscriptionPlus(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Logf("newSubscription: %v", data)
-	userSubs, err := SelectOneUserSubscriptionByIds(data.Id, userId2, false)
+	userSubs, err := SelectOneUserSubscription(data.Id, userId2)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -976,8 +976,8 @@ func TestInsertOneNewUserSubscription(t *testing.T) {
 	_, _ = InsertOneNewUserSubscription(testSubsId1, userId2)
 }
 
-func TestSelectOneUserSubscriptionByIds(t *testing.T) {
-	data, err := SelectOneUserSubscriptionByIds(testSubsId1, userId1, false)
+func TestSelectOneUserSubscription(t *testing.T) {
+	data, err := SelectOneUserSubscription(testSubsId1, userId1)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -1037,7 +1037,7 @@ func TestUpdateOneUserSubscriptionIsDelete(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
-	_, err = SelectOneUserSubscriptionByIds(testSubsId1, userId1, true)
+	_, err = SelectOneUserSubscription(testSubsId1, userId1)
 	if nil != err {
 		t.Fatal(err)
 	}
