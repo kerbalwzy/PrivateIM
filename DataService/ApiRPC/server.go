@@ -20,13 +20,13 @@ var CtxCanceledErr = errors.New("the client canceled or connection time out")
 
 // out the log information for every handler
 func logWithHandler(handlerName string, err error, timeConsumed float64) {
-	outString := "%s [%s]: "
+	outString := "[%s] %s: "
 	if nil != err {
 		outString += "%s TimeConsumed(%f)s"
-		log.Printf(outString, handlerName, "error", err.Error(), timeConsumed)
+		log.Printf(outString, "error", handlerName, err.Error(), timeConsumed)
 	} else {
-		outString += "TimeConsumed(%f)s"
-		log.Printf(outString, handlerName, "info", timeConsumed)
+		outString += "success TimeConsumed(%f)s"
+		log.Printf(outString, "info", handlerName, timeConsumed)
 	}
 }
 
@@ -42,17 +42,17 @@ func checkCtxCanceled(ctx context.Context) error {
 func getCAOption() grpc.ServerOption {
 	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAServerPem, conf.DataLayerSrvCAServerKey)
 	if err != nil {
-		log.Fatalf("getCAOption [error]: %s", err.Error())
+		log.Fatalf("[error] getCAOption: %s", err.Error())
 	}
 
 	certPool := x509.NewCertPool()
 	ca, err := ioutil.ReadFile(conf.DataLayerSrvCAPem)
 	if err != nil {
-		log.Fatalf("getCAOption [error]: %s", err.Error())
+		log.Fatalf("[error] getCAOption: %s", err.Error())
 	}
 
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		log.Fatal("getCAOption [error]: certPool.AppendCertsFromPEM Error")
+		log.Fatal("[error] getCAOption: certPool.AppendCertsFromPEM Error")
 	}
 
 	c := credentials.NewTLS(&tls.Config{
@@ -93,11 +93,11 @@ func getUnaryInterceptorOption() grpc.ServerOption {
 func StartMySQLDataRPCServer() {
 	// using CA TSL authentication
 	caOption := getCAOption()
-	log.Printf("StartMySQLDataRPCServer [info]: load CA TSL authentcation files success")
+	log.Printf("[info] StartMySQLDataRPCServer: load CA TSL authentcation files success")
 
 	// get an interceptor server option for Unary-Unary handler
 	unaryOption := getUnaryInterceptorOption()
-	log.Printf("StartMySQLDataRPCServer [info]: load unary method interceptor function success")
+	log.Printf("[info] StartMySQLDataRPCServer: load unary method interceptor function success")
 
 	server := grpc.NewServer(unaryOption, caOption)
 
@@ -105,13 +105,13 @@ func StartMySQLDataRPCServer() {
 
 	listener, err := net.Listen("tcp", conf.MySQLDataRPCServerAddress)
 	if nil != err {
-		log.Fatalf("StartMySQLDataRPCServer [error]: %s", err.Error())
+		log.Fatalf("[error] StartMySQLDataRPCServer: %s", err.Error())
 	}
 
-	log.Printf("StartMySQLDataRPCServer [info]: start the server with tcp address %s", conf.MySQLDataRPCServerAddress)
+	log.Printf("[info] StartMySQLDataRPCServer: start the server with tcp address %s", conf.MySQLDataRPCServerAddress)
 	err = server.Serve(listener)
 	if nil != err {
-		log.Fatalf("StartMySQLDataRPCServer [error]: %s", err.Error())
+		log.Fatalf("[error] StartMySQLDataRPCServer: %s", err.Error())
 	}
 
 }
