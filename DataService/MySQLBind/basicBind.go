@@ -853,7 +853,7 @@ func UpdateOneSubscriptionIsDeleteById(isDelete bool, id int64) error {
 type TableUserSubscription struct {
 	SubsId   int64 `json:"subs_id"`
 	UserId   int64 `json:"user_id"`
-	IsDelete int64 `json:"is_delete"`
+	IsDelete bool  `json:"is_delete"`
 }
 
 const (
