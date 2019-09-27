@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package mongoPb;
+
+// protoc -I ./ ./mongoBind.proto --go_out=plugins=grpc:./
+
+message DateAndMessage {
+    int32 data = 1;
+    repeated bytes message_list = 2;
+}
+
+message DelayMessage {
+    int64 id = 1;
+    repeated bytes message_list = 2;
+}
+
+message UserChatHistory {
+    string join_id = 1;
+    repeated DateAndMessage data = 2;
+}
+
+message GroupChatHistory {
+    int64 id = 1;
+    repeated DateAndMessage data = 2;
+}
+
+message SubscriptionHistory {
+    int64 id = 1;
+    repeated DateAndMessage data = 2;
+}
+
+message UserFriendsAndBlacklist {
+    int64 id = 1;
+    repeated int64 friends = 2;
+    repeated int64 blacklist = 3;
+}
+
+message UserGroupChats {
+    int64 id = 1;
+    repeated int64 groups = 2;
+}
+
+message UserSubscriptions {
+    int64 id = 1;
+    repeated int64 subscriptions = 2;
+}
+
+message GroupChatUsers {
+    int64 id = 1;
+    repeated int64 users = 2;
+}
+
+message SubscriptionUsers {
+    int64 id = 1;
+    repeated int64 users = 2;
+}
+
+message Id {
+    int64 value = 1;
+}
+
+message IdAndMessage {
+    int64 id = 1;
+    bytes message = 2;
+}
+
+message IdAndDate {
+    int64 id = 1;
+    int32 date = 2;
+}
+
+message IdAndDateRange {
+    int64 id = 1;
+    int32 start_date = 2;
+    int64 end_date = 3;
+}
+
+message JoinId {
+    string value = 1;
+}
+
+message JoinIdAndMessage {
+    string join_id = 1;
+    bytes message = 2;
+}
+
+message JoinIdAndDate {
+    string join_id = 1;
+    int32 date = 2;
+}
+
+message JoinIdAndDateRange {
+    string join_id = 1;
+    int32 start_date = 2;
+    int32 end_date = 3;
+}
+
+message DoubleId {
+    int64 main_id = 1;
+    int64 other_id = 2;
+}
+
+message EmptyResult {
+}
+
+service MongoBindService {
+    rpc PutSaveDelayMessage (IdAndMessage) returns (EmptyResult);
+    rpc GetDelayMessage (Id) returns (DelayMessage);
+
+    rpc PutSaveUserChatHistory (JoinIdAndMessage) returns (EmptyResult);
+    rpc GetAllUserChatHistory (JoinId) returns (UserChatHistory);
+    rpc GetUserChatHistoryByDate (JoinIdAndDate) returns (UserChatHistory);
+    rpc GetUserChatHistoryByDateRange (JoinIdAndDateRange) returns (UserChatHistory);
+
+    rpc PutSaveGroupChatHistory (IdAndMessage) returns (EmptyResult);
+    rpc GetAllGroupChatHistory (Id) returns (GroupChatHistory);
+    rpc GetGroupChatHistoryByDate (IdAndDate) returns (GroupChatHistory);
+    rpc GetGroupChatHistoryByDateRange (IdAndDateRange) returns (GroupChatHistory);
+
+    rpc PutSaveSubscriptionHistory (IdAndMessage) returns (EmptyResult);
+    rpc GetAllSubscriptionHistory (Id) returns (SubscriptionHistory);
+    rpc GetSubscriptionHistoryByDate (IdAndDate) returns (SubscriptionHistory);
+    rpc GetSubscriptionHistoryByDateRange (IdAndDateRange) returns (SubscriptionHistory);
+
+    rpc PutUserFriendsAdd (DoubleId) returns (EmptyResult);
+    rpc PutUserFriendsDel (DoubleId) returns (EmptyResult);
+    rpc PutUserBlacklistAdd (DoubleId) returns (EmptyResult);
+    rpc PutUserBlacklistDel (DoubleId) returns (EmptyResult);
+    rpc GetUserFriendsAndBlacklist (Id) returns (UserFriendsAndBlacklist);
+    rpc PutUserGroupChatsAdd (DoubleId) returns (EmptyResult);
+    rpc PutUserGroupChatsDel (DoubleId) returns (EmptyResult);
+    rpc GetUserGroupChats (Id) returns (UserGroupChats);
+    rpc PutUserSubscriptionsAdd (DoubleId) returns (EmptyResult);
+    rpc PutUserSubscriptionsDel (DoubleId) returns (EmptyResult);
+    rpc GetUserSubscriptions (Id) returns (UserSubscriptions);
+
+    rpc PutGroupChatUsersAdd (DoubleId) returns (EmptyResult);
+    rpc PutGroupChatUsersDel (DoubleId) returns (EmptyResult);
+    rpc GetGroupChatUsers (Id) returns (GroupChatUsers);
+
+
+    rpc PutSubscriptionUsersAdd (DoubleId) returns (EmptyResult);
+    rpc PutSubscriptionUsersDel (DoubleId) returns (EmptyResult);
+    rpc GetSubscriptionUsers (Id) returns (SubscriptionUsers);
+
+    rpc PutMoveFriendIntoBlacklistPlus (DoubleId) returns (EmptyResult);
+    rpc MoveFriendOutFromBlacklistPlus (DoubleId) returns (EmptyResult);
+
+    rpc PutUserJoinGroupChatPlus (DoubleId) returns (EmptyResult);
+    rpc PutUserQuitGroupChatPlus (DoubleId) returns (EmptyResult);
+
+    rpc PutUserFollowSubscriptionPlus (DoubleId) returns (EmptyResult);
+    rpc PutUserUnFollowSubscriptionPlus (DoubleId) returns (EmptyResult);
+
+}
+
+
+
+
+

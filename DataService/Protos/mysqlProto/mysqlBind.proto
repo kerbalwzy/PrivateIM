@@ -1,0 +1,366 @@
+syntax = "proto3";
+
+package mysqlPb;
+
+// protoc -I ./ ./mysqlBind.proto --go_out=plugins=grpc:./
+
+// public messages
+
+message EmptyParam {
+}
+
+message IdList {
+    repeated int64 data = 1;
+}
+
+message Id {
+    int64 value = 1;
+}
+
+message IdAndName {
+    int64 id = 1;
+    string name = 2;
+}
+
+message IdAndIsDelete {
+    int64 id = 1;
+    bool is_delete = 2;
+}
+
+message NameAndIsDelete {
+    string name = 1;
+    bool is_delete = 2;
+}
+
+message IdAndAvatar {
+    int64 id = 1;
+    string avatar = 2;
+}
+
+message IdAndQrCode {
+    int64 id = 1;
+    string qr_code = 2;
+}
+
+// messages for operating the user basic information
+
+message UserBasic {
+    int64 id = 1;
+    string email = 2;
+    string name = 3;
+    string password = 4;
+    string mobile = 5;
+    int32 gender = 6;
+    string avatar = 7;
+    string qr_code = 8;
+    bool is_delete = 9;
+}
+
+message UserBasicList {
+    repeated UserBasic data = 1;
+}
+
+message EmailAndIsDelete {
+    string email = 1;
+    bool is_delete = 2;
+}
+
+message Password {
+    string value = 1;
+}
+
+message Email {
+    string value = 1;
+}
+
+message IdAndPassword {
+    int64 id = 1;
+    string password = 2;
+}
+
+
+message UserProfilePlus {
+    int64 id = 1;
+    string name = 2;
+    string mobile = 3;
+    int32 gender = 4;
+}
+
+// messages for operating the user's friendship information
+
+message FriendshipBasic {
+    int64 self_id = 1;
+    int64 friend_id = 2;
+    string friend_note = 3;
+    bool is_accept = 4;
+    bool is_black = 5;
+    bool is_delete = 6;
+}
+
+message FriendshipBasicList {
+    repeated FriendshipBasic data = 1;
+}
+
+message FriendsInfoPlus {
+    int64 id = 1;
+    string note = 2;
+    string email = 3;
+    string name = 4;
+    string mobile = 5;
+    int32 gender = 6;
+    string avatar = 7;
+    bool is_accept = 8;
+    bool is_black = 9;
+    bool is_delete = 10;
+}
+
+message FriendsInfoListPlus {
+    repeated FriendsInfoPlus data = 1;
+}
+
+// messages for operating the group chat information
+
+message GroupChatBasic {
+    int64 id = 1;
+    string name = 2;
+    int64 manager_id = 3;
+    string avatar = 4;
+    string qr_code = 5;
+    bool is_delete = 6;
+}
+
+message GroupChatList {
+    repeated GroupChatBasic data = 1;
+}
+
+
+message GroupAndManagerId {
+    int64 group_id = 1;
+    int64 manager_id = 2;
+}
+
+// messages for operating the user and group chat relationship information.
+
+message UserGroupChatRelate {
+    int64 group_id = 1;
+    int64 user_id = 2;
+    string user_note = 3;
+    bool is_delete = 4;
+}
+
+message UserGroupChatRelateList {
+    repeated UserGroupChatRelate data = 1;
+}
+
+message UserAndGroupId {
+    int64 group_id = 1;
+    int64 user_id = 2;
+}
+
+message GroupChatInfoOfUser {
+    int64 user_id = 1;
+    int64 group_id = 2;
+    string group_name = 3;
+    string group_avatar = 4;
+    string group_qr_code = 5;
+}
+
+message GroupChatInfoListOfUserPlus {
+    repeated GroupChatInfoOfUser data = 1;
+}
+
+message UserInfoInGroupChat {
+    int64 group_id = 1;
+    int64 user_id = 2;
+    string user_note = 3;
+    string user_name = 4;
+    int32 user_gender = 5;
+    string user_email = 6;
+    string user_avatar = 7;
+}
+
+message UserInfoInGroupChatListPlus {
+    repeated UserInfoInGroupChat data = 1;
+}
+
+// messages for operating subscription information.
+
+message SubscriptionBasic {
+    int64 id = 1;
+    string name = 2;
+    int64 manager_id = 3;
+    string intro = 4;
+    string avatar = 5;
+    string qr_code = 6;
+    bool is_delete = 7;
+}
+
+message SubscriptionBasicList {
+    repeated SubscriptionBasic data = 1;
+}
+
+message SubsAndManagerId {
+    int64 subs_id = 1;
+    int64 manager_id = 2;
+}
+
+message IdAndIntro {
+    int64 id = 1;
+    string intro = 2;
+}
+
+// messages for operating the user and subscription information.
+
+message UserSubscriptionRelate {
+    int64 subs_id = 1;
+    int64 user_id = 2;
+    bool is_delete = 3;
+}
+
+message UserSubscriptionRelateList {
+    repeated UserSubscriptionRelate data = 1;
+}
+
+message UserAndSubsId {
+    int64 subs_id = 1;
+    int64 user_id = 2;
+}
+
+message UserInfoOfSubscription {
+    int64 subs_id = 1;
+    int64 user_id = 2;
+    string user_email = 3;
+    string user_name = 4;
+    int32 user_gender = 5;
+}
+
+message UserInfoOfSubscriptionList {
+    repeated UserInfoOfSubscription data = 1;
+}
+
+message SubscriptionInfoOfUser {
+    int64 user_id = 1;
+    int64 subs_id = 2;
+    string subs_name = 3;
+    string subs_intro = 4;
+    string subs_avatar = 5;
+    string subs_qr_code = 6;
+}
+
+message SubscriptionInfoOfUserList {
+    repeated SubscriptionInfoOfUser data = 1;
+}
+
+service MySQLBindService {
+
+    // methods for operating the user basic information
+
+    rpc PostSaveOneNewUser (UserBasic) returns (UserBasic);
+    rpc DeleteOneUserReal (Id) returns (Id);
+
+    rpc GetOneUserById (IdAndIsDelete) returns (UserBasic);
+    rpc GetOneUserByEmail (EmailAndIsDelete) returns (UserBasic);
+    rpc GetUserListByName (NameAndIsDelete) returns (UserBasicList);
+    rpc GetOneUserPasswordById (Id) returns (Password);
+    rpc GetOneUserPasswordByEmail (Email) returns (Password);
+    rpc GetAllUserList (EmptyParam) returns (UserBasicList);
+
+    rpc PutUserAvatarById (IdAndAvatar) returns (IdAndAvatar);
+    rpc PutUserQrCodeById (IdAndQrCode) returns (IdAndQrCode);
+    rpc PutUserPasswordById (IdAndPassword) returns (IdAndPassword);
+    rpc PutUserIsDeleteById (IdAndIsDelete) returns (IdAndIsDelete);
+    rpc PutUserProfileByIdPlus (UserProfilePlus) returns (UserProfilePlus);
+
+    // methods for operating the friendship information.
+
+    rpc PostSaveOneNewFriendship (FriendshipBasic) returns (FriendshipBasic);
+    rpc PostSaveOneNewFriendPlus (FriendshipBasic) returns (FriendshipBasic);
+    rpc DeleteOneFriendshipReal (FriendshipBasic) returns (FriendshipBasic);
+
+    rpc GetOneFriendship (FriendshipBasic) returns (FriendshipBasic);
+    rpc GetFriendsIdListByOptions (FriendshipBasic) returns (IdList);
+    rpc GetAllFriendshipList (EmptyParam) returns (FriendshipBasicList);
+    rpc GetEffectiveFriendsIdListByIdPlus (Id) returns (IdList);
+    rpc GetBlacklistFriendsIdListByIdPlus (Id) returns (IdList);
+    rpc GetAllFriendsInfoPlus (Id) returns (FriendsInfoListPlus);
+    rpc GetEffectiveFriendsInfoPlus (Id) returns (FriendsInfoListPlus);
+    rpc GetBlacklistFriendsInfoPlus (Id) returns (FriendsInfoListPlus);
+
+    rpc PutOneFriendNote (FriendshipBasic) returns (FriendshipBasic);
+    rpc PutOneFriendIsAccept (FriendshipBasic) returns (FriendshipBasic);
+    rpc PutOneFriendIsBlack (FriendshipBasic) returns (FriendshipBasic);
+    rpc PutOneFriendIsDelete (FriendshipBasic) returns (FriendshipBasic);
+    rpc PutAcceptOneNewFriendPlus (FriendshipBasic) returns (FriendshipBasic);
+    rpc PutDeleteOneFriendPlus (FriendshipBasic) returns (FriendshipBasic);
+
+    // methods for operating the group chat information.
+
+    rpc PostSaveOneNewGroupChat (GroupChatBasic) returns (GroupChatBasic);
+    rpc PostSaveOneNewGroupChatPlus (GroupChatBasic) returns (GroupChatBasic);
+    rpc DeleteOneGroupChatReal (Id) returns (Id);
+
+    rpc GetOneGroupChatById (IdAndIsDelete) returns (GroupChatBasic);
+    rpc GetGroupChatListByName (NameAndIsDelete) returns (GroupChatList);
+    rpc GetGroupChatListByManagerId (IdAndIsDelete) returns (GroupChatList);
+    rpc GetAllGroupChatList (EmptyParam) returns (GroupChatList);
+
+    rpc PutOneGroupChatNameById (IdAndName) returns (IdAndName);
+    rpc PutOneGroupChatManagerById (GroupAndManagerId) returns (GroupAndManagerId);
+    rpc PutOneGroupChatAvatarById (IdAndAvatar) returns (IdAndAvatar);
+    rpc PutOneGroupChatQrCodeById (IdAndQrCode) returns (IdAndQrCode);
+    rpc PutOneGroupChatIsDeleteById (IdAndIsDelete) returns (IdAndIsDelete);
+
+    // methods for operating the user and group chat relationship information.
+
+    rpc PostSaveOneNewUserGroupChat (UserGroupChatRelate) returns (UserGroupChatRelate);
+    rpc DeleteOneUserGroupChatReal (UserAndGroupId) returns (UserAndGroupId);
+
+    rpc GetOneUserGroupChat (UserAndGroupId) returns (UserGroupChatRelate);
+    rpc GetAllUserGroupChatList (EmptyParam) returns (UserGroupChatRelateList);
+    rpc GetUserGroupChatListByGroupId (IdAndIsDelete) returns (UserGroupChatRelateList);
+    rpc GetUserGroupChatListByUserId (IdAndIsDelete) returns (UserGroupChatRelateList);
+    rpc GetUserIdListOfGroupChat (IdAndIsDelete) returns (IdList);
+    rpc GetGroupChatIdListOfUser (IdAndIsDelete) returns (IdList);
+    rpc GetGroupChatUsersInfoPlus (Id) returns (UserInfoInGroupChatListPlus);
+    rpc GetUserGroupChatsInfoPlus (Id) returns (GroupChatInfoListOfUserPlus);
+
+    rpc PutOneUserGroupChatNote (UserGroupChatRelate) returns (UserGroupChatRelate);
+    rpc PutOneUserGroupChatIsDelete (UserGroupChatRelate) returns (UserGroupChatRelate);
+
+    // methods for operating the subscription information.
+
+    rpc PostSaveOneNewSubscription (SubscriptionBasic) returns (SubscriptionBasic);
+    rpc PostSaveOneNewSubscriptionPlus (SubscriptionBasic) returns (SubscriptionBasic);
+    rpc DeleteOneSubscriptionReal (Id) returns (Id);
+
+    rpc GetOneSubscriptionById (IdAndIsDelete) returns (SubscriptionBasic);
+    rpc GetOneSubscriptionByName (NameAndIsDelete) returns (SubscriptionBasic);
+    rpc GetSubscriptionListByManagerId (IdAndIsDelete) returns (SubscriptionBasicList);
+
+    rpc PutOneSubscriptionNameById (IdAndName) returns (IdAndName);
+    rpc PutOneSubscriptionManagerById (SubsAndManagerId) returns (SubsAndManagerId);
+    rpc PutOneSubscriptionIntroById (IdAndIntro) returns (IdAndIntro);
+    rpc PutOneSubscriptionAvatarById (IdAndAvatar) returns (IdAndAvatar);
+    rpc PutOneSubscriptionQrCodeById (IdAndQrCode) returns (IdAndQrCode);
+    rpc PutOneSubscriptionIsDeleteById (IdAndIsDelete) returns (IdAndIsDelete);
+
+    // methods for operating the user and subscription relate information.
+
+    rpc PostSaveOneNewUserSubscription (UserSubscriptionRelate) returns (UserSubscriptionRelate);
+    rpc DeleteOneUserSubscriptionReal (UserAndSubsId) returns (UserAndSubsId);
+
+    rpc GetOneUserSubscription (UserAndSubsId) returns (UserSubscriptionRelate);
+    rpc GetUserSubscriptionListBySubsId (IdAndIsDelete) returns (UserSubscriptionRelateList);
+    rpc GetUserSubscriptionListByUserId (IdAndIsDelete) returns (UserSubscriptionRelateList);
+    rpc GetUserIdListOfSubscription (IdAndIsDelete) returns (IdList);
+    rpc GetSubscriptionIdListOfUser (IdAndIsDelete) returns (IdList);
+    rpc GetSubscriptionUsersInfoPlus (Id) returns (UserInfoOfSubscriptionList);
+    rpc GetUserSubscriptionsInfoPlus (Id) returns (SubscriptionInfoOfUserList);
+
+    rpc PutOneUserSubscriptionIsDelete (UserSubscriptionRelate) returns (UserSubscriptionRelate);
+
+}
+
+
+
+
