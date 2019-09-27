@@ -13,7 +13,8 @@ import (
 	"time"
 
 	conf "../Config"
-	pb "../Protos"
+	mongoPb "../Protos/mongoProto"
+	mysqlPb "../Protos/mysqlProto"
 )
 
 var CtxCanceledErr = errors.New("the client canceled or connection time out")
@@ -101,7 +102,7 @@ func StartMySQLDataRPCServer() {
 
 	server := grpc.NewServer(unaryOption, caOption)
 
-	pb.RegisterMySQLBindServiceServer(server, &MySQLData{})
+	mysqlPb.RegisterMySQLBindServiceServer(server, &MySQLData{})
 
 	listener, err := net.Listen("tcp", conf.MySQLDataRPCServerAddress)
 	if nil != err {
@@ -112,6 +113,30 @@ func StartMySQLDataRPCServer() {
 	err = server.Serve(listener)
 	if nil != err {
 		log.Fatalf("[error] StartMySQLDataRPCServer: %s", err.Error())
+	}
+}
+
+func StartMongoDataRPCServer() {
+	// Start the gRPC server for MySQL data operation.
+
+	// using CA TSL authentication
+	caOption := getCAOption()
+
+	// get an interceptor server option for Unary-Unary handler
+	unaryOption := getUnaryInterceptorOption()
+
+	server := grpc.NewServer(unaryOption, caOption)
+
+	mongoPb.RegisterMongoBindServiceServer(server, &MongoData{})
+
+	log.Println(":::Start Mongo Data Layer gRPC Server")
+	listener, err := net.Listen("tcp", conf.MongoDataRPCServerAddress)
+	if nil != err {
+		log.Fatalf("Start gRPC server error: %s", err.Error())
+	}
+	err = server.Serve(listener)
+	if nil != err {
+		log.Fatal(err)
 	}
 
 }

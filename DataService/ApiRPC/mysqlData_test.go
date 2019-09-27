@@ -9,12 +9,12 @@ And all the test functions are also example for using client to call the rpc ser
 package ApiRPC
 
 import (
-	pb "../Protos"
+	mysqlPb "../Protos/mysqlProto"
 	"testing"
 )
 
 // client for mysql data rpc server.
-var testClient pb.MySQLBindServiceClient
+var testClient mysqlPb.MySQLBindServiceClient
 
 func init() {
 	testClient = GetMySQLDateClient()
@@ -36,7 +36,7 @@ var (
 
 func TestMySQLData_PostSaveOneNewUser(t *testing.T) {
 	// insert one new user with "isDelete= false"
-	param := &pb.UserBasic{
+	param := &mysqlPb.UserBasic{
 		Name:     testUserName,
 		Email:    testUserEmail1,
 		Password: testUserPassword,
@@ -54,7 +54,7 @@ func TestMySQLData_PostSaveOneNewUser(t *testing.T) {
 	testUserId1 = user.Id
 
 	// insert one new user with "isDelete= true"
-	param2 := &pb.UserBasic{
+	param2 := &mysqlPb.UserBasic{
 		Name:     testUserName,
 		Email:    testUserEmail2,
 		Password: testUserPassword,
@@ -73,14 +73,14 @@ func TestMySQLData_PostSaveOneNewUser(t *testing.T) {
 }
 
 func TestMySQLData_GetOneUserById(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId1, IsDelete: false}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId1, IsDelete: false}
 	user1, err := testClient.GetOneUserById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
 	}
 	t.Logf("\nuser1(%v)", user1)
 
-	param = &pb.IdAndIsDelete{Id: testUserId2, IsDelete: true}
+	param = &mysqlPb.IdAndIsDelete{Id: testUserId2, IsDelete: true}
 	user2, err := testClient.GetOneUserById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -90,7 +90,7 @@ func TestMySQLData_GetOneUserById(t *testing.T) {
 }
 
 func TestMySQLData_GetOneUserByEmail(t *testing.T) {
-	param := &pb.EmailAndIsDelete{Email: testUserEmail1, IsDelete: false}
+	param := &mysqlPb.EmailAndIsDelete{Email: testUserEmail1, IsDelete: false}
 	user, err := testClient.GetOneUserByEmail(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -100,7 +100,7 @@ func TestMySQLData_GetOneUserByEmail(t *testing.T) {
 }
 
 func TestMySQLData_GetUserListByName(t *testing.T) {
-	param := &pb.NameAndIsDelete{Name: testUserName}
+	param := &mysqlPb.NameAndIsDelete{Name: testUserName}
 	userList, err := testClient.GetUserListByName(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -111,7 +111,7 @@ func TestMySQLData_GetUserListByName(t *testing.T) {
 }
 
 func TestMySQLData_GetOneUserPasswordById(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	password, err := testClient.GetOneUserPasswordById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -120,7 +120,7 @@ func TestMySQLData_GetOneUserPasswordById(t *testing.T) {
 }
 
 func TestMySQLData_GetOneUserPasswordByEmail(t *testing.T) {
-	param := &pb.Email{Value: testUserEmail1}
+	param := &mysqlPb.Email{Value: testUserEmail1}
 	password, err := testClient.GetOneUserPasswordByEmail(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -129,7 +129,7 @@ func TestMySQLData_GetOneUserPasswordByEmail(t *testing.T) {
 }
 
 func TestMySQLData_GetAllUserList(t *testing.T) {
-	param := &pb.EmptyParam{}
+	param := &mysqlPb.EmptyParam{}
 	userList, err := testClient.GetAllUserList(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -140,7 +140,7 @@ func TestMySQLData_GetAllUserList(t *testing.T) {
 }
 
 func TestMySQLData_PutUserAvatarById(t *testing.T) {
-	param := &pb.IdAndAvatar{Id: testUserId1, Avatar: "<new avatar pic name>"}
+	param := &mysqlPb.IdAndAvatar{Id: testUserId1, Avatar: "<new avatar pic name>"}
 	_, err := testClient.PutUserAvatarById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -148,7 +148,7 @@ func TestMySQLData_PutUserAvatarById(t *testing.T) {
 }
 
 func TestMySQLData_PutUserQrCodeById(t *testing.T) {
-	param := &pb.IdAndQrCode{Id: testUserId1, QrCode: "<new qrCode pic name>"}
+	param := &mysqlPb.IdAndQrCode{Id: testUserId1, QrCode: "<new qrCode pic name>"}
 	_, err := testClient.PutUserQrCodeById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -156,7 +156,7 @@ func TestMySQLData_PutUserQrCodeById(t *testing.T) {
 }
 
 func TestMySQLData_PutUserPasswordById(t *testing.T) {
-	param := &pb.IdAndPassword{Id: testUserId1, Password: "<new password: a hash value>"}
+	param := &mysqlPb.IdAndPassword{Id: testUserId1, Password: "<new password: a hash value>"}
 	_, err := testClient.PutUserPasswordById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -164,7 +164,7 @@ func TestMySQLData_PutUserPasswordById(t *testing.T) {
 }
 
 func TestMySQLData_PutUserIsDeleteById(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId2, IsDelete: false}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId2, IsDelete: false}
 	_, err := testClient.PutUserIsDeleteById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -172,7 +172,7 @@ func TestMySQLData_PutUserIsDeleteById(t *testing.T) {
 }
 
 func TestMySQLData_PutUserProfileByIdPlus(t *testing.T) {
-	param := &pb.UserProfilePlus{Name: "newName", Mobile: "13199999999", Gender: 2, Id: testUserId2}
+	param := &mysqlPb.UserProfilePlus{Name: "newName", Mobile: "13199999999", Gender: 2, Id: testUserId2}
 	_, err := testClient.PutUserProfileByIdPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -187,7 +187,7 @@ var (
 )
 
 func TestMySQLData_PostSaveOneNewFriendship(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, FriendNote: testFriendNote1}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, FriendNote: testFriendNote1}
 	friendship, err := testClient.PostSaveOneNewFriendship(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -196,7 +196,7 @@ func TestMySQLData_PostSaveOneNewFriendship(t *testing.T) {
 }
 
 func TestMySQLData_PostSaveOneNewFriendPlus(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testUserId1, FriendId: testUserId2, FriendNote: testFriendNote2}
+	param := &mysqlPb.FriendshipBasic{SelfId: testUserId1, FriendId: testUserId2, FriendNote: testFriendNote2}
 	friendship, err := testClient.PostSaveOneNewFriendPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -205,7 +205,7 @@ func TestMySQLData_PostSaveOneNewFriendPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetOneFriendship(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId}
 	friendship, err := testClient.GetOneFriendship(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -214,7 +214,7 @@ func TestMySQLData_GetOneFriendship(t *testing.T) {
 }
 
 func TestMySQLData_GetAllFriendshipList(t *testing.T) {
-	param := &pb.EmptyParam{}
+	param := &mysqlPb.EmptyParam{}
 	friendshipList, err := testClient.GetAllFriendshipList(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -225,7 +225,7 @@ func TestMySQLData_GetAllFriendshipList(t *testing.T) {
 }
 
 func TestMySQLData_PutOneFriendIsAccept(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, IsAccept: true}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, IsAccept: true}
 	_, err := testClient.PutOneFriendIsAccept(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -234,7 +234,7 @@ func TestMySQLData_PutOneFriendIsAccept(t *testing.T) {
 }
 
 func TestMySQLData_PutOneFriendIsBlack(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, IsBlack: true}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, IsBlack: true}
 	_, err := testClient.PutOneFriendIsBlack(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -242,7 +242,7 @@ func TestMySQLData_PutOneFriendIsBlack(t *testing.T) {
 }
 
 func TestMySQLData_PutOneFriendIsDelete(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, IsDelete: true}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId, IsDelete: true}
 	_, err := testClient.PutOneFriendIsDelete(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -250,7 +250,7 @@ func TestMySQLData_PutOneFriendIsDelete(t *testing.T) {
 }
 
 func TestMySQLData_PutOneFriendNote(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testUserId1, FriendId: testUserId2, FriendNote: "newNote"}
+	param := &mysqlPb.FriendshipBasic{SelfId: testUserId1, FriendId: testUserId2, FriendNote: "newNote"}
 	_, err := testClient.PutOneFriendNote(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -259,7 +259,7 @@ func TestMySQLData_PutOneFriendNote(t *testing.T) {
 }
 
 func TestMySQLData_GetFriendsIdListByOptions(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, IsAccept: true, IsBlack: true, IsDelete: true}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, IsAccept: true, IsBlack: true, IsDelete: true}
 
 	// after the previous functions, should found a friendship here
 	idList, err := testClient.GetFriendsIdListByOptions(getTimeOutCtx(3), param)
@@ -270,7 +270,7 @@ func TestMySQLData_GetFriendsIdListByOptions(t *testing.T) {
 }
 
 func TestMySQLData_PutAcceptOneNewFriendPlus(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testUserId2, FriendId: testUserId1, FriendNote: "cpNote", IsAccept: true}
+	param := &mysqlPb.FriendshipBasic{SelfId: testUserId2, FriendId: testUserId1, FriendNote: "cpNote", IsAccept: true}
 	_, err := testClient.PutAcceptOneNewFriendPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -279,7 +279,7 @@ func TestMySQLData_PutAcceptOneNewFriendPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetEffectiveFriendsIdListByIdPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	idList, err := testClient.GetEffectiveFriendsIdListByIdPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -288,7 +288,7 @@ func TestMySQLData_GetEffectiveFriendsIdListByIdPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetBlacklistFriendsIdListByIdPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	idList, err := testClient.GetBlacklistFriendsIdListByIdPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -297,7 +297,7 @@ func TestMySQLData_GetBlacklistFriendsIdListByIdPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetAllFriendsInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	infoList, err := testClient.GetAllFriendsInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -308,7 +308,7 @@ func TestMySQLData_GetAllFriendsInfoPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetEffectiveFriendsInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	infoList, err := testClient.GetEffectiveFriendsInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -319,7 +319,7 @@ func TestMySQLData_GetEffectiveFriendsInfoPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetBlacklistFriendsInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	infoList, err := testClient.GetBlacklistFriendsInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -330,7 +330,7 @@ func TestMySQLData_GetBlacklistFriendsInfoPlus(t *testing.T) {
 }
 
 func TestMySQLData_PutDeleteOneFriendPlus(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testUserId2, FriendId: testUserId1}
+	param := &mysqlPb.FriendshipBasic{SelfId: testUserId2, FriendId: testUserId1}
 	_, err := testClient.PutDeleteOneFriendPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -346,7 +346,7 @@ var (
 )
 
 func TestMySQLData_PostSaveOneNewGroupChat(t *testing.T) {
-	param := &pb.GroupChatBasic{Name: testGroupName, Avatar: testAvatar, QrCode: testGroupQrCode1, ManagerId: testUserId1}
+	param := &mysqlPb.GroupChatBasic{Name: testGroupName, Avatar: testAvatar, QrCode: testGroupQrCode1, ManagerId: testUserId1}
 	groupChat, err := testClient.PostSaveOneNewGroupChat(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -355,7 +355,7 @@ func TestMySQLData_PostSaveOneNewGroupChat(t *testing.T) {
 }
 
 func TestMySQLData_PostSaveOneNewGroupChatPlus(t *testing.T) {
-	param := &pb.GroupChatBasic{Name: testGroupName, Avatar: testAvatar, QrCode: testGroupQrCode2, ManagerId: testUserId2}
+	param := &mysqlPb.GroupChatBasic{Name: testGroupName, Avatar: testAvatar, QrCode: testGroupQrCode2, ManagerId: testUserId2}
 	groupChat, err := testClient.PostSaveOneNewGroupChatPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -364,7 +364,7 @@ func TestMySQLData_PostSaveOneNewGroupChatPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetOneGroupChatById(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testGroupChatId1}
+	param := &mysqlPb.IdAndIsDelete{Id: testGroupChatId1}
 	groupChat, err := testClient.GetOneGroupChatById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -373,7 +373,7 @@ func TestMySQLData_GetOneGroupChatById(t *testing.T) {
 }
 
 func TestMySQLData_GetGroupChatListByName(t *testing.T) {
-	param := &pb.NameAndIsDelete{Name: testGroupName}
+	param := &mysqlPb.NameAndIsDelete{Name: testGroupName}
 	groupChatList, err := testClient.GetGroupChatListByName(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -384,7 +384,7 @@ func TestMySQLData_GetGroupChatListByName(t *testing.T) {
 }
 
 func TestMySQLData_GetGroupChatListByManagerId(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId2}
 	groupChatList, err := testClient.GetGroupChatListByManagerId(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -395,7 +395,7 @@ func TestMySQLData_GetGroupChatListByManagerId(t *testing.T) {
 }
 
 func TestMySQLData_GetAllGroupChatList(t *testing.T) {
-	param := &pb.EmptyParam{}
+	param := &mysqlPb.EmptyParam{}
 	groupChatList, err := testClient.GetAllGroupChatList(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -407,7 +407,7 @@ func TestMySQLData_GetAllGroupChatList(t *testing.T) {
 }
 
 func TestMySQLData_PutOneGroupChatNameById(t *testing.T) {
-	param := &pb.IdAndName{Id: testGroupChatId1, Name: "newName"}
+	param := &mysqlPb.IdAndName{Id: testGroupChatId1, Name: "newName"}
 	_, err := testClient.PutOneGroupChatNameById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -416,7 +416,7 @@ func TestMySQLData_PutOneGroupChatNameById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneGroupChatManagerById(t *testing.T) {
-	param := &pb.GroupAndManagerId{GroupId: testGroupChatId1, ManagerId: testUserId2}
+	param := &mysqlPb.GroupAndManagerId{GroupId: testGroupChatId1, ManagerId: testUserId2}
 	_, err := testClient.PutOneGroupChatManagerById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -424,7 +424,7 @@ func TestMySQLData_PutOneGroupChatManagerById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneGroupChatAvatarById(t *testing.T) {
-	param := &pb.IdAndAvatar{Id: testGroupChatId1, Avatar: "<new avatar pic name>"}
+	param := &mysqlPb.IdAndAvatar{Id: testGroupChatId1, Avatar: "<new avatar pic name>"}
 	_, err := testClient.PutOneGroupChatAvatarById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -432,7 +432,7 @@ func TestMySQLData_PutOneGroupChatAvatarById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneGroupChatQrCodeById(t *testing.T) {
-	param := &pb.IdAndQrCode{Id: testGroupChatId1, QrCode: "<new qr code pic name>"}
+	param := &mysqlPb.IdAndQrCode{Id: testGroupChatId1, QrCode: "<new qr code pic name>"}
 	_, err := testClient.PutOneGroupChatQrCodeById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -440,7 +440,7 @@ func TestMySQLData_PutOneGroupChatQrCodeById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneGroupChatIsDeleteById(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testGroupChatId1, IsDelete: true}
+	param := &mysqlPb.IdAndIsDelete{Id: testGroupChatId1, IsDelete: true}
 	_, err := testClient.PutOneGroupChatIsDeleteById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -450,7 +450,7 @@ func TestMySQLData_PutOneGroupChatIsDeleteById(t *testing.T) {
 // -----------------------------------------------------------------
 
 func TestMySQLData_PostSaveOneNewUserGroupChat(t *testing.T) {
-	param := &pb.UserGroupChatRelate{GroupId: testGroupChatId2, UserId: testUserId1, UserNote: "note3"}
+	param := &mysqlPb.UserGroupChatRelate{GroupId: testGroupChatId2, UserId: testUserId1, UserNote: "note3"}
 	_, err := testClient.PostSaveOneNewUserGroupChat(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -458,7 +458,7 @@ func TestMySQLData_PostSaveOneNewUserGroupChat(t *testing.T) {
 }
 
 func TestMySQLData_GetOneUserGroupChat(t *testing.T) {
-	param := &pb.UserAndGroupId{UserId: testUserId1, GroupId: testGroupChatId2}
+	param := &mysqlPb.UserAndGroupId{UserId: testUserId1, GroupId: testGroupChatId2}
 	userGroupChat, err := testClient.GetOneUserGroupChat(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -467,7 +467,7 @@ func TestMySQLData_GetOneUserGroupChat(t *testing.T) {
 }
 
 func TestMySQLData_GetAllUserGroupChatList(t *testing.T) {
-	param := &pb.EmptyParam{}
+	param := &mysqlPb.EmptyParam{}
 	dataList, err := testClient.GetAllUserGroupChatList(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -478,7 +478,7 @@ func TestMySQLData_GetAllUserGroupChatList(t *testing.T) {
 }
 
 func TestMySQLData_GetUserGroupChatListByGroupId(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testGroupChatId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testGroupChatId2}
 	dataList, err := testClient.GetUserGroupChatListByGroupId(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -487,7 +487,7 @@ func TestMySQLData_GetUserGroupChatListByGroupId(t *testing.T) {
 }
 
 func TestMySQLData_GetUserGroupChatListByUserId(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId2}
 	dataList, err := testClient.GetUserGroupChatListByUserId(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -496,7 +496,7 @@ func TestMySQLData_GetUserGroupChatListByUserId(t *testing.T) {
 }
 
 func TestMySQLData_GetUserIdListOfGroupChat(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testGroupChatId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testGroupChatId2}
 	dataList, err := testClient.GetUserIdListOfGroupChat(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -505,7 +505,7 @@ func TestMySQLData_GetUserIdListOfGroupChat(t *testing.T) {
 }
 
 func TestMySQLData_GetGroupChatIdListOfUser(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId2}
 	dataList, err := testClient.GetGroupChatIdListOfUser(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -514,7 +514,7 @@ func TestMySQLData_GetGroupChatIdListOfUser(t *testing.T) {
 }
 
 func TestMySQLData_GetGroupChatUsersInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testGroupChatId2}
+	param := &mysqlPb.Id{Value: testGroupChatId2}
 	infoList, err := testClient.GetGroupChatUsersInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -525,7 +525,7 @@ func TestMySQLData_GetGroupChatUsersInfoPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetUserGroupChatsInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId2}
+	param := &mysqlPb.Id{Value: testUserId2}
 	infoList, err := testClient.GetUserGroupChatsInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -536,7 +536,7 @@ func TestMySQLData_GetUserGroupChatsInfoPlus(t *testing.T) {
 }
 
 func TestMySQLData_PutOneUserGroupChatNote(t *testing.T) {
-	param := &pb.UserGroupChatRelate{GroupId: testGroupChatId2, UserId: testUserId2, UserNote: "newNote2"}
+	param := &mysqlPb.UserGroupChatRelate{GroupId: testGroupChatId2, UserId: testUserId2, UserNote: "newNote2"}
 	_, err := testClient.PutOneUserGroupChatNote(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -544,7 +544,7 @@ func TestMySQLData_PutOneUserGroupChatNote(t *testing.T) {
 }
 
 func TestMySQLData_PutOneUserGroupChatIsDelete(t *testing.T) {
-	param := &pb.UserGroupChatRelate{GroupId: testGroupChatId2, UserId: testUserId2, IsDelete: true}
+	param := &mysqlPb.UserGroupChatRelate{GroupId: testGroupChatId2, UserId: testUserId2, IsDelete: true}
 	_, err := testClient.PutOneUserGroupChatIsDelete(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -561,7 +561,7 @@ var (
 )
 
 func TestMySQLData_PostSaveOneNewSubscription(t *testing.T) {
-	param := &pb.SubscriptionBasic{Name: testSubsName1, Intro: testSubsIntro, Avatar: testAvatar,
+	param := &mysqlPb.SubscriptionBasic{Name: testSubsName1, Intro: testSubsIntro, Avatar: testAvatar,
 		QrCode: testSubsQrCode1, ManagerId: testUserId1}
 	subscription, err := testClient.PostSaveOneNewSubscription(getTimeOutCtx(3), param)
 	if nil != err {
@@ -571,7 +571,7 @@ func TestMySQLData_PostSaveOneNewSubscription(t *testing.T) {
 }
 
 func TestMySQLData_PostSaveOneNewSubscriptionPlus(t *testing.T) {
-	param := &pb.SubscriptionBasic{Name: testSubsName2, Intro: testSubsIntro, Avatar: testAvatar,
+	param := &mysqlPb.SubscriptionBasic{Name: testSubsName2, Intro: testSubsIntro, Avatar: testAvatar,
 		QrCode: testSubsQrCode2, ManagerId: testUserId2}
 	subscription, err := testClient.PostSaveOneNewSubscriptionPlus(getTimeOutCtx(3), param)
 	if nil != err {
@@ -581,7 +581,7 @@ func TestMySQLData_PostSaveOneNewSubscriptionPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetOneSubscriptionById(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testSubsId1}
+	param := &mysqlPb.IdAndIsDelete{Id: testSubsId1}
 	subs, err := testClient.GetOneSubscriptionById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -590,7 +590,7 @@ func TestMySQLData_GetOneSubscriptionById(t *testing.T) {
 }
 
 func TestMySQLData_GetOneSubscriptionByName(t *testing.T) {
-	param := &pb.NameAndIsDelete{Name: testSubsName1}
+	param := &mysqlPb.NameAndIsDelete{Name: testSubsName1}
 	subs, err := testClient.GetOneSubscriptionByName(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -599,7 +599,7 @@ func TestMySQLData_GetOneSubscriptionByName(t *testing.T) {
 }
 
 func TestMySQLData_GetSubscriptionListByManagerId(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId2}
 	subsList, err := testClient.GetSubscriptionListByManagerId(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -608,7 +608,7 @@ func TestMySQLData_GetSubscriptionListByManagerId(t *testing.T) {
 }
 
 func TestMySQLData_PutOneSubscriptionNameById(t *testing.T) {
-	param := &pb.IdAndName{Id: testSubsId1, Name: "newName"}
+	param := &mysqlPb.IdAndName{Id: testSubsId1, Name: "newName"}
 	_, err := testClient.PutOneSubscriptionNameById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -616,7 +616,7 @@ func TestMySQLData_PutOneSubscriptionNameById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneSubscriptionManagerById(t *testing.T) {
-	param := &pb.SubsAndManagerId{SubsId: testSubsId1, ManagerId: testUserId2}
+	param := &mysqlPb.SubsAndManagerId{SubsId: testSubsId1, ManagerId: testUserId2}
 	_, err := testClient.PutOneSubscriptionManagerById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -624,7 +624,7 @@ func TestMySQLData_PutOneSubscriptionManagerById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneSubscriptionIntroById(t *testing.T) {
-	param := &pb.IdAndIntro{Id: testSubsId1, Intro: "<new intro>"}
+	param := &mysqlPb.IdAndIntro{Id: testSubsId1, Intro: "<new intro>"}
 	_, err := testClient.PutOneSubscriptionIntroById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -632,7 +632,7 @@ func TestMySQLData_PutOneSubscriptionIntroById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneSubscriptionAvatarById(t *testing.T) {
-	param := &pb.IdAndAvatar{Id: testSubsId1, Avatar: "<new avatar pic name>"}
+	param := &mysqlPb.IdAndAvatar{Id: testSubsId1, Avatar: "<new avatar pic name>"}
 	_, err := testClient.PutOneSubscriptionAvatarById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -640,7 +640,7 @@ func TestMySQLData_PutOneSubscriptionAvatarById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneSubscriptionQrCodeById(t *testing.T) {
-	param := &pb.IdAndQrCode{Id: testSubsId1, QrCode: "<new qr code pic name>"}
+	param := &mysqlPb.IdAndQrCode{Id: testSubsId1, QrCode: "<new qr code pic name>"}
 	_, err := testClient.PutOneSubscriptionQrCodeById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -648,7 +648,7 @@ func TestMySQLData_PutOneSubscriptionQrCodeById(t *testing.T) {
 }
 
 func TestMySQLData_PutOneSubscriptionIsDeleteById(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testSubsId1, IsDelete: true}
+	param := &mysqlPb.IdAndIsDelete{Id: testSubsId1, IsDelete: true}
 	_, err := testClient.PutOneSubscriptionIsDeleteById(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -658,7 +658,7 @@ func TestMySQLData_PutOneSubscriptionIsDeleteById(t *testing.T) {
 // -----------------------------------------------------------------
 
 func TestMySQLData_PostSaveOneNewUserSubscription(t *testing.T) {
-	param := &pb.UserSubscriptionRelate{SubsId: testSubsId2, UserId: testUserId1}
+	param := &mysqlPb.UserSubscriptionRelate{SubsId: testSubsId2, UserId: testUserId1}
 	_, err := testClient.PostSaveOneNewUserSubscription(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -666,7 +666,7 @@ func TestMySQLData_PostSaveOneNewUserSubscription(t *testing.T) {
 }
 
 func TestMySQLData_GetOneUserSubscription(t *testing.T) {
-	param := &pb.UserAndSubsId{SubsId: testSubsId2, UserId: testUserId1}
+	param := &mysqlPb.UserAndSubsId{SubsId: testSubsId2, UserId: testUserId1}
 	relate, err := testClient.GetOneUserSubscription(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -675,7 +675,7 @@ func TestMySQLData_GetOneUserSubscription(t *testing.T) {
 }
 
 func TestMySQLData_GetUserSubscriptionListBySubsId(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testSubsId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testSubsId2}
 	relateList, err := testClient.GetUserSubscriptionListBySubsId(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -684,7 +684,7 @@ func TestMySQLData_GetUserSubscriptionListBySubsId(t *testing.T) {
 }
 
 func TestMySQLData_GetUserSubscriptionListByUserId(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId1}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId1}
 	relateList, err := testClient.GetUserSubscriptionListByUserId(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -693,7 +693,7 @@ func TestMySQLData_GetUserSubscriptionListByUserId(t *testing.T) {
 }
 
 func TestMySQLData_GetUserIdListOfSubscription(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testSubsId2}
+	param := &mysqlPb.IdAndIsDelete{Id: testSubsId2}
 	idList, err := testClient.GetUserIdListOfSubscription(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -702,7 +702,7 @@ func TestMySQLData_GetUserIdListOfSubscription(t *testing.T) {
 }
 
 func TestMySQLData_GetSubscriptionIdListOfUser(t *testing.T) {
-	param := &pb.IdAndIsDelete{Id: testUserId1}
+	param := &mysqlPb.IdAndIsDelete{Id: testUserId1}
 	idList, err := testClient.GetSubscriptionIdListOfUser(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -711,7 +711,7 @@ func TestMySQLData_GetSubscriptionIdListOfUser(t *testing.T) {
 }
 
 func TestMySQLData_GetSubscriptionUsersInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testSubsId2}
+	param := &mysqlPb.Id{Value: testSubsId2}
 	infoList, err := testClient.GetSubscriptionUsersInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -722,7 +722,7 @@ func TestMySQLData_GetSubscriptionUsersInfoPlus(t *testing.T) {
 }
 
 func TestMySQLData_GetUserSubscriptionsInfoPlus(t *testing.T) {
-	param := &pb.Id{Value: testUserId2}
+	param := &mysqlPb.Id{Value: testUserId2}
 	infoList, err := testClient.GetUserSubscriptionsInfoPlus(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -736,13 +736,13 @@ func TestMySQLData_GetUserSubscriptionsInfoPlus(t *testing.T) {
 
 // Clean testing data
 func TestMySQLData_DeleteOneUserReal(t *testing.T) {
-	param := &pb.Id{Value: testUserId1}
+	param := &mysqlPb.Id{Value: testUserId1}
 	_, err := testClient.DeleteOneUserReal(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
 	}
 
-	param2 := &pb.Id{Value: testUserId2}
+	param2 := &mysqlPb.Id{Value: testUserId2}
 	_, err = testClient.DeleteOneUserReal(getTimeOutCtx(3), param2)
 	if nil != err {
 		t.Fatal(err)
@@ -750,12 +750,12 @@ func TestMySQLData_DeleteOneUserReal(t *testing.T) {
 }
 
 func TestMySQLData_DeleteOneFriendshipReal(t *testing.T) {
-	param := &pb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId}
+	param := &mysqlPb.FriendshipBasic{SelfId: testSelfId, FriendId: testFriendId}
 	_, err := testClient.DeleteOneFriendshipReal(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
 	}
-	param2 := &pb.FriendshipBasic{SelfId: testUserId1, FriendId: testUserId2}
+	param2 := &mysqlPb.FriendshipBasic{SelfId: testUserId1, FriendId: testUserId2}
 	_, err = testClient.DeleteOneFriendshipReal(getTimeOutCtx(3), param2)
 	if nil != err {
 		t.Fatal(err)
@@ -763,13 +763,13 @@ func TestMySQLData_DeleteOneFriendshipReal(t *testing.T) {
 }
 
 func TestMySQLData_DeleteOneGroupChatReal(t *testing.T) {
-	param := &pb.Id{Value: testGroupChatId1}
+	param := &mysqlPb.Id{Value: testGroupChatId1}
 	_, err := testClient.DeleteOneGroupChatReal(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
 	}
 
-	param2 := &pb.Id{Value: testGroupChatId2}
+	param2 := &mysqlPb.Id{Value: testGroupChatId2}
 	_, err = testClient.DeleteOneGroupChatReal(getTimeOutCtx(3), param2)
 	if nil != err {
 		t.Fatal(err)
@@ -778,7 +778,7 @@ func TestMySQLData_DeleteOneGroupChatReal(t *testing.T) {
 }
 
 func TestMySQLData_DeleteOneUserGroupChatReal(t *testing.T) {
-	param := &pb.UserAndGroupId{GroupId: testGroupChatId2, UserId: testUserId1}
+	param := &mysqlPb.UserAndGroupId{GroupId: testGroupChatId2, UserId: testUserId1}
 	_, err := testClient.DeleteOneUserGroupChatReal(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -792,7 +792,7 @@ func TestMySQLData_DeleteOneUserGroupChatReal(t *testing.T) {
 }
 
 func TestMySQLData_DeleteOneSubscriptionReal(t *testing.T) {
-	param := &pb.Id{Value: testSubsId1}
+	param := &mysqlPb.Id{Value: testSubsId1}
 	_, err := testClient.DeleteOneSubscriptionReal(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -805,7 +805,7 @@ func TestMySQLData_DeleteOneSubscriptionReal(t *testing.T) {
 }
 
 func TestMySQLData_DeleteOneUserSubscriptionReal(t *testing.T) {
-	param := &pb.UserAndSubsId{SubsId: testSubsId2, UserId: testUserId2}
+	param := &mysqlPb.UserAndSubsId{SubsId: testSubsId2, UserId: testUserId2}
 	_, err := testClient.DeleteOneUserSubscriptionReal(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)

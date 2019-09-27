@@ -2,7 +2,8 @@ package ApiRPC
 
 import (
 	conf "../Config"
-	pb "../Protos"
+	mongoPb "../Protos/mongoProto"
+	mysqlPb "../Protos/mysqlProto"
 
 	"context"
 	"crypto/tls"
@@ -15,8 +16,8 @@ import (
 )
 
 var (
-	mysqlDataClient pb.MySQLBindServiceClient
-	mongoDateClient pb.MongoBindServiceClient
+	mysqlDataClient mysqlPb.MySQLBindServiceClient
+	mongoDateClient mongoPb.MongoBindServiceClient
 )
 
 func init() {
@@ -47,14 +48,14 @@ func init() {
 		log.Fatal(err.Error())
 	}
 
-	mysqlDataClient = pb.NewMySQLBindServiceClient(conn1)
+	mysqlDataClient = mysqlPb.NewMySQLBindServiceClient(conn1)
 
 	conn2, err := grpc.Dial(conf.MongoDataRPCServerAddress, grpc.WithTransportCredentials(c))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	mongoDateClient = pb.NewMongoBindServiceClient(conn2)
+	mongoDateClient = mongoPb.NewMongoBindServiceClient(conn2)
 }
 
 // Return a context instance with deadline
@@ -64,11 +65,11 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 }
 
 // Return the client for mysql data rpc sever. The type of client is pointer.
-func GetMySQLDateClient() pb.MySQLBindServiceClient {
+func GetMySQLDateClient() mysqlPb.MySQLBindServiceClient {
 	return mysqlDataClient
 }
 
 // Return the client for mongo data rpc sever. The type of client is pointer.
-func GetMongoDateClient() pb.MongoBindServiceClient {
+func GetMongoDateClient() mongoPb.MongoBindServiceClient {
 	return mongoDateClient
 }
