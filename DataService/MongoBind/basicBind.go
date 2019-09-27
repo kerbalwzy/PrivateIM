@@ -17,17 +17,15 @@ import (
 )
 
 var (
-	CollDelayMessage,           // the message for the user when him was offline. should be sent and delete when the user online.
-	CollUserChatHistory,        // the history of the message which between two user.
-	CollGroupChatHistory,       // the history of the message which belong the group chat.
-	CollSubscriptionMsgHistory, // the history of the message which belong the subscription.
-
-	CollUserFriends,       // the id of user's friends, include the blacklist.
-	CollUserGroupChats,    // the id of the group chat which the user was joined.
-	CollUserSubscriptions, // the id of the subscription which the user was followed
-
-	CollGroupChatUsers, // the id of users whom are belong to the group chat.
-	CollSubscriptionUsers *mongo.Collection // the id of users whom are followed the subscription.
+	CollDelayMessage           *mongo.Collection // the message for the user when him was offline.
+	CollUserChatHistory        *mongo.Collection // the history of the message which between two user.
+	CollGroupChatHistory       *mongo.Collection // the history of the message which belong the group chat.
+	CollSubscriptionMsgHistory *mongo.Collection // the history of the message which belong the subscription.
+	CollUserFriends            *mongo.Collection // the id of user's friends, include the blacklist.
+	CollUserGroupChats         *mongo.Collection // the id of the group chat which the user was joined.
+	CollUserSubscriptions      *mongo.Collection // the id of the subscription which the user was followed
+	CollGroupChatUsers         *mongo.Collection // the id of users whom are belong to the group chat.
+	CollSubscriptionUsers      *mongo.Collection // the id of users whom are followed the subscription.
 )
 
 func init() {
@@ -92,8 +90,8 @@ func GetJoinUserId(userId1, userId2 int64) string {
 // information for history messages(message recorded for every date).
 // Because there only have int32 and int64 in protocol buffers3, so the 'Date' defined with int32
 type historyMessage struct {
-	Date     int32    `json:"date"`
-	Messages [][]byte `json:"messages"`
+	Date     int32    `bson:"date"`
+	Messages [][]byte `bson:"messages"`
 }
 
 // Update the history message record for today.
