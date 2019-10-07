@@ -41,13 +41,13 @@ func checkCtxCanceled(ctx context.Context) error {
 
 // Create a server option to use CA TLS authentication for keeping safe for data transmission.
 func getCAOption() grpc.ServerOption {
-	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAServerPem, conf.DataLayerSrvCAServerKey)
+	cert, err := tls.LoadX509KeyPair(conf.PrivateIMServerPem, conf.PrivateIMServerKey)
 	if err != nil {
 		log.Fatalf("[error] getCAOption: %s", err.Error())
 	}
 
 	certPool := x509.NewCertPool()
-	ca, err := ioutil.ReadFile(conf.DataLayerSrvCAPem)
+	ca, err := ioutil.ReadFile(conf.PrivateIMRootCAPem)
 	if err != nil {
 		log.Fatalf("[error] getCAOption: %s", err.Error())
 	}

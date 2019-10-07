@@ -22,19 +22,19 @@ var (
 
 func init() {
 	// Add CA TLS authentication data
-	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAClientPem, conf.DataLayerSrvCAClientKey)
+	cert, err := tls.LoadX509KeyPair(conf.PrivateIMClientPem, conf.PrivateIMClientKey)
 	if err != nil {
-		log.Fatalf("tls.LoadX509KeyPair err: %v", err)
+		log.Fatalf("[error] load CA X509 key files fail: %s", err.Error())
 	}
 
 	certPool := x509.NewCertPool()
-	ca, err := ioutil.ReadFile(conf.DataLayerSrvCAPem)
+	ca, err := ioutil.ReadFile(conf.PrivateIMRootCAPem)
 	if err != nil {
-		log.Fatalf("ioutil.ReadFile err: %v", err)
+		log.Fatalf("[error] load CA Root Pem fail: %s", err.Error())
 	}
 
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		log.Fatalf("certPool.AppendCertsFromPEM err")
+		log.Fatalf("[error] certPool.AppendCertsFromPEM error")
 	}
 
 	c := credentials.NewTLS(&tls.Config{
