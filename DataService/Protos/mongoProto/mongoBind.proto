@@ -4,6 +4,7 @@ package mongoPb;
 
 // protoc -I ./ ./mongoBind.proto --go_out=plugins=grpc:./
 
+// a basic data structure for save date and the message was sent on the date.
 message DateAndMessage {
     int32 date = 1;
     repeated bytes message_list = 2;
@@ -104,29 +105,39 @@ message EmptyResult {
 }
 
 service MongoBindService {
+    // methods for delay messages
     rpc PutSaveDelayMessage (IdAndMessage) returns (EmptyResult);
     rpc GetDelayMessage (Id) returns (DelayMessage);
 
+    // methods for user chat history
     rpc PutSaveUserChatHistory (JoinIdAndMessage) returns (EmptyResult);
     rpc GetAllUserChatHistory (JoinId) returns (UserChatHistory);
     rpc GetUserChatHistoryByDate (JoinIdAndDate) returns (UserChatHistory);
     rpc GetUserChatHistoryByDateRange (JoinIdAndDateRange) returns (UserChatHistory);
 
+    // methods for group chat history
     rpc PutSaveGroupChatHistory (IdAndMessage) returns (EmptyResult);
     rpc GetAllGroupChatHistory (Id) returns (GroupChatHistory);
     rpc GetGroupChatHistoryByDate (IdAndDate) returns (GroupChatHistory);
     rpc GetGroupChatHistoryByDateRange (IdAndDateRange) returns (GroupChatHistory);
 
+    // methods for subscription messages history
     rpc PutSaveSubscriptionHistory (IdAndMessage) returns (EmptyResult);
     rpc GetAllSubscriptionHistory (Id) returns (SubscriptionHistory);
     rpc GetSubscriptionHistoryByDate (IdAndDate) returns (SubscriptionHistory);
     rpc GetSubscriptionHistoryByDateRange (IdAndDateRange) returns (SubscriptionHistory);
 
+    // methods for user's friends, blacklist cache data
     rpc PutUserFriendsAdd (DoubleId) returns (EmptyResult);
     rpc PutUserFriendsDel (DoubleId) returns (EmptyResult);
     rpc PutUserBlacklistAdd (DoubleId) returns (EmptyResult);
     rpc PutUserBlacklistDel (DoubleId) returns (EmptyResult);
     rpc GetUserFriendsAndBlacklist (Id) returns (UserFriendsAndBlacklist);
+
+    rpc PutMoveFriendIntoBlacklistPlus (DoubleId) returns (EmptyResult);
+    rpc PutMoveFriendOutFromBlacklistPlus (DoubleId) returns (EmptyResult);
+
+    // methods for the user-group-chat and user-subscription relationship cache data
     rpc PutUserGroupChatsAdd (DoubleId) returns (EmptyResult);
     rpc PutUserGroupChatsDel (DoubleId) returns (EmptyResult);
     rpc GetUserGroupChats (Id) returns (UserGroupChats);
@@ -138,13 +149,9 @@ service MongoBindService {
     rpc PutGroupChatUsersDel (DoubleId) returns (EmptyResult);
     rpc GetGroupChatUsers (Id) returns (GroupChatUsers);
 
-
     rpc PutSubscriptionUsersAdd (DoubleId) returns (EmptyResult);
     rpc PutSubscriptionUsersDel (DoubleId) returns (EmptyResult);
     rpc GetSubscriptionUsers (Id) returns (SubscriptionUsers);
-
-    rpc PutMoveFriendIntoBlacklistPlus (DoubleId) returns (EmptyResult);
-    rpc PutMoveFriendOutFromBlacklistPlus (DoubleId) returns (EmptyResult);
 
     rpc PutUserJoinGroupChatPlus (DoubleId) returns (EmptyResult);
     rpc PutUserQuitGroupChatPlus (DoubleId) returns (EmptyResult);
