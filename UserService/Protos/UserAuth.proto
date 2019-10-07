@@ -1,20 +1,20 @@
 syntax = "proto3";
 
-package pb;
+package userAuthPb;
 
 // protoc -I ./ ./UserAuth.proto --go_out=plugins=grpc:./
 
 service UserAuth {
-    rpc CheckAuthToken (AuthToken) returns (TokenCheckResult);
+    rpc CheckAuthToken (Token) returns (Id);
 }
 
 
-message AuthToken {
-    string data = 1;
+message Token {
+    string value = 1;
 }
 
-message TokenCheckResult {
-    int64 user_id = 1;
+message Id {
+    int64 value = 1;
 }
 
 

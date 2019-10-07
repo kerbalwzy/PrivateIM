@@ -2,13 +2,15 @@ package Config
 
 const (
 	// gRPC config
+	MessagePRCServerAddress = "0.0.0.0:8080"
 	MySQLDataRPCServerAddress = "0.0.0.0:23331"
-	MongoDataRPCServerAddress = "0.0.0.0:23332"
 	UserAuthRPCServerAddress  = "0.0.0.0:11111"
 
-	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/ca.pem"
-	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/client/client.pem"
-	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/client/client.key"
+	PrivateIMRootCAPem       = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/ca.pem"
+	PrivateIMServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.pem"
+	PrivateIMServerKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.key"
+	PrivateIMClientPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/client/client.pem"
+	PrivateIMClientKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/client/client.key"
 
 	// static file config, about operating the avatar and qrCode
 	StaticFoldPath         = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/"
