@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	// Add CA TSL authentication data
+	// Add CA TLS authentication data
 	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAClientPem, conf.DataLayerSrvCAClientKey)
 	if err != nil {
 		log.Fatalf("tls.LoadX509KeyPair err: %v", err)

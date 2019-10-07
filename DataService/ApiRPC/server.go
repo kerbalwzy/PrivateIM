@@ -39,7 +39,7 @@ func checkCtxCanceled(ctx context.Context) error {
 	return nil
 }
 
-// Create a server option to use CA TSL authentication for keeping safe for data transmission.
+// Create a server option to use CA TLS authentication for keeping safe for data transmission.
 func getCAOption() grpc.ServerOption {
 	cert, err := tls.LoadX509KeyPair(conf.DataLayerSrvCAServerPem, conf.DataLayerSrvCAServerKey)
 	if err != nil {
