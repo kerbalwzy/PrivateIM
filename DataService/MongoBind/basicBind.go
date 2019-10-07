@@ -182,7 +182,7 @@ func findManyHistoryMessageByIdAndDate(coll *mongo.Collection, id interface{}, d
 	if nil != err {
 		return nil, err
 	}
-	// check if have found data
+	// check if have not found data
 	if !cur.Next(getTimeOutCtx(3)) {
 		return nil, ErrMessageHistoryNotFound
 	}

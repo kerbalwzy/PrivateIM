@@ -15,14 +15,13 @@ const (
 	CollGroupChatUsersName         = "group_chat_users"
 	CollSubscriptionUsersName      = "subscription_users"
 
-	TimeDisplayFormat = "2006-01-02 15:04:05"
-
 	MySQLDataRPCServerAddress = "0.0.0.0:23331"
 	MongoDataRPCServerAddress = "0.0.0.0:23332"
 
-	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/ca.pem"
-	DataLayerSrvCAServerPem = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/server/server.pem"
-	DataLayerSrvCAServerKey = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/server/server.key"
-	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/client/client.pem"
-	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/DataService/CATSL/client/client.key"
+	// todo: when the file path changed, the config should be change
+	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/ca.pem"
+	DataLayerSrvCAServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/server/server.pem"
+	DataLayerSrvCAServerKey = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/server/server.key"
+	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/client/client.pem"
+	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/client/client.key"
 )
