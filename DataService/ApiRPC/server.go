@@ -92,9 +92,9 @@ func getUnaryInterceptorOption() grpc.ServerOption {
 
 // Start the gRPC server for MySQL data operation.
 func StartMySQLDataRPCServer() {
-	// using CA TSL authentication
+	// using CA TLS authentication
 	caOption := getCAOption()
-	log.Printf("[info] StartMySQLDataRPCServer: load CA TSL authentcation files success")
+	log.Printf("[info] StartMySQLDataRPCServer: load CA TLS authentcation files success")
 
 	// get an interceptor server option for Unary-Unary handler
 	unaryOption := getUnaryInterceptorOption()
@@ -119,9 +119,9 @@ func StartMySQLDataRPCServer() {
 func StartMongoDataRPCServer() {
 	// Start the gRPC server for MySQL data operation.
 
-	// using CA TSL authentication
+	// using CA TLS authentication
 	caOption := getCAOption()
-	log.Printf("[info] StartMongoDataRPCServer: load CA TSL authentcation files success")
+	log.Printf("[info] StartMongoDataRPCServer: load CA TLS authentcation files success")
 
 	// get an interceptor server option for Unary-Unary handler
 	unaryOption := getUnaryInterceptorOption()

@@ -19,9 +19,9 @@ const (
 	MongoDataRPCServerAddress = "0.0.0.0:23332"
 
 	// todo: when the file path changed, the config should be change
-	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/ca.pem"
-	DataLayerSrvCAServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/server/server.pem"
-	DataLayerSrvCAServerKey = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/server/server.key"
-	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/client/client.pem"
-	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/CATSLFiles/client/client.key"
+	DataLayerSrvCAPem       = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/ca.pem"
+	DataLayerSrvCAServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.pem"
+	DataLayerSrvCAServerKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.key"
+	DataLayerSrvCAClientPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/client/client.pem"
+	DataLayerSrvCAClientKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/client/client.key"
 )
