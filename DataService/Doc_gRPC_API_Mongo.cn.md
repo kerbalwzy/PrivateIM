@@ -1,1 +1,0 @@
-## Data Layer gRPC Client API 「For Mongo Data」
