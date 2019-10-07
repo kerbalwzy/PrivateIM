@@ -5,7 +5,7 @@ package mongoPb;
 // protoc -I ./ ./mongoBind.proto --go_out=plugins=grpc:./
 
 message DateAndMessage {
-    int32 data = 1;
+    int32 date = 1;
     repeated bytes message_list = 2;
 }
 
@@ -144,7 +144,7 @@ service MongoBindService {
     rpc GetSubscriptionUsers (Id) returns (SubscriptionUsers);
 
     rpc PutMoveFriendIntoBlacklistPlus (DoubleId) returns (EmptyResult);
-    rpc MoveFriendOutFromBlacklistPlus (DoubleId) returns (EmptyResult);
+    rpc PutMoveFriendOutFromBlacklistPlus (DoubleId) returns (EmptyResult);
 
     rpc PutUserJoinGroupChatPlus (DoubleId) returns (EmptyResult);
     rpc PutUserQuitGroupChatPlus (DoubleId) returns (EmptyResult);

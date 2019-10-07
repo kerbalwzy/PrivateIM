@@ -121,22 +121,25 @@ func StartMongoDataRPCServer() {
 
 	// using CA TSL authentication
 	caOption := getCAOption()
+	log.Printf("[info] StartMongoDataRPCServer: load CA TSL authentcation files success")
 
 	// get an interceptor server option for Unary-Unary handler
 	unaryOption := getUnaryInterceptorOption()
+	log.Printf("[info] StartMongoDataRPCServer: load unary method interceptor function success")
 
 	server := grpc.NewServer(unaryOption, caOption)
 
 	mongoPb.RegisterMongoBindServiceServer(server, &MongoData{})
 
-	log.Println(":::Start Mongo Data Layer gRPC Server")
 	listener, err := net.Listen("tcp", conf.MongoDataRPCServerAddress)
 	if nil != err {
-		log.Fatalf("Start gRPC server error: %s", err.Error())
+		log.Fatalf("[error] StartMongoDataRPCServer: %s", err.Error())
+
 	}
+	log.Printf("[info] StartMongoDataRPCServer: start the server with tcp address %s", conf.MongoDataRPCServerAddress)
 	err = server.Serve(listener)
 	if nil != err {
-		log.Fatal(err)
+		log.Fatalf("[error] StartMongoDataRPCServer: %s", err.Error())
 	}
 
 }
