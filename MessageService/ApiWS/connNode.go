@@ -1,23 +1,18 @@
 package ApiWS
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"sync"
+	"time"
 
-	"../DataLayer"
+	"../ApiRPC"
 )
 
 type NodePool struct {
 	clients map[int64]*Node
 	wt      sync.RWMutex
-}
-
-// Add a new client node into ClientPool
-func (obj *NodePool) Add(node *Node) {
-	obj.wt.Lock()
-	obj.clients[node.Id] = node
-	obj.wt.Unlock()
 }
 
 // Get a client node by id from ClientPool
@@ -29,92 +24,188 @@ func (obj *NodePool) Get(id int64) (*Node, bool) {
 
 }
 
+// Add a new client node into ClientPool, if the user is had a node, replace and close the old one
+func (obj *NodePool) Add(node *Node) {
+	obj.wt.Lock()
+	obj.clients[node.Id] = node
+	obj.wt.Unlock()
+
+	// todo test code used in separate development, need remove later
+	fmt.Printf("client node list: \n")
+	for k, v := range obj.clients {
+		fmt.Printf("\t%d, %p\n", k, v)
+	}
+}
+
 // Delete a client node from ClientPool, and close the connection of the node.
 func (obj *NodePool) Del(node *Node) {
 	obj.wt.Lock()
 	delete(obj.clients, node.Id)
 	obj.wt.Unlock()
-	_ = node.conn.Close()
 
-}
-
-var nodePool = &NodePool{
-	clients: make(map[int64]*Node),
-	wt:      sync.RWMutex{},
-}
-
-// Create a ClientPool to save nodes, (Singleton Design Pattern)
-func NewNodePool() *NodePool {
-	return nodePool
+	// todo test code used in separate development, need remove later
+	fmt.Printf("client node list: \n")
+	for k, v := range obj.clients {
+		fmt.Printf("\t%d, %p\n", k, v)
+	}
 }
 
 // The connection node of the client for receiving and sending messages.
-// The "Id" of the node saved the user's id which using the client, the "conn" is
-// used to send or receive data, the "messageQueue" saved the message those need
-// send to the client, the "Friends" saved the id of user's friends, the "BlackList"
-// saved the id of user who is marked black by the user.
 type Node struct {
-	Id          int64 // userId
-	conn        *websocket.Conn
-	messageChan chan []byte
-	Friends     sync.Map
-	BlackList   sync.Map
+	Id int64
+
+	conns     [3]*Connector // the connector array
+	connCount int           // the count of the connector
+	wt        sync.Mutex    // the lock for operating the 'count' field
+
+	Friends   sync.Map
+	BlackList sync.Map
 }
 
-// Sending the message to the client which the node marked.
-// Continuously try to get messages from the "messageChan" of the node and send them
-// to the client immediately. If send fail, moving the message into "WaitSendChan",
-// closing the connection and removing from node pool.
-func (obj *Node) SendLoop() {
-	defer func() {
-		ClientPool.Del(obj)
-	}()
-	for message := range obj.messageChan {
-		log.Printf("SendMessage: send data to client(user_id=%d)", obj.Id)
-		err := obj.conn.WriteMessage(websocket.TextMessage, message)
-		if nil != err {
-			log.Printf("Error: send data fail to client(user_id=%d), error detail: %s", obj.Id, err.Error())
-			WaitSendChan <- [2]interface{}{obj.Id, message}
-			return
-		}
-	}
-}
-
-// Receiving message from the client which the node marked.
-// Continuously try to receive data from the "conn" of the node, if having error
-// happened when receiving, will close the connection and remove from node pool.
-// The data will be handed over to the "Chat Dispatch" function for subsequent processing
-func (obj *Node) RecvLoop() {
-	defer func() {
-		ClientPool.Del(obj)
-	}()
-	for {
-		_, data, err := obj.conn.ReadMessage()
-		log.Printf("RecvMessage: receive data from client(user_id=%d)", obj.Id)
-		if err != nil {
-			log.Printf("Error: recevie data fail from client(user_id=%d), error detail: %s", obj.Id, err.Error())
-			return
-		}
-		ChatMessageDispatch(obj.Id, data)
-	}
-}
-
-//Create a new node instance for the connection
+// Create a new node instance for the connection
 func NewNode(userId int64, conn *websocket.Conn) *Node {
+	connector := &Connector{conn: conn, CloseSignal: make(chan struct{}), DataChan: make(chan []byte)}
+	conns := [3]*Connector{connector}
 	node := &Node{
-		Id: userId, conn: conn,
-		messageChan: make(chan []byte),
-		Friends:     sync.Map{},
-		BlackList:   sync.Map{}}
-	if friends, err := DataLayer.MongoQueryFriendsId(userId); nil == err {
+		Id: userId,
+
+		conns:     conns,
+		connCount: 0,
+		wt:        sync.Mutex{},
+
+		Friends:   sync.Map{},
+		BlackList: sync.Map{}}
+
+	// load the user's friends and blacklist
+	friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
+	if nil == err {
 		for _, id := range friends {
 			node.Friends.Store(id, struct{}{})
 		}
-	}
-	if blackList, err := DataLayer.MongoQueryBlackList(userId); nil == err {
-		for _, id := range blackList {
+
+		for _, id := range blacklist {
 			node.BlackList.Store(id, struct{}{})
 		}
+	} else {
+		log.Printf("[error] <NewNode> load friends and blacklist for user(%d) fail, detail: %s", userId, err)
 	}
+
 	return node
+}
+
+// Add a connector for the node, the max count of connectors is 3.
+func (obj *Node) AddConn(conn *Connector) {
+	obj.wt.Lock()
+	var oldestConn *Connector
+	oldestConn, obj.conns[2], obj.conns[1], obj.conns[0] = obj.conns[2], obj.conns[1], obj.conns[0], conn
+	if oldestConn != nil {
+		close(oldestConn.CloseSignal)
+	}
+	if obj.connCount < 3 {
+		obj.connCount++
+	}
+	obj.wt.Unlock()
+
+}
+
+// Watching the connectors of the node, when a connector is closed, remove it from the node and reduce the value
+// of count of the connectors whom are belong to the node. When the node have not connectors, don't save the node
+// in ClientPool anymore.
+func (obj *Node) ConnsWatchLoop() {
+	for {
+		obj.wt.Lock()
+		for index, conn := range obj.conns {
+			if nil != conn {
+				if _, ok := <-conn.CloseSignal; !ok {
+					obj.connCount--
+					switch index {
+					case 0:
+						obj.conns[0], obj.conns[1], obj.conns[2] = obj.conns[1], obj.conns[2], nil
+					case 1:
+						obj.conns[1], obj.conns[2] = obj.conns[2], nil
+					case 3:
+						obj.conns[2] = nil
+					}
+				}
+			}
+		}
+		// when the node have not connectors, don't save the node in ClientPool anymore.
+		if obj.connCount == 0 {
+			ClientPool.Del(obj)
+		}
+		obj.wt.Unlock()
+
+		time.Sleep(1 * time.Second)
+	}
+}
+
+// add the message data to the node's every connector data channel.If have not any connector here, the message would
+// be saved as delay message
+func (obj *Node) AddMessageData(data []byte) {
+	if obj.connCount == 0 {
+		delayMessageChat <- [2]interface{}{obj.Id, data}
+		return
+	}
+	for _, conn := range obj.conns {
+		if nil != conn {
+			conn.DataChan <- data
+		}
+	}
+
+}
+
+// The connector for send and receive data with client really
+type Connector struct {
+	conn        *websocket.Conn
+	CloseSignal chan struct{}
+	DataChan    chan []byte
+}
+
+// Watching the connector close signal, keep the connect safe.
+func (obj *Connector) CloseWatchLoop() {
+	for {
+		select {
+		case <-obj.CloseSignal:
+			err := obj.conn.Close()
+			log.Printf("[error] <Transfer.CloseWatchLoop> : %s", err)
+		default:
+			time.Sleep(1 * time.Second)
+		}
+	}
+}
+
+// Keep send the data to client by connector, when have a new message for it.
+// When the connector was closed, stop the goroutine.
+func SendDateLoop(userId int64, connector *Connector) {
+	for {
+		select {
+		case <-connector.CloseSignal:
+			return
+		case data := <-connector.DataChan:
+			err := connector.conn.WriteMessage(websocket.TextMessage, data)
+			if nil != err {
+				delayMessageChat <- [2]interface{}{userId, data}
+				close(connector.CloseSignal)
+			}
+			log.Printf("[info] <SendDateLoop> send data to user(%d)", userId)
+		}
+	}
+}
+
+// Keep trying to receive message from the client by connector.
+// When the connector was closed, stop the goroutine.
+func RecvDataLoop(userId int64, connector *Connector) {
+	for {
+		select {
+		case <-connector.CloseSignal:
+			return
+		default:
+			_, data, err := connector.conn.ReadMessage()
+			if err != nil {
+				log.Printf("[error] <RecvLoop> recevie data fail from user(%d), detail: %s", userId, err.Error())
+				close(connector.CloseSignal)
+			}
+			MessageDispatch(userId, data)
+		}
+	}
 }
