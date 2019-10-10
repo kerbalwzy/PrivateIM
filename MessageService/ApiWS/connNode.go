@@ -59,47 +59,16 @@ type Node struct {
 	wt            sync.Mutex    // the lock for operating the 'count' field
 	connsWatching bool          //
 
-	Friends   sync.Map
-	BlackList sync.Map
-}
-
-// Create a new node instance for the user's connection
-func NewNode(userId int64) *Node {
-	node := &Node{
-		Id: userId,
-
-		conns:     [3]*Connector{},
-		connCount: 0,
-		wt:        sync.Mutex{},
-
-		Friends:   sync.Map{},
-		BlackList: sync.Map{}}
-
-	// load the user's friends and blacklist
-	friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
-	if nil == err {
-		for _, id := range friends {
-			node.Friends.Store(id, struct{}{})
-		}
-
-		for _, id := range blacklist {
-			node.BlackList.Store(id, struct{}{})
-		}
-	} else {
-		log.Printf("[error] <NewNode> load friends and blacklist for user(%d) fail, detail: %s", userId, err)
-	}
-
-	return node
-}
-
-// Create a new connector for the connection.
-func NewConnector(conn *websocket.Conn) *Connector {
-	return &Connector{conn: conn, CloseSignal: make(chan struct{}), DataChan: make(chan []byte)}
+	Friends       sync.Map // the id of other users whom are the user's friend
+	BlackList     sync.Map // the id of other users whom are in the user' blacklist
+	GroupChats    sync.Map // the id of group chats which are joined by the user
+	Subscriptions sync.Map // the id of subscriptions which are followed by the user
 }
 
 // Add a connector for the node, the max count of connectors is 3.
 func (obj *Node) AddConn(conn *Connector) {
 	obj.wt.Lock()
+
 	var oldestConn *Connector
 	oldestConn, obj.conns[2], obj.conns[1], obj.conns[0] = obj.conns[2], obj.conns[1], obj.conns[0], conn
 	if oldestConn != nil {
@@ -111,7 +80,9 @@ func (obj *Node) AddConn(conn *Connector) {
 	if !obj.connsWatching {
 		obj.connsWatching = true
 	}
+
 	obj.wt.Unlock()
+
 	log.Printf("[info] <Node.AddConn> add one new connetor for user(%d), the connector count= %d",
 		obj.Id, obj.connCount)
 }
@@ -122,13 +93,21 @@ func (obj *Node) AddConn(conn *Connector) {
 func (obj *Node) ConnsWatchingLoop() {
 	log.Printf("[info] <Node.ConnsWatchingLoop> start a node's conns watching goroutine")
 	for {
-		obj.wt.Lock()
+
 		for index, conn := range obj.conns {
 			if nil != conn {
+				// create a timeout monitor for this check
+				timeOut := time.NewTimer(time.Second * 1)
+
 				select {
-				case <-time.After(1 * time.Second):
-					continue
+				case <-timeOut.C:
+					break // only break this select work
 				case <-conn.CloseSignal:
+					// actively close this timeout monitoring
+					timeOut.Stop()
+
+					obj.wt.Lock()
+
 					obj.connCount--
 					switch index {
 					case 0:
@@ -138,12 +117,14 @@ func (obj *Node) ConnsWatchingLoop() {
 					case 3:
 						obj.conns[2] = nil
 					}
+
+					obj.wt.Unlock()
+
 					log.Printf("[info] <Node.ConnsWatchingLoop> reduce one connector of user(%d),"+
 						" the connector count= %d", obj.Id, obj.connCount)
 				}
 			}
 		}
-		obj.wt.Unlock()
 
 		time.Sleep(1 * time.Second)
 
@@ -175,6 +156,40 @@ func (obj *Node) AddMessageData(data []byte) {
 
 }
 
+// Create a new node instance for the user's connection
+func NewNode(userId int64) *Node {
+	node := new(Node)
+	node.Id = userId
+
+	// load the user's friends and blacklist
+	friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
+	if nil == err {
+		for _, id := range friends {
+			node.Friends.Store(id, struct{}{})
+		}
+
+		for _, id := range blacklist {
+			node.BlackList.Store(id, struct{}{})
+		}
+	} else {
+		log.Printf("[error] <NewNode> load friends and blacklist for user(%d) fail, detail: %s", userId, err)
+	}
+
+	// load the user's group chats
+	groupChats, err := ApiRPC.GetUserGroupChats(userId)
+	if nil == err {
+		for _, id := range groupChats {
+			node.GroupChats.Store(id, struct{}{})
+		}
+	} else {
+		log.Printf("[error] <NewNode> load group chats for user(%d) fail, detail: %s", userId, err)
+	}
+
+	// todo: load the user's subscriptions
+
+	return node
+}
+
 // The connector for send and receive data with client really
 type Connector struct {
 	conn        *websocket.Conn
@@ -199,6 +214,11 @@ func (obj *Connector) CloseWatchingLoop() {
 			time.Sleep(1 * time.Second)
 		}
 	}
+}
+
+// Create a new connector for the connection.
+func NewConnector(conn *websocket.Conn) *Connector {
+	return &Connector{conn: conn, CloseSignal: make(chan struct{}), DataChan: make(chan []byte)}
 }
 
 // Keep send the data to client by connector, when have a new message for it.
