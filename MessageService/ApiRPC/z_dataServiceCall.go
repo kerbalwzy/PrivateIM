@@ -76,3 +76,22 @@ func GetGroupChatUsers(groupId int64) ([]int64, error) {
 	return data.Users, nil
 
 }
+
+func SaveUserChatHistory(joinId string, message []byte) error {
+	// todo test code used in separate development, need remove later
+	return nil
+
+	// code to actually use
+	param := &mongoPb.JoinIdAndMessage{JoinId: joinId, Message: message}
+	_, err := GetMongoDateClient().PutSaveUserChatHistory(getTimeOutCtx(3), param)
+	return err
+}
+
+func SaveGroupChatHistory(groupId int64, message []byte) error {
+	// todo test code used in separate development, need remove later
+	return nil
+
+	param := &mongoPb.IdAndMessage{Id: groupId, Message: message}
+	_, err := GetMongoDateClient().PutSaveGroupChatHistory(getTimeOutCtx(3), param)
+	return err
+}

@@ -180,12 +180,13 @@ func checkWhetherReceiverShouldReceive(ok bool, receiver *UserNode, senderId, re
 	return 200, nil
 }
 
+var (
+	ErrDeliveryTime = errors.New("invalid delivery time")
+)
+
 // Check the value of 'DeliveryTime' field in the message. If the value is zero, meaning it is not a timing message.
 // When it is a timing message, requiring the delivery time is after now at least 2 minute.
-func checkAndSaveTimingMessage(message Message) (bool, error) {
-	// don't support timing message at present
-	return false, nil
-
+func checkWeatherTimingMessage(message Message) (bool, error) {
 	deliveryTime := message.GetDeliveryTime()
 	if 0 == deliveryTime {
 		return false, nil
@@ -195,7 +196,5 @@ func checkAndSaveTimingMessage(message Message) (bool, error) {
 	if deliveryTime < time.Now().Add(100 * time.Second).Unix() {
 		return true, ErrDeliveryTime
 	}
-
-	// todo: save timing message
 	return true, nil
 }

@@ -2,7 +2,6 @@ package ApiWS
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -162,13 +161,15 @@ func SendUserChatMessage(senderId int64, message []byte) {
 		return
 	}
 
-	// todo: check whether the message is an timing message
-	yes, err := checkAndSaveTimingMessage(chatMessage)
+	// check whether the message is an timing message
+	yes, err := checkWeatherTimingMessage(chatMessage)
 	if nil != err {
 		SendErrorMessage(senderId, code, err, message)
 		return
 	}
+	// todo: save the timing message
 	if yes {
+
 		return
 	}
 
@@ -180,7 +181,8 @@ func SendUserChatMessage(senderId int64, message []byte) {
 		delayMessageChat <- [2]interface{}{chatMessage.ReceiverId, message}
 	}
 
-	// know the sender the message was send ok
+	// save the chat history and tell the sender the message was send ok
+	SaveUserChatHistory(senderId, chatMessage.ReceiverId, message)
 	SendErrorMessage(senderId, 200, ErrSendMessageOk, message)
 }
 
@@ -203,7 +205,6 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 
 	// get the group chat node
 	groupChatNode, ok := GlobalGroupChats.Get(tempMessage.ReceiverId)
-
 
 	if !ok {
 		groupChatNode, err = NewGroupChatNode(tempMessage.ReceiverId)
@@ -231,37 +232,17 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 	}
 	groupChatNode.Users.wt.RUnlock()
 
-	// add the activity count
+	// add the activity count and save the group chat history
 	groupChatNode.AddActiveCount()
+	SaveGroupChatHistory(tempMessage.ReceiverId, message)
 	log.Printf("[info] <SendGroupChatMessage> sender id= %d, group chat id= %d", senderId, tempMessage.ReceiverId)
 
 }
 
+// todo:
 func SendSubscriptionMessage(senderId int64, message []byte) {
 	panic("implement the function")
 }
-
-// Record the message for offline user.
-// Save the message as delay message into database, when the user online again, send these message to the client.
-// but if some thing error happened when save the delay message, it would only output the error log, would not block
-// the program.
-func SaveDelayMessageLoop() {
-	for message := range delayMessageChat {
-		receiverId := message[0].(int64)
-		messageData := message[1].([]byte)
-		err := ApiRPC.SaveDelayMessage(receiverId, messageData)
-		if nil != err {
-			log.Printf("[error] <SaveDelayMessageLoop> save data for recipient(%d) fail: %s",
-				receiverId, err.Error())
-		}
-		log.Printf("[info] <SaveDelayMessageLoop> save data for recipient(%d) success: %s",
-			receiverId, messageData)
-	}
-}
-
-var (
-	ErrDeliveryTime = errors.New("invalid delivery time")
-)
 
 // Keep send the data to client by connector, when have a new message for it.
 // When the connector was closed, stop the goroutine.
@@ -314,5 +295,42 @@ func RecvDataLoop(userId int64, connector *Connector, clientAddr string) {
 			log.Printf("[info] <SendDateLoop> recv data from  %s", userConnectInfo)
 			MessageDispatch(userId, data)
 		}
+	}
+}
+
+// Record the message for offline user.
+// Save the message as delay message into database, when the user online again, send these message to the client.
+// but if some thing error happened when save the delay message, it would only output the error log, would not block
+// the program.
+func SaveDelayMessageLoop() {
+	for message := range delayMessageChat {
+		receiverId := message[0].(int64)
+		messageData := message[1].([]byte)
+		err := ApiRPC.SaveDelayMessage(receiverId, messageData)
+		if nil != err {
+			log.Printf("[error] <SaveDelayMessageLoop> save data for recipient(%d) fail: %s",
+				receiverId, err.Error())
+		}
+		log.Printf("[info] <SaveDelayMessageLoop> save data for recipient(%d) success", receiverId)
+	}
+}
+
+// Record the normal user chat history
+func SaveUserChatHistory(senderId, receiverId int64, message []byte) {
+	if senderId > receiverId {
+		senderId, receiverId = receiverId, senderId
+	}
+	joinId := fmt.Sprintf("%d_%d", senderId, receiverId)
+	err := ApiRPC.SaveUserChatHistory(joinId, message)
+	if nil != err {
+		log.Printf("[error] <SaveUserChatHistory> save chat history for (%s) fail: %s", joinId, err.Error())
+	}
+}
+
+// Record the group chat history
+func SaveGroupChatHistory(groupId int64, message []byte) {
+	err := ApiRPC.SaveGroupChatHistory(groupId, message)
+	if nil != err {
+		log.Printf("[error] <SaveGroupChatHistory> save group chat history for (%d) fail: %s", groupId, err.Error())
 	}
 }
