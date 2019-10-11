@@ -185,6 +185,23 @@ func (obj *UserNodePool) Del(node *UserNode) {
 	}
 }
 
+// Delete all the client node.
+// It would close every connectors and stop the data translate goroutines for every nodes before reset the clients map.
+func (obj *UserNodePool) CleanAll() {
+	obj.wt.Lock()
+	// close every node's connectors, stop the data translate goroutines
+	for _, node := range obj.clients {
+		for _, conn := range node.conns {
+			close(conn.CloseSignal)
+		}
+	}
+
+	// reset the clients map
+	obj.clients = make(map[int64]*UserNode)
+	obj.wt.Unlock()
+
+}
+
 // ---------------------------------------------------------------------------------
 
 // The group chat node, saving some information of the group chat
@@ -267,6 +284,13 @@ func (obj *GroupChatNodePool) Del(id int64) {
 	obj.wt.Unlock()
 }
 
+// Reset the groups map
+func (obj *GroupChatNodePool) CleanAll() {
+	obj.wt.Lock()
+	obj.groups = make(map[int64]*GroupChatNode)
+	obj.wt.Unlock()
+}
+
 // Clear up nodes whose lifetime exceeds the limit or low activity.
 // Working on at NN:00:00 every day by config.
 func (obj *GroupChatNodePool) CleanGroupChatLoop() {
@@ -276,7 +300,7 @@ func (obj *GroupChatNodePool) CleanGroupChatLoop() {
 		todayDateStr := time.Now().Format("2006-01-02")
 		todayZeroH, _ := time.ParseInLocation("2006-01-02", todayDateStr, time.Local)
 		tomorrowZeroH := todayZeroH.AddDate(0, 0, 1)
-		nextCleanTime := tomorrowZeroH.Add(conf.GroupChatNodeCleanTIme * time.Hour)
+		nextCleanTime := tomorrowZeroH.Add(conf.GroupChatNodeCleanTime * time.Hour)
 
 		// waiting for cleaning up, would blocking here
 		select {
@@ -308,7 +332,7 @@ func (obj *GroupChatNodePool) CleanByLifeTime() {
 		delete(obj.groups, id)
 		count++
 	}
-	log.Printf("[info] <GroupChatNodePool.cleanByLifeTime> clear up the group chat node, count= %d", count)
+	log.Printf("[info] <GroupChatNodePool.CleanByLifeTime> clear up the group chat node, count= %d", count)
 
 }
 
@@ -319,10 +343,11 @@ func (obj *GroupChatNodePool) CleanByActiveCount() {
 
 	nodeCount := len(obj.groups)
 	if nodeCount <= conf.GroupChatNodeLowActivityCleanStartLimit {
+		log.Printf("[info] <GroupChatNodePool.CleanByActiveCount> don't need clean")
 		return
 	}
 
-	tempActiveSorter := make(ActiveSorter, nodeCount)
+	tempActiveSorter := make(ActiveSorter, 0, nodeCount)
 	// add element into the sorter, and sort the data
 	for _, groupChatNode := range obj.groups {
 		tempActiveSorter = append(tempActiveSorter, groupChatNode)
@@ -341,7 +366,7 @@ func (obj *GroupChatNodePool) CleanByActiveCount() {
 		node.ResetActiveCount()
 	}
 
-	log.Printf("[info] <GroupChatNodePool.cleanByActiveCount> clear up the group chat node, count= %d",
+	log.Printf("[info] <GroupChatNodePool.CleanByActiveCount> clear up the group chat node, count= %d",
 		int(cleanCount))
 
 }
