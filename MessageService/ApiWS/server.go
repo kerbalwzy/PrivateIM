@@ -9,6 +9,7 @@ import (
 
 func StartMessageWebSocketServer() {
 	go SaveDelayMessageLoop()
+	go GlobalGroupChats.CleanGroupChatLoop()
 
 	// start the message transfer WebSocket server
 	http.HandleFunc("/", BeginChat)

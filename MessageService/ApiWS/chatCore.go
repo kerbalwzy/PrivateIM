@@ -3,6 +3,7 @@ package ApiWS
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -18,9 +19,15 @@ var UpGrader = &websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true }}
 
 // Saving all node for every client connection.
-var ClientPool = &NodePool{
-	clients: make(map[int64]*Node),
+var GlobalUsers = &UserNodePool{
+	clients: make(map[int64]*UserNode),
 	wt:      sync.RWMutex{},
+}
+
+// Saving all node for group chat information
+var GlobalGroupChats = &GroupChatNodePool{
+	groups: make(map[int64]*GroupChatNode),
+	wt:     sync.RWMutex{},
 }
 
 // Saving the message which want sent to offline user.
@@ -30,7 +37,7 @@ var delayMessageChat = make(chan [2]interface{}, 10000)
 
 // Handle WebSocket upgrade request.
 // Before upgrading, check token by send it to UserCenter through gRPC call. Then trying to get the user's connect node
-// from ClientPool. if have not, new one and add into the ClientPool. Create a new connector for this connection and
+// from UserNodesPool. if have not, new one and add into the UserNodesPool. Create a new connector for this connection and
 // add the new connector into theNode's conns. Then start the send and receive data loop goroutine for this connector,
 // and start the connector status watching loop goroutine.
 func BeginChat(w http.ResponseWriter, r *http.Request) {
@@ -55,13 +62,13 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// try to get the user's connect node from ClientPool. if have not, new one and add into the ClientPool.
-	theNode, ok := ClientPool.Get(userId)
+	// try to get the user's connect node from UserNodesPool. if have not, new one and add into the UserNodesPool.
+	theNode, ok := GlobalUsers.Get(userId)
 	if !ok {
-		theNode = NewNode(userId)
+		theNode = NewUserNode(userId)
 		go theNode.ConnsWatchingLoop()
 
-		ClientPool.Add(theNode)
+		GlobalUsers.Add(theNode)
 
 	}
 
@@ -70,7 +77,6 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 	theNode.AddConn(tempConnector)
 
 	// start the goroutines for this connector
-	go tempConnector.CloseWatchingLoop()
 	go SendDateLoop(userId, tempConnector, r.RemoteAddr)
 	go RecvDataLoop(userId, tempConnector, r.RemoteAddr)
 
@@ -122,7 +128,7 @@ func SendErrorMessage(receiverId int64, code int, err error, rawMessage []byte) 
 	}
 	message, _ := json.Marshal(tempMessage)
 
-	if node, ok := ClientPool.Get(receiverId); ok {
+	if node, ok := GlobalUsers.Get(receiverId); ok {
 		log.Printf("[error] <SendErrorMessage> send to receiver(%d) {code: %d, error: %s}",
 			receiverId, code, err.Error())
 		node.AddMessageData(message)
@@ -147,9 +153,9 @@ func SendUserChatMessage(senderId int64, message []byte) {
 		return
 	}
 
-	recipientNode, ok := ClientPool.Get(chatMessage.ReceiverId)
+	recipientNode, ok := GlobalUsers.Get(chatMessage.ReceiverId)
 	// check whether the recipient should receive the message
-	code, err = checkWhetherRecipientShouldReceive(ok, recipientNode, senderId, chatMessage.ReceiverId)
+	code, err = checkWhetherReceiverShouldReceive(ok, recipientNode, senderId, chatMessage.ReceiverId)
 	if nil != err {
 		SendErrorMessage(senderId, code, err, message)
 		return
@@ -177,87 +183,56 @@ func SendUserChatMessage(senderId int64, message []byte) {
 	SendErrorMessage(senderId, 200, ErrSendMessageOk, message)
 }
 
-var (
-	ErrSendMessageOk        = errors.New("the message send ok")
-	ErrUserDisguise         = errors.New("the sender id is not identical, don't disguise other to send message")
-	ErrUnSupportContentType = errors.New("the message content type is not support")
-	ErrTextContentEmpty     = errors.New("the text content is empty")
-	ErrPreviewPicEmpty      = errors.New("the media preview picture url is empty")
-	ErrResourceURLEmpty     = errors.New("the media resource url is empty")
-	ErrRecipientRefuseRecv  = errors.New("the recipient refuse receive the message")
-	ErrFriendshipNotExisted = errors.New("your are not friend still")
-	ErrRecipientNotExisted  = errors.New("the recipient is not existed")
-)
-
-// Check the chat message data legality.
-// Requiring the sender id is identical, and the content type is supported, and the message real content not be empty
-func checkUserChatMessageData(senderId int64, chatMessage *ChatMessage) (int, error) {
-	if chatMessage.SenderId != senderId {
-		return 400, ErrUserDisguise
+// Send the message to a group chat.
+// In fact, is send the message to every other user whom joined the group chat.
+func SendGroupChatMessage(senderId int64, message []byte) {
+	tempMessage := new(ChatMessage)
+	err := json.Unmarshal(message, tempMessage)
+	if nil != err {
+		SendErrorMessage(senderId, 400, err, message)
+		return
 	}
 
-	switch chatMessage.ContentType {
-	case TextContent:
-		if chatMessage.Content == "" {
-			return 400, ErrTextContentEmpty
-		}
-	case ImageContent, VoiceContent, VideoContent:
-		if chatMessage.PreviewPic == "" {
-			return 400, ErrPreviewPicEmpty
-		}
-
-		if chatMessage.ResourceUrl == "" {
-			return 400, ErrResourceURLEmpty
-		}
-	default:
-		return 400, ErrUnSupportContentType
+	// check the chat message data legality
+	code, err := checkUserChatMessageData(senderId, tempMessage)
+	if nil != err {
+		SendErrorMessage(senderId, code, err, message)
+		return
 	}
 
-	return 200, nil
-}
-
-// Check whether the recipient should receive the message.
-// Requiring the sender have an effective friendship with the receiver.
-func checkWhetherRecipientShouldReceive(ok bool, receiverNode *Node, senderId, recipientId int64) (int, error) {
-	switch ok {
-	case true:
-		// when the recipient is online
-		if _, isBlack := receiverNode.BlackList.Load(senderId); isBlack {
-			return 403, ErrRecipientRefuseRecv
-		}
-		if _, effective := receiverNode.Friends.Load(senderId); !effective {
-			return 403, ErrFriendshipNotExisted
-		}
-	case false:
-		// when the recipient is offline
-		friends, blacklist, err := ApiRPC.GetUserFriendIdList(recipientId)
+	// get the group chat node
+	groupChatNode, ok := GlobalGroupChats.Get(tempMessage.ReceiverId)
+	if !ok {
+		groupChatNode, err = NewGroupChatNode(tempMessage.ReceiverId)
 		if nil != err {
-			return 404, ErrRecipientNotExisted
+			SendErrorMessage(senderId, 404, err, message)
+			return
 		}
-		for _, id := range blacklist {
-			if id == senderId {
-				return 403, ErrRecipientRefuseRecv
-			}
-		}
-		isNotFriend := true
-		for _, id := range friends {
-			if id == senderId {
-				isNotFriend = false
-				break
-			}
-		}
-		if isNotFriend {
-			return 403, ErrFriendshipNotExisted
+		GlobalGroupChats.Add(groupChatNode)
+	}
+	// and check weather the user has join the group chat
+	if !groupChatNode.Users.Exist(senderId) {
+		SendErrorMessage(senderId, 400, ErrNotJoinedTheGroupChat, message)
+		return
+	}
+
+	// send the message to every members of the group chat
+	groupChatNode.Users.wt.RLock()
+	for memberId := range groupChatNode.Users.data {
+		if userNode, ok := GlobalUsers.Get(memberId); ok {
+			userNode.AddMessageData(message)
+		} else {
+			delayMessageChat <- [2]interface{}{memberId, message}
 		}
 	}
-	return 200, nil
+	groupChatNode.Users.wt.RUnlock()
+
+	// add the activity count
+	groupChatNode.AddActiveCount()
+
 }
 
 func SendSubscriptionMessage(senderId int64, message []byte) {
-	panic("implement the function")
-}
-
-func SendGroupChatMessage(senderId int64, message []byte) {
 	panic("implement the function")
 }
 
@@ -283,22 +258,56 @@ var (
 	ErrDeliveryTime = errors.New("invalid delivery time")
 )
 
-// Check the value of 'DeliveryTime' field in the message. If the value is zero, meaning it is not a timing message.
-// When it is a timing message, requiring the delivery time is after now at least 2 minute.
-func checkAndSaveTimingMessage(message Message) (bool, error) {
-	// don't support timing message at present
-	return false, nil
+// Keep send the data to client by connector, when have a new message for it.
+// When the connector was closed, stop the goroutine.
+func SendDateLoop(userId int64, connector *Connector, clientAddr string) {
+	defer func() {
+		recover()
+	}()
 
-	deliveryTime := message.GetDeliveryTime()
-	if 0 == deliveryTime {
-		return false, nil
+	userConnectInfo := fmt.Sprintf("user(%d)-address(%s)-connector(%p)", userId, clientAddr, connector)
+	log.Printf("[info] <SendDateLoop> start a send data goroutine for %s", userConnectInfo)
+
+	for {
+		select {
+		case <-connector.CloseSignal:
+			log.Printf("[info] <SendDateLoop> stop a send data goroutine for %s", userConnectInfo)
+			return
+		case data := <-connector.DataChan:
+			err := connector.conn.WriteMessage(websocket.TextMessage, data)
+			if nil != err {
+				delayMessageChat <- [2]interface{}{userId, data}
+				close(connector.CloseSignal)
+				return
+			}
+			log.Printf("[info] <SendDateLoop> send data to %s", userConnectInfo)
+		}
 	}
+}
 
-	// leave 20 seconds free
-	if deliveryTime < time.Now().Add(100 * time.Second).Unix() {
-		return true, ErrDeliveryTime
+// Keep trying to receive message from the client by connector.
+// When the connector was closed, stop the goroutine.
+func RecvDataLoop(userId int64, connector *Connector, clientAddr string) {
+	defer func() {
+		recover()
+	}()
+
+	userConnectInfo := fmt.Sprintf("user(%d)-address(%s)-connector(%p)", userId, clientAddr, connector)
+	log.Printf("[info] <RecvDataLoop> start a recv data goroutine for %s", userConnectInfo)
+	for {
+		select {
+		case <-connector.CloseSignal:
+			log.Printf("[info] <RecvDataLoop> stop a recv data goroutine for %s", userConnectInfo)
+			return
+		default:
+			_, data, err := connector.conn.ReadMessage()
+			if err != nil {
+				log.Printf("[error] <RecvDataLoop> recevie data fail from %s, detail: %s", userConnectInfo, err.Error())
+				close(connector.CloseSignal)
+				return
+			}
+			log.Printf("[info] <SendDateLoop> recv data from  %s", userConnectInfo)
+			MessageDispatch(userId, data)
+		}
 	}
-
-	// todo: save timing message
-	return true, nil
 }

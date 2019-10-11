@@ -5,6 +5,8 @@ import (
 	"errors"
 	"reflect"
 	"time"
+
+	"../ApiRPC"
 )
 
 const SystemId = 1024
@@ -100,4 +102,100 @@ func GetRawJsonMessageTypeId(message []byte) (int, error) {
 		return int(reflect.ValueOf(typeId).Float()), nil
 	}
 	return -1, ErrNoMessageTypeId
+}
+
+var (
+	ErrSendMessageOk        = errors.New("the message send ok")
+	ErrUserDisguise         = errors.New("the sender id is not identical, don't disguise other to send message")
+	ErrUnSupportContentType = errors.New("the message content type is not support")
+	ErrTextContentEmpty     = errors.New("the text content is empty")
+	ErrPreviewPicEmpty      = errors.New("the media preview picture url is empty")
+	ErrResourceURLEmpty     = errors.New("the media resource url is empty")
+	ErrReceiverRefuseRecv   = errors.New("the receiver refuse receive the message")
+	ErrFriendshipNotExisted = errors.New("your are not friend still")
+	ErrReceiverNotExisted   = errors.New("the receiver is not existed")
+)
+
+// Check the chat message data legality.
+// Requiring the sender id is identical, and the content type is supported, and the message real content not be empty
+func checkUserChatMessageData(senderId int64, chatMessage *ChatMessage) (int, error) {
+	if chatMessage.SenderId != senderId {
+		return 400, ErrUserDisguise
+	}
+
+	switch chatMessage.ContentType {
+	case TextContent:
+		if chatMessage.Content == "" {
+			return 400, ErrTextContentEmpty
+		}
+	case ImageContent, VoiceContent, VideoContent:
+		if chatMessage.PreviewPic == "" {
+			return 400, ErrPreviewPicEmpty
+		}
+
+		if chatMessage.ResourceUrl == "" {
+			return 400, ErrResourceURLEmpty
+		}
+	default:
+		return 400, ErrUnSupportContentType
+	}
+
+	return 200, nil
+}
+
+// Check whether the receiver should receive the message.
+// Requiring the sender have an effective friendship with the receiver.
+func checkWhetherReceiverShouldReceive(ok bool, receiver *UserNode, senderId, receiverId int64) (int, error) {
+	switch ok {
+	case true:
+		// when the receiver is online
+		if _, isBlack := receiver.BlackList.Load(senderId); isBlack {
+			return 403, ErrReceiverRefuseRecv
+		}
+		if _, effective := receiver.Friends.Load(senderId); !effective {
+			return 403, ErrFriendshipNotExisted
+		}
+	case false:
+		// when the receiver is offline
+		friends, blacklist, err := ApiRPC.GetUserFriendIdList(receiverId)
+		if nil != err {
+			return 404, ErrReceiverNotExisted
+		}
+		for _, id := range blacklist {
+			if id == senderId {
+				return 403, ErrReceiverRefuseRecv
+			}
+		}
+		isNotFriend := true
+		for _, id := range friends {
+			if id == senderId {
+				isNotFriend = false
+				break
+			}
+		}
+		if isNotFriend {
+			return 403, ErrFriendshipNotExisted
+		}
+	}
+	return 200, nil
+}
+
+// Check the value of 'DeliveryTime' field in the message. If the value is zero, meaning it is not a timing message.
+// When it is a timing message, requiring the delivery time is after now at least 2 minute.
+func checkAndSaveTimingMessage(message Message) (bool, error) {
+	// don't support timing message at present
+	return false, nil
+
+	deliveryTime := message.GetDeliveryTime()
+	if 0 == deliveryTime {
+		return false, nil
+	}
+
+	// leave 20 seconds free
+	if deliveryTime < time.Now().Add(100 * time.Second).Unix() {
+		return true, ErrDeliveryTime
+	}
+
+	// todo: save timing message
+	return true, nil
 }
