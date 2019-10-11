@@ -23,8 +23,8 @@ type UserNode struct {
 	connsWatching bool          // mark weather the ConnsWatchingLoop goroutine is started
 	wt            sync.Mutex    // the lock for operating the 'count' field
 
-	Friends   sync.Map // the id of other users whom are the user's friend
-	BlackList sync.Map // the id of other users whom are in the user' blacklist
+	Friends   Int64IdSet // the id of other users whom are the user's friend
+	BlackList Int64IdSet // the id of other users whom are in the user' blacklist
 }
 
 // Add a connector for the node, the max count of connectors is 3.
@@ -125,21 +125,23 @@ func (obj *UserNode) ConnsWatchingLoop() {
 func NewUserNode(userId int64) *UserNode {
 	node := new(UserNode)
 	node.Id = userId
+	node.Friends = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
+	node.BlackList = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
 
 	// load the user's friends and blacklist
 	friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
 	if nil == err {
 		for _, id := range friends {
-			node.Friends.Store(id, struct{}{})
+			node.Friends.data[id] = struct{}{} // don't need lock here
 		}
 
 		for _, id := range blacklist {
-			node.BlackList.Store(id, struct{}{})
+			node.BlackList.data[id] = struct{}{} // don't need lock here
 		}
 	} else {
 		log.Printf("[error] <NewNode> load friends and blacklist for user(%d) fail, detail: %s", userId, err)
 	}
-
+	log.Printf("[info] <NewUserNode> new a user client node, id= %d", userId)
 	return node
 }
 
@@ -219,21 +221,20 @@ func NewGroupChatNode(id int64) (*GroupChatNode, error) {
 	tempGroupChat := new(GroupChatNode)
 	tempGroupChat.Id = id
 	tempGroupChat.initTime = time.Now()
+	tempGroupChat.Users = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
 
 	userIdSlice, err := ApiRPC.GetGroupChatUsers(id)
+
 	// load the id of users whom haven joined the group chat
 	if nil == err {
-		tempGroupChat.Users.wt.Lock()
-		defer tempGroupChat.Users.wt.Unlock()
-
 		for _, id := range userIdSlice {
-			tempGroupChat.Users.data[id] = struct{}{}
+			tempGroupChat.Users.data[id] = struct{}{} // don't need lock here
 		}
-
 	} else {
-		log.Printf("[error] <NewGroupChat> load users for group chat(%d) fail, detail: %s", id, err)
+		log.Printf("[error] <NewGroupChatNode> load users for group chat(%d) fail, detail: %s", id, err)
 		return nil, ErrGroupChatFindFail
 	}
+	log.Printf("[info] <NewGroupChatNode> new a group chat node, the id= %d", id)
 	return tempGroupChat, nil
 }
 

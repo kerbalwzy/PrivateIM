@@ -27,3 +27,30 @@
   	ProduceTime int64 `json:"produce_time,omitempty"` // the message produce time
   }
   ```
+
+
+
+TextUserChatMessageDemo
+
+```json
+{
+    "type_id": 0,
+    "sender_id": 0,
+    "receiver_id": 1,
+    "content_type": 0,
+    "content": "<test user chat text message>"
+}
+```
+
+TextGroupChatMessageDemo
+
+```json
+{
+    "type_id": 1,
+    "sender_id": 0,
+    "receiver_id": 111,
+    "content_type": 0,
+    "content": "<test group chat text message>"
+}
+```
+

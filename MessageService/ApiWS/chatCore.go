@@ -76,6 +76,9 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 	tempConnector := NewConnector(conn)
 	theNode.AddConn(tempConnector)
 
+	log.Printf("[info] <BeginChat> new WebSockt connection for user(%d)-address(%s), connector(%p)",
+		userId, r.RemoteAddr, tempConnector)
+
 	// start the goroutines for this connector
 	go SendDateLoop(userId, tempConnector, r.RemoteAddr)
 	go RecvDataLoop(userId, tempConnector, r.RemoteAddr)
@@ -88,8 +91,6 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	log.Printf("[info] <BeginChat> new WebSockt connection for user(%d)-address(%s), connector(%p)",
-		userId, r.RemoteAddr, tempConnector)
 }
 
 // Dispatch the chat message from ordinary user.
@@ -202,6 +203,8 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 
 	// get the group chat node
 	groupChatNode, ok := GlobalGroupChats.Get(tempMessage.ReceiverId)
+
+
 	if !ok {
 		groupChatNode, err = NewGroupChatNode(tempMessage.ReceiverId)
 		if nil != err {
@@ -210,6 +213,7 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 		}
 		GlobalGroupChats.Add(groupChatNode)
 	}
+
 	// and check weather the user has join the group chat
 	if !groupChatNode.Users.Exist(senderId) {
 		SendErrorMessage(senderId, 400, ErrNotJoinedTheGroupChat, message)
@@ -229,6 +233,7 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 
 	// add the activity count
 	groupChatNode.AddActiveCount()
+	log.Printf("[info] <SendGroupChatMessage> sender id= %d, group chat id= %d", senderId, tempMessage.ReceiverId)
 
 }
 

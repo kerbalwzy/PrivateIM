@@ -26,7 +26,7 @@ func (obj *Int64IdSet) Del(id int64) {
 func (obj *Int64IdSet) Exist(id int64) bool {
 	obj.wt.RLock()
 	_, ok := obj.data[id]
-	obj.wt.Unlock()
+	obj.wt.RUnlock()
 	return ok
 }
 

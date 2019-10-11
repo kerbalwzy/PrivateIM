@@ -149,10 +149,10 @@ func checkWhetherReceiverShouldReceive(ok bool, receiver *UserNode, senderId, re
 	switch ok {
 	case true:
 		// when the receiver is online
-		if _, isBlack := receiver.BlackList.Load(senderId); isBlack {
+		if receiver.BlackList.Exist(senderId) {
 			return 403, ErrReceiverRefuseRecv
 		}
-		if _, effective := receiver.Friends.Load(senderId); !effective {
+		if !receiver.Friends.Exist(senderId) {
 			return 403, ErrFriendshipNotExisted
 		}
 	case false:
