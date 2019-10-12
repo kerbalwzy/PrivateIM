@@ -24,6 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// a basic data structure for save date and the message was sent on the date.
 type DateAndMessage struct {
 	Date                 int32    `protobuf:"varint,1,opt,name=date,proto3" json:"date,omitempty"`
 	MessageList          [][]byte `protobuf:"bytes,2,rep,name=message_list,json=messageList,proto3" json:"message_list,omitempty"`
@@ -411,6 +412,7 @@ func (m *UserSubscriptions) GetSubscriptions() []int64 {
 type GroupChatUsers struct {
 	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Users                []int64  `protobuf:"varint,2,rep,packed,name=users,proto3" json:"users,omitempty"`
+	ManagerId            int64    `protobuf:"varint,3,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -455,9 +457,17 @@ func (m *GroupChatUsers) GetUsers() []int64 {
 	return nil
 }
 
+func (m *GroupChatUsers) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
+}
+
 type SubscriptionUsers struct {
 	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Users                []int64  `protobuf:"varint,2,rep,packed,name=users,proto3" json:"users,omitempty"`
+	ManagerId            int64    `protobuf:"varint,3,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -500,6 +510,13 @@ func (m *SubscriptionUsers) GetUsers() []int64 {
 		return m.Users
 	}
 	return nil
+}
+
+func (m *SubscriptionUsers) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
 }
 
 type Id struct {
@@ -925,6 +942,61 @@ func (m *DoubleId) GetOtherId() int64 {
 	return 0
 }
 
+type XAndManagerAndUserId struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ManagerId            int64    `protobuf:"varint,2,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	UserId               int64    `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *XAndManagerAndUserId) Reset()         { *m = XAndManagerAndUserId{} }
+func (m *XAndManagerAndUserId) String() string { return proto.CompactTextString(m) }
+func (*XAndManagerAndUserId) ProtoMessage()    {}
+func (*XAndManagerAndUserId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0561428ad23b023f, []int{19}
+}
+
+func (m *XAndManagerAndUserId) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_XAndManagerAndUserId.Unmarshal(m, b)
+}
+func (m *XAndManagerAndUserId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_XAndManagerAndUserId.Marshal(b, m, deterministic)
+}
+func (m *XAndManagerAndUserId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_XAndManagerAndUserId.Merge(m, src)
+}
+func (m *XAndManagerAndUserId) XXX_Size() int {
+	return xxx_messageInfo_XAndManagerAndUserId.Size(m)
+}
+func (m *XAndManagerAndUserId) XXX_DiscardUnknown() {
+	xxx_messageInfo_XAndManagerAndUserId.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_XAndManagerAndUserId proto.InternalMessageInfo
+
+func (m *XAndManagerAndUserId) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *XAndManagerAndUserId) GetManagerId() int64 {
+	if m != nil {
+		return m.ManagerId
+	}
+	return 0
+}
+
+func (m *XAndManagerAndUserId) GetUserId() int64 {
+	if m != nil {
+		return m.UserId
+	}
+	return 0
+}
+
 type EmptyResult struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -935,7 +1007,7 @@ func (m *EmptyResult) Reset()         { *m = EmptyResult{} }
 func (m *EmptyResult) String() string { return proto.CompactTextString(m) }
 func (*EmptyResult) ProtoMessage()    {}
 func (*EmptyResult) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0561428ad23b023f, []int{19}
+	return fileDescriptor_0561428ad23b023f, []int{20}
 }
 
 func (m *EmptyResult) XXX_Unmarshal(b []byte) error {
@@ -976,73 +1048,78 @@ func init() {
 	proto.RegisterType((*JoinIdAndDate)(nil), "mongoPb.JoinIdAndDate")
 	proto.RegisterType((*JoinIdAndDateRange)(nil), "mongoPb.JoinIdAndDateRange")
 	proto.RegisterType((*DoubleId)(nil), "mongoPb.DoubleId")
+	proto.RegisterType((*XAndManagerAndUserId)(nil), "mongoPb.XAndManagerAndUserId")
 	proto.RegisterType((*EmptyResult)(nil), "mongoPb.EmptyResult")
 }
 
 func init() { proto.RegisterFile("mongoBind.proto", fileDescriptor_0561428ad23b023f) }
 
 var fileDescriptor_0561428ad23b023f = []byte{
-	// 949 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x97, 0xf1, 0x6f, 0xda, 0x46,
-	0x14, 0xc7, 0x15, 0x58, 0xa1, 0x3c, 0x08, 0x04, 0x97, 0x82, 0xc3, 0x92, 0x8c, 0x58, 0xfb, 0x21,
-	0xd2, 0xa4, 0x4c, 0xea, 0xb4, 0xa9, 0x95, 0xaa, 0x76, 0x50, 0x0a, 0x75, 0x96, 0xa8, 0xcc, 0x59,
-	0x37, 0xa9, 0xbf, 0x44, 0x26, 0xbe, 0x11, 0x6f, 0xc6, 0x46, 0xf6, 0x99, 0x89, 0x3f, 0x6e, 0xff,
-	0xdb, 0x74, 0xe7, 0xb3, 0xf1, 0xf9, 0x6c, 0x2f, 0xf6, 0xf6, 0x5b, 0xee, 0xde, 0x7b, 0x9f, 0x7b,
-	0xef, 0xfb, 0x78, 0xe7, 0x0b, 0x74, 0xd6, 0x8e, 0xbd, 0x72, 0x26, 0xa6, 0x6d, 0x5c, 0x6e, 0x5c,
-	0x07, 0x3b, 0x52, 0x9d, 0x6e, 0x2c, 0x96, 0xca, 0x1c, 0xda, 0x53, 0x1d, 0xa3, 0xb1, 0x6d, 0xdc,
-	0x20, 0xcf, 0xd3, 0x57, 0x48, 0x92, 0xe0, 0x0b, 0x43, 0xc7, 0x48, 0x3e, 0x18, 0x1d, 0x5c, 0x3c,
-	0xd1, 0xe8, 0xdf, 0xd2, 0x39, 0xb4, 0xd6, 0x81, 0xf9, 0xce, 0x32, 0x3d, 0x2c, 0x57, 0x46, 0xd5,
-	0x8b, 0x96, 0xd6, 0x64, 0x7b, 0xd7, 0xa6, 0x87, 0x95, 0x31, 0xb4, 0xa6, 0xc8, 0xd2, 0x77, 0x21,
-	0xa6, 0x0d, 0x15, 0xd3, 0xa0, 0x90, 0xaa, 0x56, 0x31, 0x8d, 0xc7, 0x20, 0x7e, 0x83, 0xce, 0x27,
-	0x0f, 0xb9, 0xef, 0x1e, 0x74, 0xfc, 0xc1, 0xf4, 0xb0, 0xe3, 0xee, 0xa4, 0x01, 0xd4, 0xff, 0x70,
-	0x4c, 0xfb, 0x8e, 0xa1, 0x1a, 0x5a, 0x8d, 0x2c, 0x55, 0x43, 0xfa, 0x86, 0x66, 0xa9, 0x53, 0x4c,
-	0xf3, 0xc5, 0xe0, 0x92, 0xd5, 0x73, 0xc9, 0x17, 0x43, 0xd3, 0xd7, 0x95, 0x8f, 0x70, 0x34, 0x77,
-	0x1d, 0x7f, 0x13, 0x27, 0x27, 0xf3, 0x2b, 0x04, 0xd4, 0xe0, 0xd9, 0xad, 0xbf, 0xf4, 0xee, 0x5d,
-	0x73, 0x83, 0x4d, 0xc7, 0xfe, 0x5f, 0x98, 0x3a, 0x0c, 0x48, 0xf5, 0x33, 0xd7, 0x44, 0xb6, 0xe1,
-	0x8d, 0x6d, 0x63, 0x62, 0xe9, 0xf7, 0x7f, 0x12, 0xad, 0x04, 0xae, 0x0c, 0xf5, 0xdf, 0x03, 0x37,
-	0x8a, 0xae, 0x6a, 0xe1, 0x52, 0x3a, 0x81, 0xc6, 0x32, 0x0c, 0x93, 0xab, 0xd4, 0xb6, 0xdf, 0x50,
-	0x5e, 0x42, 0x9b, 0x1c, 0x11, 0x69, 0xe1, 0x09, 0xe4, 0x3e, 0xd4, 0x56, 0xc4, 0x1a, 0x82, 0xd9,
-	0x4a, 0x51, 0xa1, 0x4b, 0x22, 0xe3, 0x45, 0x8b, 0xc1, 0x5f, 0xc3, 0xa1, 0x17, 0x77, 0x60, 0x0c,
-	0x7e, 0x53, 0xf9, 0x01, 0xda, 0x51, 0x02, 0x84, 0x29, 0x72, 0x7a, 0xf0, 0xc4, 0x27, 0x06, 0x16,
-	0x1f, 0x2c, 0x94, 0x57, 0xd0, 0x8d, 0x1f, 0x5f, 0x24, 0x74, 0x08, 0x15, 0x95, 0xda, 0xb6, 0xba,
-	0xe5, 0x23, 0xe6, 0x1e, 0x2c, 0x94, 0x97, 0xd0, 0x52, 0x8d, 0xd8, 0xcf, 0x3f, 0x45, 0x6b, 0xf6,
-	0x1b, 0x95, 0x2b, 0xa3, 0x83, 0x8b, 0x96, 0x16, 0x2e, 0x95, 0x6f, 0xa1, 0x41, 0x23, 0x49, 0x37,
-	0x85, 0xb0, 0x70, 0x8a, 0x2a, 0xfb, 0x29, 0x52, 0x3e, 0x43, 0x3b, 0x0a, 0xd0, 0x74, 0x3b, 0xe5,
-	0xb0, 0x53, 0x00, 0x0f, 0xeb, 0x2e, 0xbe, 0x8b, 0xc5, 0x36, 0xe8, 0x0e, 0x3d, 0xe4, 0x18, 0x9e,
-	0x22, 0xdb, 0x08, 0x8c, 0x55, 0x6a, 0xac, 0xa3, 0x00, 0xa7, 0x9c, 0x41, 0xed, 0x2a, 0x98, 0x0c,
-	0xae, 0xcc, 0x46, 0x58, 0xe6, 0x7b, 0x38, 0x0a, 0xec, 0xb1, 0x52, 0x33, 0x87, 0x2b, 0xbb, 0xe6,
-	0xd7, 0x70, 0x18, 0x61, 0x68, 0x4a, 0x99, 0x8c, 0x34, 0x01, 0x56, 0x20, 0x71, 0xd1, 0x81, 0x08,
-	0x99, 0x88, 0xf2, 0x6a, 0xbc, 0x81, 0xa7, 0x53, 0xc7, 0x5f, 0x5a, 0x48, 0x35, 0x08, 0x7e, 0xad,
-	0xef, 0xf1, 0x55, 0xad, 0x46, 0x96, 0xaa, 0x41, 0xe2, 0x1d, 0xfc, 0x80, 0x5c, 0x62, 0xa9, 0x50,
-	0x4b, 0x9d, 0xae, 0x55, 0x43, 0x39, 0x84, 0xe6, 0xfb, 0xf5, 0x06, 0xef, 0x34, 0xe4, 0xf9, 0x16,
-	0x7e, 0xf1, 0x77, 0x0f, 0x8e, 0x6e, 0xc2, 0x1b, 0xf4, 0x16, 0xb9, 0x5b, 0xf3, 0x1e, 0x49, 0x13,
-	0x78, 0xb6, 0xf0, 0xf1, 0xad, 0xbe, 0x45, 0xdc, 0xbd, 0xf7, 0x3c, 0x9a, 0xf2, 0xb8, 0xd6, 0xc3,
-	0x5e, 0xb4, 0x1d, 0x03, 0x4b, 0xdf, 0x43, 0x67, 0x8e, 0x30, 0x17, 0xdf, 0x8c, 0xc5, 0x0f, 0xf7,
-	0x30, 0xce, 0x47, 0x85, 0x3e, 0x3b, 0x3a, 0x79, 0x5f, 0x1e, 0x47, 0x01, 0xc9, 0x6e, 0x67, 0x64,
-	0x30, 0x81, 0xe7, 0x73, 0x84, 0xc7, 0x96, 0x95, 0x24, 0x75, 0x12, 0xa4, 0xa1, 0x1c, 0x6d, 0x24,
-	0x5d, 0xaf, 0x41, 0x9e, 0x23, 0x9c, 0xd8, 0x9d, 0xec, 0x68, 0x93, 0xfa, 0x62, 0x42, 0x64, 0x3f,
-	0x87, 0xf6, 0x2b, 0x9c, 0x66, 0xd1, 0x82, 0xdf, 0xcb, 0x97, 0xe9, 0x48, 0x6a, 0xcc, 0xe1, 0xce,
-	0x60, 0xc0, 0x44, 0x13, 0xbe, 0x05, 0x85, 0x7a, 0xf6, 0x23, 0xf4, 0x03, 0xc5, 0x04, 0x0c, 0xd7,
-	0xba, 0x7d, 0x27, 0x04, 0xbf, 0x2b, 0x38, 0x9e, 0x23, 0x9c, 0xdc, 0x66, 0x82, 0x49, 0x7c, 0x2e,
-	0x54, 0xac, 0x1c, 0xd6, 0x2f, 0x70, 0x96, 0xc9, 0x62, 0xe3, 0x25, 0x02, 0x03, 0xa9, 0x72, 0xa8,
-	0x2a, 0x0c, 0x99, 0x56, 0x69, 0x9f, 0xb9, 0x42, 0x72, 0xcd, 0x68, 0xb1, 0x63, 0xcb, 0x4a, 0x23,
-	0x71, 0x8a, 0x9d, 0x44, 0x8b, 0x34, 0xd7, 0x05, 0x9c, 0xcc, 0x11, 0x4e, 0xb1, 0xe4, 0xe8, 0x96,
-	0x4f, 0xfc, 0x0c, 0xe7, 0x79, 0xc4, 0x7f, 0x51, 0x2f, 0x9f, 0xfd, 0x1a, 0xba, 0x0b, 0x1f, 0xc7,
-	0xbf, 0xe7, 0x86, 0x21, 0x75, 0xf7, 0xd3, 0xcc, 0x2e, 0xa7, 0x0c, 0xcd, 0x84, 0xe8, 0x29, 0xb2,
-	0x1e, 0x1f, 0xfd, 0x86, 0x5e, 0x4c, 0x24, 0x3a, 0x7a, 0x41, 0x14, 0x3a, 0x3d, 0x25, 0xbe, 0xd0,
-	0xf9, 0x3f, 0xc1, 0x90, 0x0d, 0x70, 0xda, 0x5b, 0x86, 0x6b, 0xf9, 0x88, 0x9b, 0xd6, 0x34, 0xf7,
-	0xb7, 0xd0, 0x63, 0xc9, 0xec, 0x5f, 0x2d, 0x85, 0xaa, 0x49, 0x03, 0x14, 0x2a, 0xe7, 0x15, 0x74,
-	0x59, 0x39, 0xb1, 0x77, 0x13, 0x57, 0xc5, 0x80, 0xab, 0x22, 0xe6, 0x35, 0xa1, 0x57, 0x8e, 0xf0,
-	0x70, 0x2a, 0x94, 0x7f, 0x06, 0xa3, 0x50, 0x09, 0x6f, 0xa1, 0xc7, 0x4a, 0xe0, 0x1f, 0x70, 0x5c,
-	0x15, 0x43, 0xae, 0x0a, 0xde, 0x31, 0x10, 0x91, 0x7f, 0xb6, 0x95, 0xe8, 0x02, 0x0f, 0x28, 0xd1,
-	0x85, 0xc4, 0xc3, 0x31, 0xa3, 0x0b, 0x09, 0xaf, 0x40, 0x41, 0xe1, 0xed, 0x58, 0xa2, 0x0b, 0x02,
-	0xa3, 0x44, 0x17, 0xc4, 0x37, 0x6c, 0x46, 0x17, 0x44, 0x47, 0x15, 0xce, 0x16, 0x3e, 0xbe, 0x71,
-	0xb6, 0x28, 0x98, 0x14, 0xd5, 0xc6, 0x4e, 0x34, 0x29, 0x0b, 0xcb, 0xf7, 0x1e, 0x9f, 0xcb, 0x35,
-	0x9c, 0x73, 0xa8, 0x8f, 0x3e, 0x9e, 0xb9, 0xce, 0xba, 0x24, 0xed, 0x1d, 0xc8, 0xec, 0x37, 0x4a,
-	0xbe, 0xc8, 0x91, 0xfc, 0x65, 0x21, 0x3f, 0xfb, 0x26, 0x2e, 0x09, 0xf9, 0x00, 0xa7, 0xe1, 0xcd,
-	0xe9, 0x58, 0x96, 0xf3, 0x57, 0x5c, 0xc4, 0x62, 0xa4, 0x2b, 0xf8, 0x8a, 0x91, 0x3e, 0xd9, 0xff,
-	0x91, 0xb5, 0xac, 0xd1, 0x7f, 0xba, 0xbf, 0xfb, 0x27, 0x00, 0x00, 0xff, 0xff, 0x2a, 0x25, 0x23,
-	0x34, 0x87, 0x0f, 0x00, 0x00,
+	// 1012 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x98, 0x59, 0x6f, 0xdb, 0x46,
+	0x10, 0xc7, 0x61, 0xa9, 0x91, 0xa2, 0xb1, 0x2c, 0x5b, 0x8c, 0x62, 0xc9, 0xaa, 0xe5, 0xda, 0x44,
+	0x1f, 0x0c, 0x14, 0x70, 0x81, 0x14, 0x05, 0x52, 0x20, 0x48, 0x2a, 0xc5, 0xb1, 0x42, 0xc7, 0x6e,
+	0x54, 0xba, 0x6e, 0x83, 0x3c, 0xd4, 0x58, 0x79, 0xb7, 0x0a, 0x5b, 0x8a, 0x34, 0xc8, 0xa5, 0x0b,
+	0x7d, 0xd0, 0x7e, 0x9f, 0x62, 0x0f, 0x1e, 0xcb, 0xab, 0xa6, 0x9a, 0x37, 0xed, 0x31, 0xbf, 0x9d,
+	0xf9, 0xcf, 0xec, 0x72, 0x20, 0xd8, 0x5e, 0xba, 0xce, 0xc2, 0x9d, 0x58, 0x0e, 0x3e, 0xb9, 0xf3,
+	0x5c, 0xea, 0x6a, 0x4d, 0x3e, 0x31, 0x9b, 0xeb, 0x53, 0xe8, 0x9c, 0x22, 0x4a, 0xc6, 0x0e, 0xbe,
+	0x24, 0xbe, 0x8f, 0x16, 0x44, 0xd3, 0xe0, 0x0b, 0x8c, 0x28, 0x19, 0x6c, 0x1c, 0x6e, 0x1c, 0x3f,
+	0x32, 0xf9, 0x6f, 0xed, 0x08, 0xda, 0x4b, 0xb1, 0x7c, 0x63, 0x5b, 0x3e, 0x1d, 0xd4, 0x0e, 0xeb,
+	0xc7, 0x6d, 0x73, 0x53, 0xce, 0x5d, 0x58, 0x3e, 0xd5, 0xc7, 0xd0, 0x3e, 0x25, 0x36, 0x5a, 0x85,
+	0x98, 0x0e, 0xd4, 0x2c, 0xcc, 0x21, 0x75, 0xb3, 0x66, 0xe1, 0x87, 0x20, 0x7e, 0x83, 0xed, 0x6b,
+	0x9f, 0x78, 0xaf, 0x3f, 0x21, 0xfa, 0xd6, 0xf2, 0xa9, 0xeb, 0xad, 0xb4, 0x3e, 0x34, 0xff, 0x74,
+	0x2d, 0xe7, 0x46, 0xa2, 0x5a, 0x66, 0x83, 0x0d, 0x0d, 0xac, 0x7d, 0xc3, 0xbd, 0x44, 0x1c, 0xb3,
+	0xf9, 0xac, 0x7f, 0x22, 0xe3, 0x39, 0x51, 0x83, 0xe1, 0xee, 0x23, 0xfd, 0x3d, 0xec, 0x4c, 0x3d,
+	0x37, 0xb8, 0x4b, 0x92, 0xd3, 0xfe, 0x55, 0x02, 0x9a, 0xf0, 0xe4, 0x2a, 0x98, 0xfb, 0xb7, 0x9e,
+	0x75, 0x47, 0x2d, 0xd7, 0xf9, 0x2c, 0x4c, 0x04, 0x7d, 0x16, 0xfd, 0x99, 0x67, 0x11, 0x07, 0xfb,
+	0x63, 0x07, 0x4f, 0x6c, 0x74, 0xfb, 0x17, 0xd3, 0x2a, 0xc3, 0x1d, 0x40, 0xf3, 0x0f, 0xb1, 0x8d,
+	0xa3, 0xeb, 0x66, 0x38, 0xd4, 0xf6, 0xa1, 0x35, 0x0f, 0xcd, 0x06, 0x75, 0xbe, 0x16, 0x4f, 0xe8,
+	0xcf, 0xa1, 0xc3, 0x8e, 0x88, 0xb4, 0xf0, 0x33, 0xe4, 0x5d, 0x68, 0x2c, 0xd8, 0x6a, 0x08, 0x96,
+	0x23, 0xdd, 0x80, 0x2e, 0xb3, 0x4c, 0x06, 0x9d, 0x35, 0xfe, 0x1a, 0xb6, 0xfc, 0xe4, 0x06, 0xc9,
+	0x50, 0x27, 0xf5, 0x6b, 0xe8, 0x44, 0x0e, 0x30, 0x66, 0x96, 0xd3, 0x83, 0x47, 0x01, 0x5b, 0x90,
+	0xf6, 0x62, 0xa0, 0x8d, 0x00, 0x96, 0xc8, 0x41, 0x0b, 0xe2, 0xb1, 0x6a, 0xa8, 0xf3, 0xdd, 0x2d,
+	0x39, 0x63, 0x60, 0xfd, 0x03, 0x74, 0x93, 0xde, 0x7d, 0x46, 0xf2, 0x10, 0x6a, 0x06, 0x37, 0xbd,
+	0x47, 0x76, 0x40, 0x24, 0x4d, 0x0c, 0xf4, 0xe7, 0xd0, 0x36, 0x70, 0xe2, 0xf2, 0xe4, 0x64, 0x4a,
+	0x56, 0xf8, 0xa0, 0x76, 0xb8, 0x71, 0xdc, 0x36, 0xc3, 0xa1, 0xfe, 0x2d, 0xb4, 0xb8, 0x25, 0xab,
+	0x85, 0x8c, 0x59, 0x78, 0x07, 0x6b, 0xf1, 0x1d, 0xd4, 0x3f, 0x42, 0x27, 0x32, 0x30, 0x91, 0x93,
+	0x73, 0xd8, 0x08, 0xc0, 0xa7, 0xc8, 0xa3, 0x37, 0x09, 0xdb, 0x16, 0x9f, 0xe1, 0x87, 0xec, 0xc1,
+	0x63, 0xe2, 0x60, 0xb1, 0x58, 0xe7, 0x8b, 0x4d, 0x22, 0x70, 0xfa, 0x01, 0x34, 0xce, 0xc5, 0xbd,
+	0x52, 0xc2, 0x6c, 0x85, 0x61, 0xbe, 0x81, 0x1d, 0xb1, 0x9e, 0x08, 0xb5, 0xf0, 0x6a, 0x16, 0xc7,
+	0xfc, 0x02, 0xb6, 0x22, 0x0c, 0x77, 0xa9, 0x90, 0x91, 0x27, 0xc0, 0x02, 0x34, 0xc5, 0x5a, 0x88,
+	0x50, 0x88, 0x58, 0x5f, 0x8d, 0x97, 0xf0, 0xf8, 0xd4, 0x0d, 0xe6, 0x36, 0x31, 0x30, 0xc3, 0x2f,
+	0x51, 0x8c, 0xaf, 0x9b, 0x0d, 0x36, 0x34, 0x30, 0xb3, 0x77, 0xe9, 0x27, 0x51, 0x32, 0x35, 0xbe,
+	0xd2, 0xe4, 0x63, 0x03, 0xeb, 0xbf, 0x43, 0xef, 0x03, 0x13, 0x4a, 0x54, 0xd0, 0xd8, 0xc1, 0xac,
+	0x18, 0x0d, 0x9c, 0x97, 0xaf, 0x44, 0xdd, 0xd5, 0x52, 0x75, 0xc7, 0x8e, 0x66, 0xf5, 0x19, 0xd7,
+	0x64, 0x23, 0xe0, 0x1c, 0x7d, 0x0b, 0x36, 0xdf, 0x2c, 0xef, 0xe8, 0xca, 0x24, 0x7e, 0x60, 0xd3,
+	0x67, 0xff, 0xf4, 0x60, 0xe7, 0x32, 0x7c, 0xdf, 0xaf, 0x88, 0x77, 0x6f, 0xdd, 0x12, 0x6d, 0x02,
+	0x4f, 0x66, 0x01, 0xbd, 0x42, 0xf7, 0x44, 0x79, 0x95, 0x9f, 0x46, 0x6f, 0x50, 0x32, 0x97, 0xc3,
+	0x5e, 0x34, 0x9d, 0x00, 0x6b, 0xdf, 0xc3, 0xf6, 0x94, 0x50, 0xc5, 0x7e, 0x33, 0x61, 0x3f, 0x8c,
+	0x61, 0xca, 0x1e, 0x03, 0x76, 0xe5, 0xd1, 0xe9, 0xd7, 0x7c, 0x2f, 0x32, 0x48, 0x57, 0x53, 0x81,
+	0x07, 0x13, 0x78, 0x3a, 0x25, 0x74, 0x6c, 0xdb, 0x69, 0xd2, 0x76, 0x8a, 0x34, 0x1c, 0x44, 0x13,
+	0xe9, 0xad, 0x17, 0x30, 0x98, 0x12, 0x9a, 0x9a, 0x9d, 0xac, 0x78, 0x11, 0xec, 0x66, 0x1d, 0x62,
+	0xf3, 0x25, 0xb4, 0x5f, 0x61, 0x54, 0x44, 0x13, 0xf5, 0xf8, 0x65, 0x3e, 0x92, 0x2f, 0x96, 0x70,
+	0xcf, 0xa0, 0x2f, 0x45, 0xcb, 0x7c, 0xa9, 0x2a, 0xe5, 0xec, 0x47, 0xd8, 0x15, 0x8a, 0x65, 0x30,
+	0x4a, 0xea, 0xe2, 0x4c, 0x64, 0xf6, 0x9d, 0xc3, 0xde, 0x94, 0xd0, 0xf4, 0xb4, 0x14, 0x4c, 0x53,
+	0x7d, 0xe1, 0x62, 0x95, 0xb0, 0x7e, 0x81, 0x83, 0x42, 0x96, 0xbc, 0xbe, 0x59, 0xa0, 0x90, 0xaa,
+	0x84, 0x6a, 0xc0, 0x50, 0x6a, 0x95, 0xf7, 0x11, 0xae, 0x24, 0xd7, 0x19, 0x0f, 0x76, 0x6c, 0xdb,
+	0x79, 0x24, 0x45, 0xb1, 0xfd, 0x68, 0x90, 0xb7, 0x75, 0x06, 0xfb, 0x53, 0x42, 0x73, 0x56, 0x4a,
+	0x74, 0x2b, 0x27, 0x7e, 0x84, 0xa3, 0x32, 0xe2, 0x7f, 0xa8, 0x57, 0xce, 0x7e, 0x01, 0xdd, 0x59,
+	0x40, 0x93, 0xdd, 0x06, 0xc6, 0x5a, 0x37, 0xbe, 0xcd, 0xf2, 0xf1, 0x2b, 0xd0, 0x2c, 0x63, 0x7d,
+	0x4a, 0xec, 0x87, 0x5b, 0xbf, 0xe4, 0x0f, 0x13, 0xb3, 0x8e, 0xfa, 0x9b, 0x4a, 0xa7, 0xe7, 0xd8,
+	0x57, 0x3a, 0xff, 0x1d, 0x0c, 0xe5, 0x05, 0xce, 0xeb, 0xb4, 0x94, 0x94, 0x1f, 0x2a, 0xb7, 0x35,
+	0x6f, 0xbb, 0x01, 0x07, 0xb3, 0x80, 0x5e, 0xba, 0xf7, 0x44, 0xac, 0x1a, 0x0e, 0x75, 0xa3, 0xd5,
+	0x99, 0x1d, 0xf8, 0x0f, 0xf7, 0xeb, 0x02, 0x8e, 0x14, 0xd4, 0xfb, 0x80, 0x9e, 0x79, 0xee, 0x72,
+	0x4d, 0xda, 0x2b, 0xe8, 0x49, 0x95, 0xe2, 0x66, 0xaf, 0x92, 0xcc, 0x79, 0x80, 0x4a, 0x3a, 0xff,
+	0x00, 0x5d, 0xa9, 0x73, 0xa2, 0xdd, 0x54, 0xe4, 0xed, 0x2b, 0xf2, 0x26, 0x76, 0x4d, 0xf8, 0x5b,
+	0x98, 0xe9, 0x37, 0x2b, 0xf9, 0x5f, 0xc0, 0xa8, 0x14, 0xc2, 0x2b, 0xe8, 0xc9, 0x10, 0xd4, 0xbe,
+	0x57, 0x89, 0x62, 0xa8, 0x44, 0xa1, 0x6e, 0x7c, 0xc7, 0x45, 0x54, 0xbb, 0x5d, 0x16, 0xc5, 0x28,
+	0xb2, 0xc9, 0xeb, 0x13, 0x4a, 0x33, 0xa2, 0xc2, 0xd6, 0xc8, 0x48, 0xaa, 0xf7, 0x2e, 0xc8, 0x48,
+	0x6a, 0xd7, 0x4f, 0xe2, 0xeb, 0x94, 0xee, 0xaf, 0xd7, 0x8e, 0x65, 0x92, 0xcf, 0x5b, 0x23, 0x3b,
+	0xd9, 0x9e, 0xbf, 0x20, 0x3b, 0xd9, 0x8d, 0xaf, 0x61, 0x20, 0x4b, 0x84, 0x7d, 0xa9, 0xa3, 0x88,
+	0xab, 0x5d, 0xb4, 0x18, 0xf2, 0x73, 0x60, 0xd1, 0x35, 0x21, 0x6f, 0x61, 0x14, 0xbe, 0xa8, 0xae,
+	0x6d, 0xbb, 0x7f, 0x27, 0x7d, 0xad, 0x46, 0x3a, 0x87, 0xaf, 0x24, 0xe9, 0xda, 0xf9, 0x9f, 0xac,
+	0x79, 0x83, 0xff, 0x55, 0xf0, 0xdd, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x6d, 0x41, 0x29, 0xfa,
+	0x3d, 0x10, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1057,39 +1134,45 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MongoBindServiceClient interface {
+	// methods for delay messages
 	PutSaveDelayMessage(ctx context.Context, in *IdAndMessage, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetDelayMessage(ctx context.Context, in *Id, opts ...grpc.CallOption) (*DelayMessage, error)
+	// methods for user chat history
 	PutSaveUserChatHistory(ctx context.Context, in *JoinIdAndMessage, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetAllUserChatHistory(ctx context.Context, in *JoinId, opts ...grpc.CallOption) (*UserChatHistory, error)
 	GetUserChatHistoryByDate(ctx context.Context, in *JoinIdAndDate, opts ...grpc.CallOption) (*UserChatHistory, error)
 	GetUserChatHistoryByDateRange(ctx context.Context, in *JoinIdAndDateRange, opts ...grpc.CallOption) (*UserChatHistory, error)
+	// methods for group chat history
 	PutSaveGroupChatHistory(ctx context.Context, in *IdAndMessage, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetAllGroupChatHistory(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GroupChatHistory, error)
 	GetGroupChatHistoryByDate(ctx context.Context, in *IdAndDate, opts ...grpc.CallOption) (*GroupChatHistory, error)
 	GetGroupChatHistoryByDateRange(ctx context.Context, in *IdAndDateRange, opts ...grpc.CallOption) (*GroupChatHistory, error)
+	// methods for subscription messages history
 	PutSaveSubscriptionHistory(ctx context.Context, in *IdAndMessage, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetAllSubscriptionHistory(ctx context.Context, in *Id, opts ...grpc.CallOption) (*SubscriptionHistory, error)
 	GetSubscriptionHistoryByDate(ctx context.Context, in *IdAndDate, opts ...grpc.CallOption) (*SubscriptionHistory, error)
 	GetSubscriptionHistoryByDateRange(ctx context.Context, in *IdAndDateRange, opts ...grpc.CallOption) (*SubscriptionHistory, error)
+	// methods for user's friends, blacklist cache data
 	PutUserFriendsAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserFriendsDel(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserBlacklistAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserBlacklistDel(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetUserFriendsAndBlacklist(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserFriendsAndBlacklist, error)
+	PutMoveFriendIntoBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
+	PutMoveFriendOutFromBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
+	// methods for the user-group-chat and user-subscription relationship cache data
 	PutUserGroupChatsAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserGroupChatsDel(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetUserGroupChats(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserGroupChats, error)
 	PutUserSubscriptionsAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserSubscriptionsDel(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetUserSubscriptions(ctx context.Context, in *Id, opts ...grpc.CallOption) (*UserSubscriptions, error)
-	PutGroupChatUsersAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
+	PutGroupChatUsersAdd(ctx context.Context, in *XAndManagerAndUserId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutGroupChatUsersDel(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetGroupChatUsers(ctx context.Context, in *Id, opts ...grpc.CallOption) (*GroupChatUsers, error)
-	PutSubscriptionUsersAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
+	PutSubscriptionUsersAdd(ctx context.Context, in *XAndManagerAndUserId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutSubscriptionUsersDel(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	GetSubscriptionUsers(ctx context.Context, in *Id, opts ...grpc.CallOption) (*SubscriptionUsers, error)
-	PutMoveFriendIntoBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
-	PutMoveFriendOutFromBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserJoinGroupChatPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserQuitGroupChatPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
 	PutUserFollowSubscriptionPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error)
@@ -1275,6 +1358,24 @@ func (c *mongoBindServiceClient) GetUserFriendsAndBlacklist(ctx context.Context,
 	return out, nil
 }
 
+func (c *mongoBindServiceClient) PutMoveFriendIntoBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
+	out := new(EmptyResult)
+	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutMoveFriendIntoBlacklistPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *mongoBindServiceClient) PutMoveFriendOutFromBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
+	out := new(EmptyResult)
+	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutMoveFriendOutFromBlacklistPlus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mongoBindServiceClient) PutUserGroupChatsAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
 	out := new(EmptyResult)
 	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutUserGroupChatsAdd", in, out, opts...)
@@ -1329,7 +1430,7 @@ func (c *mongoBindServiceClient) GetUserSubscriptions(ctx context.Context, in *I
 	return out, nil
 }
 
-func (c *mongoBindServiceClient) PutGroupChatUsersAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
+func (c *mongoBindServiceClient) PutGroupChatUsersAdd(ctx context.Context, in *XAndManagerAndUserId, opts ...grpc.CallOption) (*EmptyResult, error) {
 	out := new(EmptyResult)
 	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutGroupChatUsersAdd", in, out, opts...)
 	if err != nil {
@@ -1356,7 +1457,7 @@ func (c *mongoBindServiceClient) GetGroupChatUsers(ctx context.Context, in *Id, 
 	return out, nil
 }
 
-func (c *mongoBindServiceClient) PutSubscriptionUsersAdd(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
+func (c *mongoBindServiceClient) PutSubscriptionUsersAdd(ctx context.Context, in *XAndManagerAndUserId, opts ...grpc.CallOption) (*EmptyResult, error) {
 	out := new(EmptyResult)
 	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutSubscriptionUsersAdd", in, out, opts...)
 	if err != nil {
@@ -1377,24 +1478,6 @@ func (c *mongoBindServiceClient) PutSubscriptionUsersDel(ctx context.Context, in
 func (c *mongoBindServiceClient) GetSubscriptionUsers(ctx context.Context, in *Id, opts ...grpc.CallOption) (*SubscriptionUsers, error) {
 	out := new(SubscriptionUsers)
 	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/GetSubscriptionUsers", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mongoBindServiceClient) PutMoveFriendIntoBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
-	out := new(EmptyResult)
-	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutMoveFriendIntoBlacklistPlus", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mongoBindServiceClient) PutMoveFriendOutFromBlacklistPlus(ctx context.Context, in *DoubleId, opts ...grpc.CallOption) (*EmptyResult, error) {
-	out := new(EmptyResult)
-	err := c.cc.Invoke(ctx, "/mongoPb.MongoBindService/PutMoveFriendOutFromBlacklistPlus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1439,39 +1522,45 @@ func (c *mongoBindServiceClient) PutUserUnFollowSubscriptionPlus(ctx context.Con
 
 // MongoBindServiceServer is the server API for MongoBindService service.
 type MongoBindServiceServer interface {
+	// methods for delay messages
 	PutSaveDelayMessage(context.Context, *IdAndMessage) (*EmptyResult, error)
 	GetDelayMessage(context.Context, *Id) (*DelayMessage, error)
+	// methods for user chat history
 	PutSaveUserChatHistory(context.Context, *JoinIdAndMessage) (*EmptyResult, error)
 	GetAllUserChatHistory(context.Context, *JoinId) (*UserChatHistory, error)
 	GetUserChatHistoryByDate(context.Context, *JoinIdAndDate) (*UserChatHistory, error)
 	GetUserChatHistoryByDateRange(context.Context, *JoinIdAndDateRange) (*UserChatHistory, error)
+	// methods for group chat history
 	PutSaveGroupChatHistory(context.Context, *IdAndMessage) (*EmptyResult, error)
 	GetAllGroupChatHistory(context.Context, *Id) (*GroupChatHistory, error)
 	GetGroupChatHistoryByDate(context.Context, *IdAndDate) (*GroupChatHistory, error)
 	GetGroupChatHistoryByDateRange(context.Context, *IdAndDateRange) (*GroupChatHistory, error)
+	// methods for subscription messages history
 	PutSaveSubscriptionHistory(context.Context, *IdAndMessage) (*EmptyResult, error)
 	GetAllSubscriptionHistory(context.Context, *Id) (*SubscriptionHistory, error)
 	GetSubscriptionHistoryByDate(context.Context, *IdAndDate) (*SubscriptionHistory, error)
 	GetSubscriptionHistoryByDateRange(context.Context, *IdAndDateRange) (*SubscriptionHistory, error)
+	// methods for user's friends, blacklist cache data
 	PutUserFriendsAdd(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserFriendsDel(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserBlacklistAdd(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserBlacklistDel(context.Context, *DoubleId) (*EmptyResult, error)
 	GetUserFriendsAndBlacklist(context.Context, *Id) (*UserFriendsAndBlacklist, error)
+	PutMoveFriendIntoBlacklistPlus(context.Context, *DoubleId) (*EmptyResult, error)
+	PutMoveFriendOutFromBlacklistPlus(context.Context, *DoubleId) (*EmptyResult, error)
+	// methods for the user-group-chat and user-subscription relationship cache data
 	PutUserGroupChatsAdd(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserGroupChatsDel(context.Context, *DoubleId) (*EmptyResult, error)
 	GetUserGroupChats(context.Context, *Id) (*UserGroupChats, error)
 	PutUserSubscriptionsAdd(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserSubscriptionsDel(context.Context, *DoubleId) (*EmptyResult, error)
 	GetUserSubscriptions(context.Context, *Id) (*UserSubscriptions, error)
-	PutGroupChatUsersAdd(context.Context, *DoubleId) (*EmptyResult, error)
+	PutGroupChatUsersAdd(context.Context, *XAndManagerAndUserId) (*EmptyResult, error)
 	PutGroupChatUsersDel(context.Context, *DoubleId) (*EmptyResult, error)
 	GetGroupChatUsers(context.Context, *Id) (*GroupChatUsers, error)
-	PutSubscriptionUsersAdd(context.Context, *DoubleId) (*EmptyResult, error)
+	PutSubscriptionUsersAdd(context.Context, *XAndManagerAndUserId) (*EmptyResult, error)
 	PutSubscriptionUsersDel(context.Context, *DoubleId) (*EmptyResult, error)
 	GetSubscriptionUsers(context.Context, *Id) (*SubscriptionUsers, error)
-	PutMoveFriendIntoBlacklistPlus(context.Context, *DoubleId) (*EmptyResult, error)
-	PutMoveFriendOutFromBlacklistPlus(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserJoinGroupChatPlus(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserQuitGroupChatPlus(context.Context, *DoubleId) (*EmptyResult, error)
 	PutUserFollowSubscriptionPlus(context.Context, *DoubleId) (*EmptyResult, error)
@@ -1539,6 +1628,12 @@ func (*UnimplementedMongoBindServiceServer) PutUserBlacklistDel(ctx context.Cont
 func (*UnimplementedMongoBindServiceServer) GetUserFriendsAndBlacklist(ctx context.Context, req *Id) (*UserFriendsAndBlacklist, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserFriendsAndBlacklist not implemented")
 }
+func (*UnimplementedMongoBindServiceServer) PutMoveFriendIntoBlacklistPlus(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutMoveFriendIntoBlacklistPlus not implemented")
+}
+func (*UnimplementedMongoBindServiceServer) PutMoveFriendOutFromBlacklistPlus(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutMoveFriendOutFromBlacklistPlus not implemented")
+}
 func (*UnimplementedMongoBindServiceServer) PutUserGroupChatsAdd(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutUserGroupChatsAdd not implemented")
 }
@@ -1557,7 +1652,7 @@ func (*UnimplementedMongoBindServiceServer) PutUserSubscriptionsDel(ctx context.
 func (*UnimplementedMongoBindServiceServer) GetUserSubscriptions(ctx context.Context, req *Id) (*UserSubscriptions, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserSubscriptions not implemented")
 }
-func (*UnimplementedMongoBindServiceServer) PutGroupChatUsersAdd(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
+func (*UnimplementedMongoBindServiceServer) PutGroupChatUsersAdd(ctx context.Context, req *XAndManagerAndUserId) (*EmptyResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutGroupChatUsersAdd not implemented")
 }
 func (*UnimplementedMongoBindServiceServer) PutGroupChatUsersDel(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
@@ -1566,7 +1661,7 @@ func (*UnimplementedMongoBindServiceServer) PutGroupChatUsersDel(ctx context.Con
 func (*UnimplementedMongoBindServiceServer) GetGroupChatUsers(ctx context.Context, req *Id) (*GroupChatUsers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGroupChatUsers not implemented")
 }
-func (*UnimplementedMongoBindServiceServer) PutSubscriptionUsersAdd(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
+func (*UnimplementedMongoBindServiceServer) PutSubscriptionUsersAdd(ctx context.Context, req *XAndManagerAndUserId) (*EmptyResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutSubscriptionUsersAdd not implemented")
 }
 func (*UnimplementedMongoBindServiceServer) PutSubscriptionUsersDel(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
@@ -1574,12 +1669,6 @@ func (*UnimplementedMongoBindServiceServer) PutSubscriptionUsersDel(ctx context.
 }
 func (*UnimplementedMongoBindServiceServer) GetSubscriptionUsers(ctx context.Context, req *Id) (*SubscriptionUsers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubscriptionUsers not implemented")
-}
-func (*UnimplementedMongoBindServiceServer) PutMoveFriendIntoBlacklistPlus(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutMoveFriendIntoBlacklistPlus not implemented")
-}
-func (*UnimplementedMongoBindServiceServer) PutMoveFriendOutFromBlacklistPlus(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PutMoveFriendOutFromBlacklistPlus not implemented")
 }
 func (*UnimplementedMongoBindServiceServer) PutUserJoinGroupChatPlus(ctx context.Context, req *DoubleId) (*EmptyResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PutUserJoinGroupChatPlus not implemented")
@@ -1940,6 +2029,42 @@ func _MongoBindService_GetUserFriendsAndBlacklist_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MongoBindService_PutMoveFriendIntoBlacklistPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DoubleId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MongoBindServiceServer).PutMoveFriendIntoBlacklistPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mongoPb.MongoBindService/PutMoveFriendIntoBlacklistPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MongoBindServiceServer).PutMoveFriendIntoBlacklistPlus(ctx, req.(*DoubleId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MongoBindService_PutMoveFriendOutFromBlacklistPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DoubleId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MongoBindServiceServer).PutMoveFriendOutFromBlacklistPlus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mongoPb.MongoBindService/PutMoveFriendOutFromBlacklistPlus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MongoBindServiceServer).PutMoveFriendOutFromBlacklistPlus(ctx, req.(*DoubleId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MongoBindService_PutUserGroupChatsAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DoubleId)
 	if err := dec(in); err != nil {
@@ -2049,7 +2174,7 @@ func _MongoBindService_GetUserSubscriptions_Handler(srv interface{}, ctx context
 }
 
 func _MongoBindService_PutGroupChatUsersAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DoubleId)
+	in := new(XAndManagerAndUserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2061,7 +2186,7 @@ func _MongoBindService_PutGroupChatUsersAdd_Handler(srv interface{}, ctx context
 		FullMethod: "/mongoPb.MongoBindService/PutGroupChatUsersAdd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MongoBindServiceServer).PutGroupChatUsersAdd(ctx, req.(*DoubleId))
+		return srv.(MongoBindServiceServer).PutGroupChatUsersAdd(ctx, req.(*XAndManagerAndUserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2103,7 +2228,7 @@ func _MongoBindService_GetGroupChatUsers_Handler(srv interface{}, ctx context.Co
 }
 
 func _MongoBindService_PutSubscriptionUsersAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DoubleId)
+	in := new(XAndManagerAndUserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2115,7 +2240,7 @@ func _MongoBindService_PutSubscriptionUsersAdd_Handler(srv interface{}, ctx cont
 		FullMethod: "/mongoPb.MongoBindService/PutSubscriptionUsersAdd",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MongoBindServiceServer).PutSubscriptionUsersAdd(ctx, req.(*DoubleId))
+		return srv.(MongoBindServiceServer).PutSubscriptionUsersAdd(ctx, req.(*XAndManagerAndUserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2152,42 +2277,6 @@ func _MongoBindService_GetSubscriptionUsers_Handler(srv interface{}, ctx context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MongoBindServiceServer).GetSubscriptionUsers(ctx, req.(*Id))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MongoBindService_PutMoveFriendIntoBlacklistPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DoubleId)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MongoBindServiceServer).PutMoveFriendIntoBlacklistPlus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/mongoPb.MongoBindService/PutMoveFriendIntoBlacklistPlus",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MongoBindServiceServer).PutMoveFriendIntoBlacklistPlus(ctx, req.(*DoubleId))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MongoBindService_PutMoveFriendOutFromBlacklistPlus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DoubleId)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MongoBindServiceServer).PutMoveFriendOutFromBlacklistPlus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/mongoPb.MongoBindService/PutMoveFriendOutFromBlacklistPlus",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MongoBindServiceServer).PutMoveFriendOutFromBlacklistPlus(ctx, req.(*DoubleId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2345,6 +2434,14 @@ var _MongoBindService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _MongoBindService_GetUserFriendsAndBlacklist_Handler,
 		},
 		{
+			MethodName: "PutMoveFriendIntoBlacklistPlus",
+			Handler:    _MongoBindService_PutMoveFriendIntoBlacklistPlus_Handler,
+		},
+		{
+			MethodName: "PutMoveFriendOutFromBlacklistPlus",
+			Handler:    _MongoBindService_PutMoveFriendOutFromBlacklistPlus_Handler,
+		},
+		{
 			MethodName: "PutUserGroupChatsAdd",
 			Handler:    _MongoBindService_PutUserGroupChatsAdd_Handler,
 		},
@@ -2391,14 +2488,6 @@ var _MongoBindService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSubscriptionUsers",
 			Handler:    _MongoBindService_GetSubscriptionUsers_Handler,
-		},
-		{
-			MethodName: "PutMoveFriendIntoBlacklistPlus",
-			Handler:    _MongoBindService_PutMoveFriendIntoBlacklistPlus_Handler,
-		},
-		{
-			MethodName: "PutMoveFriendOutFromBlacklistPlus",
-			Handler:    _MongoBindService_PutMoveFriendOutFromBlacklistPlus_Handler,
 		},
 		{
 			MethodName: "PutUserJoinGroupChatPlus",

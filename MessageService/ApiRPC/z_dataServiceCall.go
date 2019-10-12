@@ -95,3 +95,27 @@ func SaveGroupChatHistory(groupId int64, message []byte) error {
 	_, err := GetMongoDateClient().PutSaveGroupChatHistory(getTimeOutCtx(3), param)
 	return err
 }
+
+func GetSubscriptionInfo(subsId int64) (managerId int64, fans []int64, err error) {
+	// todo test code used in separate development, need remove later
+	return 1, []int64{1, 2, 3, 4, 5}, nil
+
+	// code to actually use
+	param := &mongoPb.Id{Value: subsId}
+	data, err := GetMongoDateClient().GetSubscriptionUsers(getTimeOutCtx(3), param)
+	if nil != err {
+		return 0, nil, err
+	}
+	return data.ManagerId, data.Users, nil
+
+}
+
+func SaveSubscriptionMessageHistory(subsId int64, message []byte) error {
+	// todo test code used in separate development, need remove later
+	return nil
+
+	// code to actually use
+	param := &mongoPb.IdAndMessage{Id: subsId, Message: message}
+	_, err := GetMongoDateClient().PutSaveSubscriptionHistory(getTimeOutCtx(3), param)
+	return err
+}

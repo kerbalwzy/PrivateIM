@@ -13,8 +13,11 @@ const (
 
 	GroupChatNodeLifeTime                   = 60 * 60 * 24 * 3 // unit: sec
 	GroupChatNodeLowActivityCleanPercentage = 30               // 0-100 / 100 %
-	GroupChatNodeCleanTime                  = 2                // 0-23 h/d (every day)
+	GroupChatNodeCleanTime                  = 3                // 0-23 h/d (every day)
 
 	// when the count of group chat nodes is less then this value, would not do the clear up by activity count.
 	GroupChatNodeLowActivityCleanStartLimit = 1000
+
+	SubscriptionNodeLifeTime  = 60 * 60 * 23 // unit: sec
+	SubscriptionNodeCleanTime = 3            // 0-23 h/d (every day)
 )
