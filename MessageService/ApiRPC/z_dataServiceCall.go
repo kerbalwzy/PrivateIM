@@ -11,7 +11,7 @@ func SaveDelayMessage(userId int64, message []byte) error {
 
 	// code to actually use
 	param := &mongoPb.IdAndMessage{Id: userId, Message: message}
-	_, err := GetMongoDateClient().PutSaveDelayMessage(getTimeOutCtx(3), param)
+	_, err := GetMongoDataClient().PutSaveDelayMessage(getTimeOutCtx(3), param)
 	return err
 }
 
@@ -27,7 +27,7 @@ func GetDelayMessages(userId int64) ([][]byte, error) {
 
 	// code to actually use
 	param := &mongoPb.Id{Value: userId}
-	data, err := GetMongoDateClient().GetDelayMessage(getTimeOutCtx(3), param)
+	data, err := GetMongoDataClient().GetDelayMessage(getTimeOutCtx(3), param)
 	if nil != err {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func GetUserFriendIdList(userId int64) ([]int64, []int64, error) {
 
 	// code to actually use
 	param := &mongoPb.Id{Value: userId}
-	data, err := GetMongoDateClient().GetUserFriendsAndBlacklist(getTimeOutCtx(3), param)
+	data, err := GetMongoDataClient().GetUserFriendsAndBlacklist(getTimeOutCtx(3), param)
 	if nil != err {
 		log.Printf(
 			"[error] <GetUserFriendIdList> load friends and blacklist for user(%d) fail, detail: %s",
@@ -56,7 +56,7 @@ func GetGroupChatUsers(groupId int64) ([]int64, error) {
 
 	// code to actually use
 	param := &mongoPb.Id{Value: groupId}
-	data, err := GetMongoDateClient().GetGroupChatUsers(getTimeOutCtx(3), param)
+	data, err := GetMongoDataClient().GetGroupChatUsers(getTimeOutCtx(3), param)
 	if nil != err {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func SaveUserChatHistory(joinId string, message []byte) error {
 
 	// code to actually use
 	param := &mongoPb.JoinIdAndMessage{JoinId: joinId, Message: message}
-	_, err := GetMongoDateClient().PutSaveUserChatHistory(getTimeOutCtx(3), param)
+	_, err := GetMongoDataClient().PutSaveUserChatHistory(getTimeOutCtx(3), param)
 	return err
 }
 
@@ -79,7 +79,7 @@ func SaveGroupChatHistory(groupId int64, message []byte) error {
 	return nil
 
 	param := &mongoPb.IdAndMessage{Id: groupId, Message: message}
-	_, err := GetMongoDateClient().PutSaveGroupChatHistory(getTimeOutCtx(3), param)
+	_, err := GetMongoDataClient().PutSaveGroupChatHistory(getTimeOutCtx(3), param)
 	return err
 }
 
@@ -89,7 +89,7 @@ func GetSubscriptionInfo(subsId int64) (managerId int64, fans []int64, err error
 
 	// code to actually use
 	param := &mongoPb.Id{Value: subsId}
-	data, err := GetMongoDateClient().GetSubscriptionUsers(getTimeOutCtx(3), param)
+	data, err := GetMongoDataClient().GetSubscriptionUsers(getTimeOutCtx(3), param)
 	if nil != err {
 		return 0, nil, err
 	}
@@ -103,6 +103,6 @@ func SaveSubscriptionMessageHistory(subsId int64, message []byte) error {
 
 	// code to actually use
 	param := &mongoPb.IdAndMessage{Id: subsId, Message: message}
-	_, err := GetMongoDateClient().PutSaveSubscriptionHistory(getTimeOutCtx(3), param)
+	_, err := GetMongoDataClient().PutSaveSubscriptionHistory(getTimeOutCtx(3), param)
 	return err
 }

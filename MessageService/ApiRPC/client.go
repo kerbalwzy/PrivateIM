@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	mongoDateClient mongoPb.MongoBindServiceClient
+	mongoDataClient mongoPb.MongoBindServiceClient
 	userAuthClient  userAuthPb.UserAuthClient
 )
 
@@ -57,7 +57,7 @@ func init() {
 		log.Fatal(err.Error())
 	}
 
-	mongoDateClient = mongoPb.NewMongoBindServiceClient(conn2)
+	mongoDataClient = mongoPb.NewMongoBindServiceClient(conn2)
 }
 
 // Return a context instance with deadline
@@ -67,8 +67,8 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 }
 
 // Return the client for mongo data rpc sever. The type of client is pointer.
-func GetMongoDateClient() mongoPb.MongoBindServiceClient {
-	return mongoDateClient
+func GetMongoDataClient() mongoPb.MongoBindServiceClient {
+	return mongoDataClient
 }
 
 // Return the client for user aut rpc server.
