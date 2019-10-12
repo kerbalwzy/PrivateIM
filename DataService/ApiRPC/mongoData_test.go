@@ -335,6 +335,7 @@ func TestMongoData_GetGroupChatUsers(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	t.Logf("the group chat(%d)'s manager id= %d", data.Id, data.ManagerId)
 	t.Logf("the group chat(%d)'s users: %v", data.Id, data.Users)
 }
 
@@ -360,6 +361,7 @@ func TestMongoData_GetSubscriptionUsers(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	t.Logf("the subscription(%d)'s manager id= %d", data.Id, data.ManagerId)
 	t.Logf("the subscription(%d)'s users: %v", data.Id, data.Users)
 }
 

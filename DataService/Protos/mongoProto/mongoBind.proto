@@ -49,11 +49,13 @@ message UserSubscriptions {
 message GroupChatUsers {
     int64 id = 1;
     repeated int64 users = 2;
+    int64 manager_id = 3;
 }
 
 message SubscriptionUsers {
     int64 id = 1;
     repeated int64 users = 2;
+    int64 manager_id = 3;
 }
 
 message Id {

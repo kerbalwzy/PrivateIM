@@ -214,7 +214,7 @@ func (obj *MongoData) GetGroupChatUsers(ctx context.Context, param *mongoPb.Id) 
 	if nil != err {
 		return nil, err
 	}
-	return &mongoPb.GroupChatUsers{Id: data.GroupId, Users: data.Users}, nil
+	return &mongoPb.GroupChatUsers{Id: data.GroupId, Users: data.Users, ManagerId: data.ManagerId}, nil
 }
 
 func (obj *MongoData) PutSubscriptionUsersAdd(ctx context.Context, param *mongoPb.XAndManagerAndUserId) (*mongoPb.EmptyResult, error) {
@@ -230,7 +230,7 @@ func (obj *MongoData) GetSubscriptionUsers(ctx context.Context, param *mongoPb.I
 	if nil != err {
 		return nil, err
 	}
-	return &mongoPb.SubscriptionUsers{Id: data.SubsId, Users: data.Users}, nil
+	return &mongoPb.SubscriptionUsers{Id: data.SubsId, Users: data.Users, ManagerId: data.ManagerId}, nil
 }
 
 func (obj *MongoData) PutMoveFriendIntoBlacklistPlus(ctx context.Context, param *mongoPb.DoubleId) (*mongoPb.EmptyResult, error) {
