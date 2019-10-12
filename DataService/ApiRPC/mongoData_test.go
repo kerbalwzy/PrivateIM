@@ -322,7 +322,7 @@ func TestMongoData_PutUserSubscriptionsDel(t *testing.T) {
 // -----------------------------------------------------------
 
 func TestMongoData_PutGroupChatUsersAdd(t *testing.T) {
-	param := &mongoPb.DoubleId{MainId: testGId, OtherId: testUId3}
+	param := &mongoPb.XAndManagerAndUserId{Id: testGId, ManagerId: testUId1, UserId: testUId3}
 	_, err := tClient.PutGroupChatUsersAdd(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)
@@ -347,7 +347,7 @@ func TestMongoData_PutGroupChatUsersDel(t *testing.T) {
 }
 
 func TestMongoData_PutSubscriptionUsersAdd(t *testing.T) {
-	param := &mongoPb.DoubleId{MainId: testSubsId, OtherId: testUId3}
+	param := &mongoPb.XAndManagerAndUserId{Id: testSubsId, ManagerId: testUId1, UserId: testUId3}
 	_, err := tClient.PutSubscriptionUsersAdd(getTimeOutCtx(3), param)
 	if nil != err {
 		t.Fatal(err)

@@ -101,6 +101,12 @@ message DoubleId {
     int64 other_id = 2;
 }
 
+message XAndManagerAndUserId {
+    int64 id = 1;
+    int64 manager_id = 2;
+    int64 user_id = 3;
+}
+
 message EmptyResult {
 }
 
@@ -145,11 +151,11 @@ service MongoBindService {
     rpc PutUserSubscriptionsDel (DoubleId) returns (EmptyResult);
     rpc GetUserSubscriptions (Id) returns (UserSubscriptions);
 
-    rpc PutGroupChatUsersAdd (DoubleId) returns (EmptyResult);
+    rpc PutGroupChatUsersAdd (XAndManagerAndUserId) returns (EmptyResult);
     rpc PutGroupChatUsersDel (DoubleId) returns (EmptyResult);
     rpc GetGroupChatUsers (Id) returns (GroupChatUsers);
 
-    rpc PutSubscriptionUsersAdd (DoubleId) returns (EmptyResult);
+    rpc PutSubscriptionUsersAdd (XAndManagerAndUserId) returns (EmptyResult);
     rpc PutSubscriptionUsersDel (DoubleId) returns (EmptyResult);
     rpc GetSubscriptionUsers (Id) returns (SubscriptionUsers);
 

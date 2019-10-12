@@ -378,7 +378,7 @@ func TestUpdateUserSubscriptionsToDelOne(t *testing.T) {
 // ------------------------------------------------------------------------------------
 
 func TestUpdateGroupChatUserToAddOne(t *testing.T) {
-	err := UpdateGroupChatUserToAddOne(testGroupChatId, testUserId)
+	err := UpdateGroupChatUserToAddOne(testGroupChatId, testUserId2, testUserId)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -389,6 +389,7 @@ func TestFindGroupChatUsersById(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	t.Logf("group chat(%d)'s manager id= %d", data.GroupId, data.ManagerId)
 	t.Logf("group chat(%d)'s user id", data.GroupId)
 	for index, id := range data.Users {
 		t.Logf("%d >> %d", index, id)
@@ -405,7 +406,7 @@ func TestUpdateGroupChatUsersToDelOne(t *testing.T) {
 // ------------------------------------------------------------------------------------
 
 func TestUpdateSubscriptionUsersToAddOne(t *testing.T) {
-	err := UpdateSubscriptionUsersToAddOne(testSubsId, testUserId)
+	err := UpdateSubscriptionUsersToAddOne(testSubsId, testUserId2, testUserId)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -416,6 +417,7 @@ func TestFindSubscriptionUsersById(t *testing.T) {
 	if nil != err {
 		t.Fatal(err)
 	}
+	t.Logf("subscription(%d)'s manager id= %d", data.SubsId, data.ManagerId)
 	t.Logf("subscription(%d)'s user id", data.SubsId)
 	for index, id := range data.Users {
 		t.Logf("%d >> %d", index, id)

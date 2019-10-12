@@ -584,6 +584,7 @@ func FindUserSubscriptionsById(userId int64) (*DocUserSubscriptions, error) {
 /* group_chat_users document eg.:
 {
 	"_id": <the group chat id>,
+	"manager": <the user id>,
 	"users" : [
 		<the user id>,
 		<the user id>,
@@ -593,13 +594,18 @@ func FindUserSubscriptionsById(userId int64) (*DocUserSubscriptions, error) {
 */
 // information for the users which belong to the group chat
 type DocGroupChatUsers struct {
-	GroupId int64   `bson:"_id"`
-	Users   []int64 `bson:"users"`
+	GroupId   int64   `bson:"_id"`
+	ManagerId int64   `bson:"manager"`
+	Users     []int64 `bson:"users"`
 }
 
 // Update the 'users' array to add one user id.
-func UpdateGroupChatUserToAddOne(groupChatId, userId int64) error {
-	return updateIdArrayOfOneDocument(CollGroupChatUsers, groupChatId, userId, "users", "$addToSet")
+func UpdateGroupChatUserToAddOne(groupChatId, managerId, userId int64) error {
+	_, err := CollGroupChatUsers.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": groupChatId, "manager": managerId},
+		bson.M{"$addToSet": bson.M{"users": userId}},
+		upsertTrueOption)
+	return err
 }
 
 // Update the 'users' array to delete one user id.
@@ -618,6 +624,7 @@ func FindGroupChatUsersById(groupChatId int64) (*DocGroupChatUsers, error) {
 /* subscription_users document eg.:
 {
 	"_id": <the subscription id>,
+	"manager": <the user id>,
 	"users" : [
 		<the user id>,
 		<the user id>,
@@ -627,13 +634,18 @@ func FindGroupChatUsersById(groupChatId int64) (*DocGroupChatUsers, error) {
 */
 // information for the users which followed the subscription.
 type DocSubscriptionUsers struct {
-	SubsId int64   `bson:"_id"`
-	Users  []int64 `bson:"users"`
+	SubsId    int64   `bson:"_id"`
+	ManagerId int64   `bson:"manager"`
+	Users     []int64 `bson:"users"`
 }
 
 // Update the 'users' array to add one user id.
-func UpdateSubscriptionUsersToAddOne(subsId, userId int64) error {
-	return updateIdArrayOfOneDocument(CollSubscriptionUsers, subsId, userId, "users", "$addToSet")
+func UpdateSubscriptionUsersToAddOne(subsId, managerId, userId int64) error {
+	_, err := CollSubscriptionUsers.UpdateOne(getTimeOutCtx(3),
+		bson.M{"_id": subsId, "manager": managerId},
+		bson.M{"$addToSet": bson.M{"users": userId}},
+		upsertTrueOption)
+	return err
 }
 
 // Update the 'users' array to delete one user id.

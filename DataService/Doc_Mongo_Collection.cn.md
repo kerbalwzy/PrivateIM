@@ -2,6 +2,12 @@
 
 - #### Collections
 
+  ​	⚠️注意: 由于每个Doc的`_id`都使用了我们自定义的值, 并且为了保证MongoDB中的数据的读写并发安
+
+  全, 给每个集合都设置`_id`为唯一主键.
+
+  设置主键的方式: `db.collection_name.createIndex({"_id": 1},{unique: true})` [官方文档](<https://docs.mongodb.com/manual/core/index-unique/#index-type-unique>)
+
   | Name                                | Description                                                  |
   | ----------------------------------- | ------------------------------------------------------------ |
   | [coll_delay_message](#1)            | 延时消息; 用户因未上线待接收的消息, 用户上线接收后则从集合删除 |
@@ -187,12 +193,14 @@
   | Name          | BsonType   | GolangType | Description          |
   | ------------- | ---------- | ---------- | -------------------- |
   | _id           | NumberLong | int64      | 群聊ID               |
+  | manger        | NumberLong | int64      | 群主ID               |
   | users         | Array      | slice      | 群聊的用户成员ID列表 |
   | users-element | NumberLong | int64      | 用户ID               |
 
   ```
   {
       "_id": NumberLong(1234567890123458888),
+      “manager”: NumberLong(1234567890123456790),
       // 成员用户ID列表
       "users": [
           NumberLong(1234567890123456790),
@@ -208,12 +216,14 @@
   | Name          | BsonType   | GolangType | Description            |
   | ------------- | ---------- | ---------- | ---------------------- |
   | _id           | NumberLong | int64      | 订阅号ID               |
+  | manager       | NumberLong | int64      | 订阅号拥有者ID         |
   | users         | Array      | slice      | 订阅号的用户成员ID列表 |
   | users-element | NumberLong | int64      | 用户ID                 |
 
   ```
   {
       "_id": NumberLong(1234567890123457777),
+      “manager”: NumberLong(1234567890123456790),
       // 成员用户ID列表
       "users": [
           NumberLong(1234567890123456790),

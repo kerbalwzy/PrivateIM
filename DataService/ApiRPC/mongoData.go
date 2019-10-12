@@ -200,8 +200,8 @@ func (obj *MongoData) GetUserSubscriptions(ctx context.Context, param *mongoPb.I
 	return &mongoPb.UserSubscriptions{Id: data.UserId, Subscriptions: data.Subscriptions}, nil
 }
 
-func (obj *MongoData) PutGroupChatUsersAdd(ctx context.Context, param *mongoPb.DoubleId) (*mongoPb.EmptyResult, error) {
-	return &mongoPb.EmptyResult{}, mongoBind.UpdateGroupChatUserToAddOne(param.MainId, param.OtherId)
+func (obj *MongoData) PutGroupChatUsersAdd(ctx context.Context, param *mongoPb.XAndManagerAndUserId) (*mongoPb.EmptyResult, error) {
+	return &mongoPb.EmptyResult{}, mongoBind.UpdateGroupChatUserToAddOne(param.Id, param.ManagerId, param.UserId)
 
 }
 
@@ -217,8 +217,8 @@ func (obj *MongoData) GetGroupChatUsers(ctx context.Context, param *mongoPb.Id) 
 	return &mongoPb.GroupChatUsers{Id: data.GroupId, Users: data.Users}, nil
 }
 
-func (obj *MongoData) PutSubscriptionUsersAdd(ctx context.Context, param *mongoPb.DoubleId) (*mongoPb.EmptyResult, error) {
-	return &mongoPb.EmptyResult{}, mongoBind.UpdateSubscriptionUsersToAddOne(param.MainId, param.OtherId)
+func (obj *MongoData) PutSubscriptionUsersAdd(ctx context.Context, param *mongoPb.XAndManagerAndUserId) (*mongoPb.EmptyResult, error) {
+	return &mongoPb.EmptyResult{}, mongoBind.UpdateSubscriptionUsersToAddOne(param.Id, param.ManagerId, param.UserId)
 }
 
 func (obj *MongoData) PutSubscriptionUsersDel(ctx context.Context, param *mongoPb.DoubleId) (*mongoPb.EmptyResult, error) {
