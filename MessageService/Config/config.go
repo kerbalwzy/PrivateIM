@@ -1,9 +1,10 @@
 package Config
 
 const (
-	MessageServerAddress      = "0.0.0.0:8080"
-	MongoDataRPCServerAddress = "0.0.0.0:23332"
-	UserAuthRPCServerAddress  = "0.0.0.0:11111"
+	MessageServerAddress        = "0.0.0.0:8080"
+	MongoDataRPCServerAddress   = "0.0.0.0:23332"
+	UserAuthRPCServerAddress    = "0.0.0.0:11111"
+	MsgTransferRPCServerAddress = "0.0.0.0:12222"
 
 	PrivateIMRootCAPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/ca.pem"
 	PrivateIMServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.pem"
@@ -20,4 +21,6 @@ const (
 
 	SubscriptionNodeLifeTime  = 60 * 60 * 23 // unit: sec
 	SubscriptionNodeCleanTime = 3            // 0-23 h/d (every day)
+
+	CleanWorkRPCCallSecretKey = "1234!@#$%^&*nsb#$%^78qwe"
 )

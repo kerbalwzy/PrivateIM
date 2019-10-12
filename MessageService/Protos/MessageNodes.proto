@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package messageNodesPb;
+
+// protoc -I ./ ./MessageNodes.proto --go_out=plugins=grpc:./
+
+message Result {
+    int32 code = 1;
+    string error_msg = 2;
+}
+
+message DoubleId {
+    int64 main_id = 1;
+    int64 other_id = 2;
+}
+
+message CleanNodePoolAuth {
+    string secret_key = 1;
+}
+
+service NodesData {
+    rpc UserNodeFriendsAdd (DoubleId) returns (Result);
+    rpc UserNodeFriendsDel (DoubleId) returns (Result);
+    rpc UserNodeBlacklistAdd (DoubleId) returns (Result);
+    rpc UserNodeBlacklistDel (DoubleId) returns (Result);
+    rpc UserNodeMoveFriendIntoBlacklist (DoubleId) returns (Result);
+    rpc UserNodeMoveFriendOutFromBlacklist (DoubleId) returns (Result);
+
+    rpc GroupChatNodeUserAdd (DoubleId) returns (Result);
+    rpc GroupChatNodeUserDel (DoubleId) returns (Result);
+
+    rpc SubsNodeFansAdd (DoubleId) returns (Result);
+    rpc SubsNodeFansDel (DoubleId) returns (Result);
+
+    rpc GroupChatNodesPoolCleanByLifeTime (CleanNodePoolAuth) returns (Result);
+    rpc GroupChatNodesPoolCleanByActivity (CleanNodePoolAuth) returns (Result);
+
+    rpc SubsNodesPoolCleanByLifeTime (CleanNodePoolAuth) returns (Result);
+
+
+}
+
+

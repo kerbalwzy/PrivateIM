@@ -9,9 +9,12 @@ import (
 	"google.golang.org/grpc/credentials"
 	"io/ioutil"
 	"log"
+	"net"
 	"time"
 
 	conf "../Config"
+
+	"../Protos"
 )
 
 var CtxCanceledErr = errors.New("the client canceled or connection time out")
@@ -87,30 +90,31 @@ func getUnaryInterceptorOption() grpc.ServerOption {
 	return grpc.UnaryInterceptor(interceptor)
 }
 
-//func StartMsgTransferRPCServer() {
-//	// Start the gRPC server for MySQL data operation.
-//
-//	// using CA TLS authentication
-//	caOption := getCAOption()
-//	log.Printf("[info] StartMsgTransferRPCServer: load CA TLS authentcation files success")
-//
-//	// get an interceptor server option for Unary-Unary handler
-//	unaryOption := getUnaryInterceptorOption()
-//	log.Printf("[info] StartMsgTransferRPCServer: load unary method interceptor function success")
-//
-//	server := grpc.NewServer(unaryOption, caOption)
-//
-//	mongoPb.RegisterMongoBindServiceServer(server, &MongoData{})
-//
-//	listener, err := net.Listen("tcp", conf.MongoDataRPCServerAddress)
-//	if nil != err {
-//		log.Fatalf("[error] StartMsgTransferRPCServer: %s", err.Error())
-//
-//	}
-//	log.Printf("[info] StartMsgTransferRPCServer: start the server with tcp address %s", conf.MongoDataRPCServerAddress)
-//	err = server.Serve(listener)
-//	if nil != err {
-//		log.Fatalf("[error] StartMsgTransferRPCServer: %s", err.Error())
-//	}
-//
-//}
+// start the rpc server which for operating the data of node pool in message service
+func StartMsgTransferRPCServer() {
+	// Start the gRPC server for MySQL data operation.
+
+	// using CA TLS authentication
+	caOption := getCAOption()
+	log.Printf("[info] StartMsgTransferRPCServer: load CA TLS authentcation files success")
+
+	// get an interceptor server option for Unary-Unary handler
+	unaryOption := getUnaryInterceptorOption()
+	log.Printf("[info] StartMsgTransferRPCServer: load unary method interceptor function success")
+
+	server := grpc.NewServer(unaryOption, caOption)
+
+	messageNodesPb.RegisterNodesDataServer(server, &NodesData{})
+
+	listener, err := net.Listen("tcp", conf.MsgTransferRPCServerAddress)
+	if nil != err {
+		log.Fatalf("[error] StartMsgTransferRPCServer: %s", err.Error())
+
+	}
+	log.Printf("[info] StartMsgTransferRPCServer: start the server with tcp address %s", conf.MsgTransferRPCServerAddress)
+	err = server.Serve(listener)
+	if nil != err {
+		log.Fatalf("[error] StartMsgTransferRPCServer: %s", err.Error())
+	}
+
+}
