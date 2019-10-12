@@ -2,11 +2,12 @@ package Config
 
 const (
 	// gRPC config
-	MessagePRCServerAddress = "0.0.0.0:8080"
-	MySQLDataRPCServerAddress = "0.0.0.0:23331"
-	UserAuthRPCServerAddress  = "0.0.0.0:11111"
+	MySQLDataRPCServerAddress   = "0.0.0.0:23331"
+	MongoDataRPCServerAddress   = "0.0.0.0:23332"
+	UserAuthRPCServerAddress    = "0.0.0.0:11111"
+	MsgTransferRPCServerAddress = "0.0.0.0:12222"
 
-	PrivateIMRootCAPem       = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/ca.pem"
+	PrivateIMRootCAPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/ca.pem"
 	PrivateIMServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.pem"
 	PrivateIMServerKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.key"
 	PrivateIMClientPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/client/client.pem"

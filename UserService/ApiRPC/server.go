@@ -17,7 +17,6 @@ import (
 	"../Protos"
 )
 
-
 var CtxCanceledErr = errors.New("the client canceled or connection time out")
 
 // out the log information for every handler
@@ -91,8 +90,7 @@ func getUnaryInterceptorOption() grpc.ServerOption {
 	return grpc.UnaryInterceptor(interceptor)
 }
 
-
-
+// start the user auth gRPC server goroutine
 func StartUserAuthRPCServer() {
 	// Start the gRPC server for MySQL data operation.
 
