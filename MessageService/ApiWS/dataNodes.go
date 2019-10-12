@@ -2,7 +2,6 @@ package ApiWS
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"math"
 	"sort"
@@ -13,6 +12,8 @@ import (
 
 	conf "../Config"
 )
+
+// ---------------------------------------------------------------------------------
 
 // The node of the user's clients for receiving and sending messages.
 type UserNode struct {
@@ -166,10 +167,10 @@ func (obj *UserNodePool) Add(node *UserNode) {
 	obj.wt.Unlock()
 
 	// todo test code used in separate development, need remove later
-	fmt.Printf("client node list: \n")
-	for k, v := range obj.clients {
-		fmt.Printf("\t%d, %p\n", k, v)
-	}
+	//fmt.Printf("client node list: \n")
+	//for k, v := range obj.clients {
+	//	fmt.Printf("\t%d, %p\n", k, v)
+	//}
 }
 
 // Delete a client node from UserNodesPool, and close the connection of the node.
@@ -179,10 +180,10 @@ func (obj *UserNodePool) Del(node *UserNode) {
 	obj.wt.Unlock()
 
 	// todo test code used in separate development, need remove later
-	fmt.Printf("client node list: \n")
-	for k, v := range obj.clients {
-		fmt.Printf("\t%d, %p\n", k, v)
-	}
+	//fmt.Printf("client node list: \n")
+	//for k, v := range obj.clients {
+	//	fmt.Printf("\t%d, %p\n", k, v)
+	//}
 }
 
 // Delete all the client node.
@@ -235,22 +236,22 @@ var (
 
 // Initial a new group chat node.
 func NewGroupChatNode(id int64) (*GroupChatNode, error) {
+	users, err := ApiRPC.GetGroupChatUsers(id)
+	if nil != err {
+		log.Printf("[error] <NewGroupChatNode> load users for group chat(%d) fail, detail: %s", id, err)
+		return nil, ErrGroupChatFindFail
+	}
+
 	tempGroupChat := new(GroupChatNode)
 	tempGroupChat.Id = id
 	tempGroupChat.initTime = time.Now()
 	tempGroupChat.Users = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
 
-	userIdSlice, err := ApiRPC.GetGroupChatUsers(id)
-
 	// load the id of users whom haven joined the group chat
-	if nil == err {
-		for _, id := range userIdSlice {
-			tempGroupChat.Users.data[id] = struct{}{} // don't need lock here
-		}
-	} else {
-		log.Printf("[error] <NewGroupChatNode> load users for group chat(%d) fail, detail: %s", id, err)
-		return nil, ErrGroupChatFindFail
+	for _, id := range users {
+		tempGroupChat.Users.data[id] = struct{}{} // don't need lock here
 	}
+
 	log.Printf("[info] <NewGroupChatNode> new a group chat node, the id= %d", id)
 	return tempGroupChat, nil
 }
@@ -308,6 +309,7 @@ func (obj *GroupChatNodePool) CleanGroupChatLoop() {
 			obj.CleanByLifeTime()
 			obj.CleanByActiveCount()
 		}
+
 	}
 }
 
@@ -369,4 +371,115 @@ func (obj *GroupChatNodePool) CleanByActiveCount() {
 	log.Printf("[info] <GroupChatNodePool.CleanByActiveCount> clear up the group chat node, count= %d",
 		int(cleanCount))
 
+}
+
+// ---------------------------------------------------------------------------------
+
+// The subscription node, saving some information for the subscription
+type SubsNode struct {
+	Id        int64      // the subscription id
+	ManagerId int64      // the id of the manager user
+	Fans      Int64IdSet // the id of users whom followed the subscription
+	initTime  time.Time  // the node initial time
+}
+
+var (
+	ErrSubscriptionFindFail = errors.New("find the target subscription fail, maybe not existed")
+	ErrNotSubsManager       = errors.New("you are not the subscription's manager")
+)
+
+// New a subscription node
+func NewSubsNode(senderId, subsId int64) (*SubsNode, error) {
+	managerId, fans, err := ApiRPC.GetSubscriptionInfo(subsId)
+	if nil != err {
+		log.Printf("[error] <NewSubsNode> find subscription(%d) information fail: %s", subsId, err.Error())
+		return nil, ErrSubscriptionFindFail
+	}
+	if managerId != senderId {
+		return nil, ErrNotSubsManager
+	}
+
+	tempNode := new(SubsNode)
+	tempNode.Id = subsId
+	tempNode.ManagerId = managerId
+	tempNode.initTime = time.Now()
+	tempNode.Fans = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
+
+	// load the id of the fans
+	for _, id := range fans {
+		tempNode.Fans.data[id] = struct{}{} // don't need lock here
+	}
+
+	log.Printf("[info] <NewSubsNode> new a subscription node, the id= %d", subsId)
+	return tempNode, nil
+}
+
+// The group chat node pool. Save and manage the group chat nodes
+type SubscriptionNodePool struct {
+	subscriptions map[int64]*SubsNode
+	wt            sync.RWMutex
+}
+
+// Get a group chat node from the SubscriptionPool
+func (obj *SubscriptionNodePool) Get(id int64) (*SubsNode, bool) {
+	obj.wt.RLock()
+	subsNode, ok := obj.subscriptions[id]
+	obj.wt.RUnlock()
+	return subsNode, ok
+}
+
+// Add a group chat node into the SubscriptionPool
+func (obj *SubscriptionNodePool) Add(subsNode *SubsNode) {
+	obj.wt.Lock()
+	obj.subscriptions[subsNode.Id] = subsNode
+	obj.wt.Unlock()
+
+}
+
+// Delete a group chat node from the SubscriptionPool
+func (obj *SubscriptionNodePool) Del(id int64) {
+	obj.wt.Lock()
+	delete(obj.subscriptions, id)
+	obj.wt.Unlock()
+}
+
+func (obj *SubscriptionNodePool) CleanByLifeTimeLoop() {
+	log.Printf("[info] <SubscriptionNodePool.CleanByLifeTimeLoop> start the subscription pool clear up goroutine")
+	for {
+
+		// get next cleaning up execute time
+		todayDateStr := time.Now().Format("2006-01-02")
+		todayZeroH, _ := time.ParseInLocation("2006-01-02", todayDateStr, time.Local)
+		tomorrowZeroH := todayZeroH.AddDate(0, 0, 1)
+		nextCleanTime := tomorrowZeroH.Add(conf.SubscriptionNodeCleanTime * time.Hour)
+
+		select {
+		// waiting for cleaning up, would blocking here
+		case <-time.After(nextCleanTime.Sub(time.Now())):
+			targets := make([]int64, 0)
+			timeNow := time.Now()
+			count := 0
+
+			obj.wt.Lock()
+			// find all the subscription nodes whose life time exceeds the limit
+			for id, subsNode := range obj.subscriptions {
+				lifeTime := timeNow.Sub(subsNode.initTime)
+				if lifeTime.Seconds() > conf.SubscriptionNodeLifeTime {
+					targets = append(targets, id)
+				}
+			}
+
+			// clear up the nodes
+			for _, id := range targets {
+				delete(obj.subscriptions, id)
+				count++
+			}
+			obj.wt.Unlock()
+
+			log.Printf("[info] <SubscriptionNodePool.CleanByLifeTimeLoop> clear up the subscription node,"+
+				" count= %d", count)
+
+		}
+
+	}
 }

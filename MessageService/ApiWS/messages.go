@@ -38,7 +38,7 @@ type BasicMessage struct {
 	TypeId       int   `json:"type_id"`                 // the type number of message
 	SenderId     int64 `json:"sender_id"`               // who send this message, the sender id
 	ReceiverId   int64 `json:"receiver_id"`             // who will recv this message, the receiver id
-	CreateTime   int64 `json:"create_time,omitempty"`   // Added by the message center, timestamp, unit:sec.
+	CreateTime   int64 `json:"create_time,omitempty"`   // set by the message center, timestamp, unit:sec.
 	DeliveryTime int64 `json:"delivery_time,omitempty"` // the time for message want be sent, use for timing message
 }
 
@@ -73,7 +73,7 @@ type ChatMessage struct {
 type SubscriptionMessage struct {
 	BasicMessage
 	Title       string `json:"title"`                  // the title
-	Abstract    string `json:"abstract,omitempty"`     // the brief introduction of this message
+	Abstract    string `json:"abstract"`               // the brief introduction of this message
 	PreviewPic  string `json:"preview_pic,omitempty"`  // the preview picture url
 	ResourceUrl string `json:"resource_url,omitempty"` // resource URL
 }
@@ -91,7 +91,7 @@ var (
 	ErrUnSupportMsgTypeId = errors.New("the value of 'type_id' is not support")
 )
 
-// get the value of 'type_id' from the json string message
+// Get the value of 'type_id' from the json string message
 func GetRawJsonMessageTypeId(message []byte) (int, error) {
 	temp := make(map[string]interface{})
 	err := json.Unmarshal(message, &temp)
@@ -128,14 +128,18 @@ func checkUserChatMessageData(senderId int64, chatMessage *ChatMessage) (int, er
 		if chatMessage.Content == "" {
 			return 400, ErrTextContentEmpty
 		}
-	case ImageContent, VoiceContent, VideoContent:
+	case ImageContent, VoiceContent:
 		if chatMessage.PreviewPic == "" {
 			return 400, ErrPreviewPicEmpty
 		}
-
 		if chatMessage.ResourceUrl == "" {
 			return 400, ErrResourceURLEmpty
 		}
+	case VideoContent:
+		if chatMessage.ResourceUrl == "" {
+			return 400, ErrResourceURLEmpty
+		}
+
 	default:
 		return 400, ErrUnSupportContentType
 	}
@@ -176,6 +180,26 @@ func checkWhetherReceiverShouldReceive(ok bool, receiver *UserNode, senderId, re
 		if isNotFriend {
 			return 403, ErrFriendshipNotExisted
 		}
+	}
+	return 200, nil
+}
+
+var (
+	ErrTitleEmpty    = errors.New("the title can not be empty")
+	ErrAbstractEmpty = errors.New("the abstract can not be empty")
+)
+
+// Check the subscription message data legality
+// Requiring the Title and Abstract not be empty
+func checkSubscriptionMessageData(senderId int64, subsMessage *SubscriptionMessage) (int, error) {
+	if subsMessage.SenderId != senderId {
+		return 400, ErrUserDisguise
+	}
+	if subsMessage.Title == "" {
+		return 400, ErrTitleEmpty
+	}
+	if subsMessage.Abstract == "" {
+		return 400, ErrAbstractEmpty
 	}
 	return 200, nil
 }
