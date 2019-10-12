@@ -443,6 +443,8 @@ func (obj *SubscriptionNodePool) Del(id int64) {
 	obj.wt.Unlock()
 }
 
+// Clear up nodes whose lifetime exceeds the limit.
+// Working on at NN:00:00 every day by config.
 func (obj *SubscriptionNodePool) CleanByLifeTimeLoop() {
 	log.Printf("[info] <SubscriptionNodePool.CleanByLifeTimeLoop> start the subscription pool clear up goroutine")
 	for {
@@ -456,30 +458,33 @@ func (obj *SubscriptionNodePool) CleanByLifeTimeLoop() {
 		select {
 		// waiting for cleaning up, would blocking here
 		case <-time.After(nextCleanTime.Sub(time.Now())):
-			targets := make([]int64, 0)
-			timeNow := time.Now()
-			count := 0
-
-			obj.wt.Lock()
-			// find all the subscription nodes whose life time exceeds the limit
-			for id, subsNode := range obj.subscriptions {
-				lifeTime := timeNow.Sub(subsNode.initTime)
-				if lifeTime.Seconds() > conf.SubscriptionNodeLifeTime {
-					targets = append(targets, id)
-				}
-			}
-
-			// clear up the nodes
-			for _, id := range targets {
-				delete(obj.subscriptions, id)
-				count++
-			}
-			obj.wt.Unlock()
-
-			log.Printf("[info] <SubscriptionNodePool.CleanByLifeTimeLoop> clear up the subscription node,"+
-				" count= %d", count)
-
+			obj.CleanByLifeTime()
 		}
-
 	}
+}
+
+// Clear up nodes whose lifetime exceeds the limit
+func (obj *SubscriptionNodePool) CleanByLifeTime() {
+	targets := make([]int64, 0)
+	timeNow := time.Now()
+	count := 0
+
+	obj.wt.Lock()
+	// find all the subscription nodes whose life time exceeds the limit
+	for id, subsNode := range obj.subscriptions {
+		lifeTime := timeNow.Sub(subsNode.initTime)
+		if lifeTime.Seconds() > conf.SubscriptionNodeLifeTime {
+			targets = append(targets, id)
+		}
+	}
+
+	// clear up the nodes
+	for _, id := range targets {
+		delete(obj.subscriptions, id)
+		count++
+	}
+	obj.wt.Unlock()
+
+	log.Printf("[info] <SubscriptionNodePool.CleanByLifeTimeLoop> clear up the subscription node,"+
+		" count= %d", count)
 }
