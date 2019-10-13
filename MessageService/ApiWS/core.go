@@ -48,9 +48,13 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 	// try to get the user's connect node from UserNodesPool. if have not, new one and add into the UserNodesPool.
 	theNode, ok := MSGNode.GlobalUsers.Get(userId)
 	if !ok {
-		friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
+		friends, err := ApiRPC.GetUserFriends(userId)
 		if nil != err {
-			log.Printf("[error] <BeginChat> get friends and blacklist for user(%d) fail, detail: %s", userId, err)
+			log.Printf("[error] <BeginChat> get friends for user(%d) fail, detail: %s", userId, err)
+		}
+		blacklist, err := ApiRPC.GetUserBlacklist(userId)
+		if nil != err {
+			log.Printf("[error] <BeginChat> get blacklist for user(%d) fail, detail: %s", userId, err)
 		}
 		theNode = MSGNode.NewUserNode(userId, friends, blacklist)
 		go theNode.ConnsWatchingLoop()

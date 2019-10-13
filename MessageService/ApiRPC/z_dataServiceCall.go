@@ -2,7 +2,7 @@ package ApiRPC
 
 import (
 	"../RpcClientPbs/mongoPb"
-	"log"
+	"../RpcClientPbs/mysqlPb"
 )
 
 func SaveDelayMessage(userId int64, message []byte) error {
@@ -34,20 +34,30 @@ func GetDelayMessages(userId int64) ([][]byte, error) {
 	return data.MessageList, nil
 }
 
-func GetUserFriendIdList(userId int64) ([]int64, []int64, error) {
+func GetUserFriends(userId int64) ([]int64, error) {
 	// todo test code used in separate development, need remove later
-	return []int64{userId - 1, userId + 1, userId + 2}, []int64{userId + 10}, nil
+	return []int64{userId - 1, userId + 1, userId + 2}, nil
 
 	// code to actually use
-	param := &mongoPb.Id{Value: userId}
-	data, err := GetMongoDataClient().GetUserFriendsAndBlacklist(getTimeOutCtx(3), param)
+	param := &mysqlPb.Id{Value: userId}
+	data, err := GetMySQLDataClient().GetEffectiveFriendsIdListByIdPlus(getTimeOutCtx(3), param)
 	if nil != err {
-		log.Printf(
-			"[error] <GetUserFriendIdList> load friends and blacklist for user(%d) fail, detail: %s",
-			userId, err.Error())
-		return nil, nil, err
+		return nil, err
 	}
-	return data.Friends, data.Blacklist, nil
+	return data.Data, nil
+}
+
+func GetUserBlacklist(userId int64) ([]int64, error) {
+	// todo test code used in separate development, need remove later
+	return []int64{userId + 5}, nil
+
+	// code to actually use
+	param := &mysqlPb.Id{Value: userId}
+	data, err := GetMySQLDataClient().GetBlacklistFriendsIdListByIdPlus(getTimeOutCtx(3), param)
+	if nil != err {
+		return nil, err
+	}
+	return data.Data, nil
 }
 
 func GetGroupChatUsers(groupId int64) ([]int64, error) {
@@ -55,12 +65,12 @@ func GetGroupChatUsers(groupId int64) ([]int64, error) {
 	return []int64{0, 1, 2, 3}, nil
 
 	// code to actually use
-	param := &mongoPb.Id{Value: groupId}
-	data, err := GetMongoDataClient().GetGroupChatUsers(getTimeOutCtx(3), param)
+	param := &mysqlPb.IdAndIsDelete{Id: groupId}
+	data, err := GetMySQLDataClient().GetUserIdListOfGroupChat(getTimeOutCtx(3), param)
 	if nil != err {
 		return nil, err
 	}
-	return data.Users, nil
+	return data.Data, nil
 
 }
 
@@ -88,12 +98,14 @@ func GetSubscriptionInfo(subsId int64) (managerId int64, fans []int64, err error
 	return 1, []int64{1, 2, 3, 4, 5}, nil
 
 	// code to actually use
-	param := &mongoPb.Id{Value: subsId}
-	data, err := GetMongoDataClient().GetSubscriptionUsers(getTimeOutCtx(3), param)
+	param := &mysqlPb.IdAndIsDelete{Id: subsId}
+	subscription, err := GetMySQLDataClient().GetOneSubscriptionById(getTimeOutCtx(3), param)
 	if nil != err {
 		return 0, nil, err
 	}
-	return data.ManagerId, data.Users, nil
+	data, err := GetMySQLDataClient().GetUserIdListOfSubscription(getTimeOutCtx(3), param)
+
+	return subscription.ManagerId, data.Data, nil
 
 }
 

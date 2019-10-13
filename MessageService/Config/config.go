@@ -2,6 +2,7 @@ package Config
 
 const (
 	MessageServerAddress        = "0.0.0.0:8080"
+	MySQLDataRPCServerAddress   = "0.0.0.0:23331"
 	MongoDataRPCServerAddress   = "0.0.0.0:23332"
 	UserAuthRPCServerAddress    = "0.0.0.0:11111"
 	MsgTransferRPCServerAddress = "0.0.0.0:12222"

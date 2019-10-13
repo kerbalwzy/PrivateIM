@@ -13,11 +13,13 @@ import (
 	conf "../Config"
 
 	"../RpcClientPbs/mongoPb"
+	"../RpcClientPbs/mysqlPb"
 	"../RpcClientPbs/userAuthPb"
 )
 
 var (
 	mongoDataClient mongoPb.MongoBindServiceClient
+	mysqlDataClient mysqlPb.MySQLBindServiceClient
 	userAuthClient  userAuthPb.UserAuthClient
 )
 
@@ -58,6 +60,12 @@ func init() {
 	}
 
 	mongoDataClient = mongoPb.NewMongoBindServiceClient(conn2)
+
+	conn3, err := grpc.Dial(conf.MySQLDataRPCServerAddress, grpc.WithTransportCredentials(c))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	mysqlDataClient = mysqlPb.NewMySQLBindServiceClient(conn3)
 }
 
 // Return a context instance with deadline
@@ -69,6 +77,11 @@ func getTimeOutCtx(expire time.Duration) context.Context {
 // Return the client for mongo data rpc sever. The type of client is pointer.
 func GetMongoDataClient() mongoPb.MongoBindServiceClient {
 	return mongoDataClient
+}
+
+// Return the client for mysql data rpc server. The type of client is pointer.
+func GetMySQLDataClient() mysqlPb.MySQLBindServiceClient {
+	return mysqlDataClient
 }
 
 // Return the client for user aut rpc server.

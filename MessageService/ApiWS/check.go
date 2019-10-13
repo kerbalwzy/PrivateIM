@@ -85,13 +85,16 @@ func checkWhetherReceiverShouldReceive(ok bool, receiver *MSGNode.UserNode, send
 		}
 	case false:
 		// when the receiver is offline
-		friends, blacklist, err := ApiRPC.GetUserFriendIdList(receiverId)
+		friends, err := ApiRPC.GetUserFriends(receiverId)
 		if nil != err {
 			return 404, ErrReceiverNotExisted
 		}
-		for _, id := range blacklist {
-			if id == senderId {
-				return 403, ErrReceiverRefuseRecv
+
+		if blacklist, _ := ApiRPC.GetUserBlacklist(receiverId); nil != blacklist {
+			for _, id := range blacklist {
+				if id == senderId {
+					return 403, ErrReceiverRefuseRecv
+				}
 			}
 		}
 		isNotFriend := true
