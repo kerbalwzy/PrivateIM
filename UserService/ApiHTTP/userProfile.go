@@ -1,37 +1,30 @@
 package ApiHTTP
 
+//
 import (
-	"../ApiRPC"
-	"../utils"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"gopkg.in/go-playground/validator.v8"
+	"log"
+
+	//"encoding/json"
+	//"errors"
+	//"fmt"
+	//"github.com/dgrijalva/jwt-go"
+	//"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin/binding"
+	//"gopkg.in/go-playground/validator.v8"
 	"io/ioutil"
-	"time"
+	//"time"
+
+	"../ApiRPC"
+	"../utils"
 
 	conf "../Config"
 )
 
-const (
-	JWTGetUserId = "user_id"
-)
-
-// Just used to validate a basic type value, not struct instance.
-// The main use for validate the query string params
-var (
-	simpleFieldValidate *validator.Validate
-)
-
-func init() {
-	config := &validator.Config{TagName: "validate"}
-	simpleFieldValidate = validator.New(config)
-
-}
-
+//
 // GetProfile HTTP API function
 func GetProfile(c *gin.Context) {
 	userId := c.MustGet(JWTGetUserId).(int64)
@@ -40,7 +33,7 @@ func GetProfile(c *gin.Context) {
 		c.JSON(404, gin.H{"error": err.Error()})
 		return
 	}
-	userBasic.Password = ""
+	HidePasswordAndCompleteAvatarAndQrCodeURL(userBasic)
 	c.JSON(200, userBasic)
 }
 
@@ -50,13 +43,19 @@ type TempProfile struct {
 	Gender int    `json:"gender" binding:"genderValidator"`
 }
 
+var (
+	ErrNoJsonBody         = errors.New("not have any JsonBodyParams")
+	ERrPutProfileNoName   = errors.New("`name` not exited in JsonBodyParams")
+	ERrPutProfileNoMobile = errors.New("`mobile` not exited in JsonBodyParams")
+	ERrPutProfileNoGender = errors.New("`gender` not exited in JsonBodyParams")
+)
 // Parse the JsonBodyParams to TempProfile
 func parseTempProfile(c *gin.Context) (*TempProfile, error) {
 	// Parse the JsonBodyParams to map
 	buf := make([]byte, 1024)
 	n, _ := c.Request.Body.Read(buf)
 	if n == 0 {
-		return nil, errors.New("not have any JsonBodyParams")
+		return nil, ErrNoJsonBody
 	}
 
 	tempDict := make(map[string]interface{})
@@ -64,15 +63,15 @@ func parseTempProfile(c *gin.Context) (*TempProfile, error) {
 	// Check the integrity of parameters
 	name, ok := tempDict["name"]
 	if !ok {
-		return nil, errors.New("`name` not exited in JsonBodyParams")
+		return nil, ERrPutProfileNoName
 	}
 	mobile, ok := tempDict["mobile"]
 	if !ok {
-		return nil, errors.New("`mobile` not exited in JsonBodyParams")
+		return nil, ERrPutProfileNoMobile
 	}
 	gender, ok := tempDict["gender"]
 	if !ok {
-		return nil, errors.New("`gender` not exited in JsonBodyParams")
+		return nil, ERrPutProfileNoGender
 	}
 
 	tempProfileP := &TempProfile{
@@ -90,36 +89,24 @@ func PutProfile(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	errs := binding.Validator.ValidateStruct(tempProfile)
-	if nil != errs {
-		c.JSON(400, gin.H{"errors": errs.Error()})
+	err = binding.Validator.ValidateStruct(tempProfile)
+	if nil != err {
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 	// Update user info
 	userId := c.MustGet(JWTGetUserId).(int64)
-	userBasic, err := ApiRPC.PutUserBasicById(
-		tempProfile.Name, tempProfile.Mobile, tempProfile.Gender, userId)
-	if nil != err {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	userBasic.Password = ""
-	c.JSON(200, userBasic)
-}
+	userBasic, err := ApiRPC.PutUserProfileById(
+		userId,
+		tempProfile.Name,
+		tempProfile.Mobile,
+		tempProfile.Gender)
 
-// GetAvatar HTTP API function
-func GetAvatar(c *gin.Context) {
-	userId := c.MustGet(JWTGetUserId).(int64)
-	data, err := ApiRPC.GetUserAvatarById(userId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	if data.Avatar == "" {
-		c.JSON(200, gin.H{"avatar_url": conf.DefaultAvatarUrl})
-		return
-	}
-	c.JSON(200, gin.H{"avatar_url": conf.PhotosUrlPrefix + data.Avatar + conf.PhotoSuffix})
+	c.JSON(200, userBasic)
 }
 
 // PutAvatar HTTP API function
@@ -169,54 +156,19 @@ func PutPassword(c *gin.Context) {
 		return
 	}
 	userId := c.MustGet(JWTGetUserId).(int64)
-	userBasic, err := ApiRPC.GetUserById(userId)
+	oldPasswordHash, err := ApiRPC.GetUserPasswordById(userId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	if userBasic.Password != utils.GetPasswordHash(temp.OldPassword, conf.PasswordHashSalt) {
+	if oldPasswordHash.Value != utils.GetPasswordHash(temp.OldPassword, conf.PasswordHashSalt) {
 		c.JSON(400, gin.H{"error": "old password error"})
 		return
 	}
-	_, err = ApiRPC.PutUserPasswordById(utils.GetPasswordHash(temp.Password, conf.PasswordHashSalt), userId)
+	err = ApiRPC.PutUserPasswordById(utils.GetPasswordHash(temp.Password, conf.PasswordHashSalt), userId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 	}
-	c.Status(200)
-}
-
-// GetResetPasswordEmail HTTP API function
-// Send a email which content with the `Auth-Token` to the user's email box for reset password.
-func GetResetPasswordEmail(c *gin.Context) {
-	tempEmail := c.Request.URL.Query().Get("email")
-	if tempEmail == "" {
-		c.JSON(400, gin.H{"error": "query string param: email is required"})
-		return
-	}
-	err := simpleFieldValidate.Field(tempEmail, "email,lte=100")
-	if nil != err {
-		c.JSON(400, gin.H{"error": "param: email validate failed"})
-		return
-	}
-	data, err := ApiRPC.GetUserByEmail(tempEmail)
-	if nil != err {
-		c.JSON(400, gin.H{"error": "email not registered"})
-		return
-	}
-	if ok := utils.CheckEmailSentIn3Minute(tempEmail); ok {
-		c.JSON(200, gin.H{"message": "the email was sent, please check your email box"})
-		return
-	}
-	// send the reset password authentication link email
-	claims := utils.CustomJWTClaims{
-		Id: data.Id,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: int64(time.Now().Unix() + conf.ResetPasswordTokenAliveTIme), // expire time
-			Issuer:    conf.AuthTokenIssuer,                                        //signal issuer
-		},
-	}
-	authToken, _ := utils.CreateJWTToken(claims, []byte(conf.AuthTokenSalt))
-	go utils.SendPasswordResetEmail(tempEmail, authToken)
 	c.Status(200)
 }
 
@@ -235,7 +187,7 @@ func ForgetPassword(c *gin.Context) {
 	}
 	userId := c.MustGet(JWTGetUserId).(int64)
 	passwordHash := utils.GetPasswordHash(temp.Password, conf.PasswordHashSalt)
-	_, err := ApiRPC.PutUserPasswordById(passwordHash, userId)
+	err := ApiRPC.PutUserPasswordById(passwordHash, userId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -244,39 +196,7 @@ func ForgetPassword(c *gin.Context) {
 
 }
 
-// GetQRCode HTT API function
-func GetQrCode(c *gin.Context) {
-	// try to get QrCode hash name from database. if existed, return.
-	userId := c.MustGet(JWTGetUserId).(int64)
-	userQrCode, err := ApiRPC.GetUserQRCodeById(userId)
-	if nil != err {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	if userQrCode.QrCode != "" {
-		c.JSON(200, gin.H{"qr_code": conf.PhotosUrlPrefix + userQrCode.QrCode + conf.PhotoSuffix})
-		return
-	}
-
-	// if the qr code hash name is not existed, create an new and save
-	queryStrParam := fmt.Sprintf("user=%d", userId)
-	content := QRCodeContent(queryStrParam)
-	data, _ := utils.CreatQRCodeBytes(content)
-	hashName := utils.BytesDataHash(data)
-	err = SaveQRCodeLocal(data, hashName)
-	if nil != err {
-		c.JSON(500, gin.H{"error": "create QRCode fail"})
-		return
-	}
-	userQrCode, err = ApiRPC.PutUserQRCodeById(hashName, userId)
-	if nil != err {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(200, gin.H{"qr_code_url": conf.PhotosUrlPrefix + userQrCode.QrCode + conf.PhotoSuffix})
-
-}
-
+//
 // ParseQrCode HTTP API function
 func ParseQrCode(c *gin.Context) {
 	// get file data
@@ -312,16 +232,13 @@ func UploadAvatarLocal(data []byte, hashName string) error {
 	return nil
 }
 
-// make the content for create a QRCode, infect the content is a query string param.
-func QRCodeContent(content string) string {
-	return conf.QRCodeBaseUrl + content
-}
-
 // save QRCode file to local
 func SaveQRCodeLocal(data []byte, hashName string) error {
+
 	savePath := conf.PhotoSaveFoldPath + hashName + conf.PhotoSuffix
 	err := ioutil.WriteFile(savePath, data, 0644)
 	if nil != err {
+		log.Printf("@@@@@@@%s", err.Error())
 		return err
 	}
 	return nil

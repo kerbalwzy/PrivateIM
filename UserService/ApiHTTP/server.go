@@ -10,6 +10,14 @@ import (
 	conf "../Config"
 )
 
+// the source code of the gin.StyleLogger is add by myself.
+// the source code explanation: https://github.com/gin-gonic/gin/pull/2096
+var GlobalGinStyleLogger *gin.StyleLogger
+
+func init() {
+	GlobalGinStyleLogger = gin.NewGinStyleLogger(nil, nil)
+}
+
 func StartHttpServer() {
 	r := gin.Default()
 	r.Static("/static", conf.StaticFoldPath)
@@ -22,19 +30,19 @@ func StartHttpServer() {
 	info := r.Group("/info", JWTAuthMiddleware())
 	info.GET("/profile", GetProfile)
 	info.PUT("/profile", PutProfile)
+	info.PUT("/avatar", PutAvatar)
+
 	info.PUT("/password", PutPassword)
 	info.POST("/password", ForgetPassword)
-	info.GET("/avatar", GetAvatar)
-	info.PUT("/avatar", PutAvatar)
-	info.GET("/qrcode", GetQrCode)
-	info.POST("/qrcode", ParseQrCode)
 
-	relate := r.Group("/relation", JWTAuthMiddleware())
-	relate.GET("/friend", GetFriend)
-	relate.POST("/friend", AddFriend)
-	relate.PUT("/friend", PutFriend)
-	relate.DELETE("/friend", DeleteFriend)
-	relate.GET("/friends", AllFriends)
+	info.POST("/qr_code", ParseQrCode)
+	//
+	//relate := r.Group("/relation", JWTAuthMiddleware())
+	//relate.GET("/friend", GetFriend)
+	//relate.POST("/friend", AddFriend)
+	//relate.PUT("/friend", PutFriend)
+	//relate.DELETE("/friend", DeleteFriend)
+	//relate.GET("/friends", AllFriends)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", NameValidator)
@@ -47,7 +55,7 @@ func StartHttpServer() {
 		log.Fatal("binding custom validators fail!!!")
 	}
 
-	err := r.Run(":8080")
+	err := r.Run(conf.UserCenterHttpServerAddress)
 	if nil != err {
 		log.Fatal(err)
 	}

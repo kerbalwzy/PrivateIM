@@ -7,6 +7,8 @@ import (
 	conf "../Config"
 )
 
+
+
 // JWTAuthMiddleware, check the jwt token string from request.
 func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
