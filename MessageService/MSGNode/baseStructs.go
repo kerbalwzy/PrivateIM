@@ -1,4 +1,4 @@
-package ApiWS
+package MSGNode
 
 import (
 	"github.com/gorilla/websocket"
@@ -30,6 +30,19 @@ func (obj *Int64IdSet) Exist(id int64) bool {
 	return ok
 }
 
+func (obj *Int64IdSet) Keys() []int64 {
+	obj.wt.RLock()
+	temp := make([]int64, len(obj.data))
+	index := 0
+	for K := range obj.data {
+		temp[index] = K
+		index++
+	}
+	obj.wt.Unlock()
+	return temp
+
+}
+
 // type for sort the group chat node by activeCount
 type ActiveSorter []*GroupChatNode
 
@@ -46,11 +59,19 @@ func (obj ActiveSorter) Swap(i, j int) {
 	obj[i], obj[j] = obj[j], obj[i]
 }
 
-// The connector for send and receive data with client really
+// The connector for send and receive data with client
 type Connector struct {
 	conn        *websocket.Conn
 	CloseSignal chan struct{}
 	DataChan    chan []byte
+}
+
+func (obj *Connector) WriteMessage(messageType int, data []byte) error {
+	return obj.conn.WriteMessage(messageType, data)
+}
+
+func (obj *Connector) ReadMessage() (messageType int, p []byte, err error) {
+	return obj.conn.ReadMessage()
 }
 
 // Create a new connector for the connection.

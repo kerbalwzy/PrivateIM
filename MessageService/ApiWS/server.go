@@ -4,13 +4,15 @@ import (
 	"log"
 	"net/http"
 
+	"../MSGNode"
+
 	conf "../Config"
 )
 
 func StartMessageWebSocketServer() {
 	go SaveDelayMessageLoop()
-	go GlobalGroupChats.CleanGroupChatLoop()
-	go GlobalSubscriptions.CleanByLifeTimeLoop()
+	go MSGNode.GlobalGroupChats.CleanGroupChatLoop()
+	go MSGNode.GlobalSubscriptions.CleanByLifeTimeLoop()
 
 	// start the message transfer WebSocket server
 	http.HandleFunc("/", BeginChat)

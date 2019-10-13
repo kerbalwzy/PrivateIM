@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"../ApiWS"
+	"../MSGNode"
 
 	conf "../Config"
 	msgNodesPb "../Protos"
@@ -15,7 +15,7 @@ type NodesData struct {
 
 func (obj *NodesData) UserNodeFriendsAdd(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalUsers.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(param.MainId); ok {
 		node.Friends.Add(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -23,7 +23,7 @@ func (obj *NodesData) UserNodeFriendsAdd(ctx context.Context, param *msgNodesPb.
 
 func (obj *NodesData) UserNodeFriendsDel(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalUsers.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(param.MainId); ok {
 		node.Friends.Del(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -31,7 +31,7 @@ func (obj *NodesData) UserNodeFriendsDel(ctx context.Context, param *msgNodesPb.
 
 func (obj *NodesData) UserNodeBlacklistAdd(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalUsers.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(param.MainId); ok {
 		node.BlackList.Add(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -39,7 +39,7 @@ func (obj *NodesData) UserNodeBlacklistAdd(ctx context.Context, param *msgNodesP
 
 func (obj *NodesData) UserNodeBlacklistDel(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalUsers.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(param.MainId); ok {
 		node.BlackList.Del(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -47,7 +47,7 @@ func (obj *NodesData) UserNodeBlacklistDel(ctx context.Context, param *msgNodesP
 
 func (obj *NodesData) UserNodeMoveFriendIntoBlacklist(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalUsers.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(param.MainId); ok {
 		node.Friends.Del(param.OtherId)
 		node.BlackList.Add(param.OtherId)
 	}
@@ -56,7 +56,7 @@ func (obj *NodesData) UserNodeMoveFriendIntoBlacklist(ctx context.Context, param
 
 func (obj *NodesData) UserNodeMoveFriendOutFromBlacklist(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalUsers.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(param.MainId); ok {
 		node.Friends.Add(param.OtherId)
 		node.BlackList.Del(param.OtherId)
 	}
@@ -65,7 +65,7 @@ func (obj *NodesData) UserNodeMoveFriendOutFromBlacklist(ctx context.Context, pa
 
 func (obj *NodesData) GroupChatNodeUserAdd(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalGroupChats.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalGroupChats.Get(param.MainId); ok {
 		node.Users.Add(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -73,7 +73,7 @@ func (obj *NodesData) GroupChatNodeUserAdd(ctx context.Context, param *msgNodesP
 
 func (obj *NodesData) GroupChatNodeUserDel(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalGroupChats.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalGroupChats.Get(param.MainId); ok {
 		node.Users.Del(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -81,7 +81,7 @@ func (obj *NodesData) GroupChatNodeUserDel(ctx context.Context, param *msgNodesP
 
 func (obj *NodesData) SubsNodeFansAdd(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalSubscriptions.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalSubscriptions.Get(param.MainId); ok {
 		node.Fans.Add(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -89,7 +89,7 @@ func (obj *NodesData) SubsNodeFansAdd(ctx context.Context, param *msgNodesPb.Dou
 
 func (obj *NodesData) SubsNodeFansDel(ctx context.Context, param *msgNodesPb.DoubleId) (
 	*msgNodesPb.Result, error) {
-	if node, ok := ApiWS.GlobalSubscriptions.Get(param.MainId); ok {
+	if node, ok := MSGNode.GlobalSubscriptions.Get(param.MainId); ok {
 		node.Fans.Del(param.OtherId)
 	}
 	return &msgNodesPb.Result{Code: 200}, nil
@@ -102,7 +102,7 @@ func (obj *NodesData) GroupChatNodesPoolCleanByLifeTime(ctx context.Context, par
 	if param.SecretKey != conf.CleanWorkRPCCallSecretKey {
 		return &msgNodesPb.Result{Code: 400}, ErrWrongSecretKey
 	}
-	ApiWS.GlobalGroupChats.CleanByLifeTime()
+	MSGNode.GlobalGroupChats.CleanByLifeTime()
 	return &msgNodesPb.Result{Code: 200}, nil
 }
 
@@ -111,7 +111,7 @@ func (obj *NodesData) GroupChatNodesPoolCleanByActivity(ctx context.Context, par
 	if param.SecretKey != conf.CleanWorkRPCCallSecretKey {
 		return &msgNodesPb.Result{Code: 400}, ErrWrongSecretKey
 	}
-	ApiWS.GlobalGroupChats.CleanByActiveCount()
+	MSGNode.GlobalGroupChats.CleanByActiveCount()
 	return &msgNodesPb.Result{Code: 200}, nil
 }
 
@@ -120,6 +120,6 @@ func (obj *NodesData) SubsNodesPoolCleanByLifeTime(ctx context.Context, param *m
 	if param.SecretKey != conf.CleanWorkRPCCallSecretKey {
 		return &msgNodesPb.Result{Code: 400}, ErrWrongSecretKey
 	}
-	ApiWS.GlobalSubscriptions.CleanByLifeTime()
+	MSGNode.GlobalSubscriptions.CleanByLifeTime()
 	return &msgNodesPb.Result{Code: 200}, nil
 }

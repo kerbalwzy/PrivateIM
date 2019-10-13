@@ -1,17 +1,32 @@
-package ApiWS
+package MSGNode
 
 import (
-	"errors"
 	"log"
 	"math"
 	"sort"
 	"sync"
 	"time"
 
-	"../ApiRPC"
-
 	conf "../Config"
 )
+
+// Saving all nodes for every client connection.
+var GlobalUsers = &UserNodePool{
+	clients: make(map[int64]*UserNode),
+	wt:      sync.RWMutex{},
+}
+
+// Saving all nodes for group chat information
+var GlobalGroupChats = &GroupChatNodePool{
+	groups: make(map[int64]*GroupChatNode),
+	wt:     sync.RWMutex{},
+}
+
+// Saving all nodes for subscription information
+var GlobalSubscriptions = &SubscriptionNodePool{
+	subscriptions: make(map[int64]*SubsNode),
+	wt:            sync.RWMutex{},
+}
 
 // ---------------------------------------------------------------------------------
 
@@ -57,7 +72,7 @@ func (obj *UserNode) AddConn(conn *Connector) {
 // be saved as delay message
 func (obj *UserNode) AddMessageData(data []byte) {
 	if obj.connCount == 0 {
-		delayMessageChat <- [2]interface{}{obj.Id, data}
+		DelayMessageChat <- [2]interface{}{obj.Id, data}
 		return
 	}
 	for _, conn := range obj.conns {
@@ -123,25 +138,24 @@ func (obj *UserNode) ConnsWatchingLoop() {
 }
 
 // Create a new node instance for the user's connection
-func NewUserNode(userId int64) *UserNode {
+func NewUserNode(userId int64, friends, blacklist []int64) *UserNode {
 	node := new(UserNode)
 	node.Id = userId
 	node.Friends = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
 	node.BlackList = Int64IdSet{data: map[int64]struct{}{}, wt: sync.RWMutex{}}
 
 	// load the user's friends and blacklist
-	friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
-	if nil == err {
+	if nil != friends {
 		for _, id := range friends {
 			node.Friends.data[id] = struct{}{} // don't need lock here
 		}
-
+	}
+	if nil != blacklist {
 		for _, id := range blacklist {
 			node.BlackList.data[id] = struct{}{} // don't need lock here
 		}
-	} else {
-		log.Printf("[error] <NewNode> load friends and blacklist for user(%d) fail, detail: %s", userId, err)
 	}
+
 	log.Printf("[info] <NewUserNode> new a user client node, id= %d", userId)
 	return node
 }
@@ -229,19 +243,8 @@ func (obj *GroupChatNode) ResetActiveCount() {
 	obj.wt.Unlock()
 }
 
-var (
-	ErrGroupChatFindFail     = errors.New("find the target group chat fail, may not existed")
-	ErrNotJoinedTheGroupChat = errors.New("you are not the member of the group chat")
-)
-
 // Initial a new group chat node.
-func NewGroupChatNode(id int64) (*GroupChatNode, error) {
-	users, err := ApiRPC.GetGroupChatUsers(id)
-	if nil != err {
-		log.Printf("[error] <NewGroupChatNode> load users for group chat(%d) fail, detail: %s", id, err)
-		return nil, ErrGroupChatFindFail
-	}
-
+func NewGroupChatNode(id int64, users []int64) *GroupChatNode {
 	tempGroupChat := new(GroupChatNode)
 	tempGroupChat.Id = id
 	tempGroupChat.initTime = time.Now()
@@ -253,7 +256,7 @@ func NewGroupChatNode(id int64) (*GroupChatNode, error) {
 	}
 
 	log.Printf("[info] <NewGroupChatNode> new a group chat node, the id= %d", id)
-	return tempGroupChat, nil
+	return tempGroupChat
 }
 
 // The group chat node pool. Save and manage the group chat nodes
@@ -383,21 +386,8 @@ type SubsNode struct {
 	initTime  time.Time  // the node initial time
 }
 
-var (
-	ErrSubscriptionFindFail = errors.New("find the target subscription fail, maybe not existed")
-	ErrNotSubsManager       = errors.New("you are not the subscription's manager")
-)
-
 // New a subscription node
-func NewSubsNode(senderId, subsId int64) (*SubsNode, error) {
-	managerId, fans, err := ApiRPC.GetSubscriptionInfo(subsId)
-	if nil != err {
-		log.Printf("[error] <NewSubsNode> find subscription(%d) information fail: %s", subsId, err.Error())
-		return nil, ErrSubscriptionFindFail
-	}
-	if managerId != senderId {
-		return nil, ErrNotSubsManager
-	}
+func NewSubsNode(subsId, managerId int64, fans []int64) *SubsNode {
 
 	tempNode := new(SubsNode)
 	tempNode.Id = subsId
@@ -411,7 +401,7 @@ func NewSubsNode(senderId, subsId int64) (*SubsNode, error) {
 	}
 
 	log.Printf("[info] <NewSubsNode> new a subscription node, the id= %d", subsId)
-	return tempNode, nil
+	return tempNode
 }
 
 // The group chat node pool. Save and manage the group chat nodes

@@ -6,40 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 
 	"../ApiRPC"
+	"../MSGNode"
 )
 
 // WebSocket upgrade worker
 var UpGrader = &websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true }}
-
-// Saving all nodes for every client connection.
-var GlobalUsers = &UserNodePool{
-	clients: make(map[int64]*UserNode),
-	wt:      sync.RWMutex{},
-}
-
-// Saving all nodes for group chat information
-var GlobalGroupChats = &GroupChatNodePool{
-	groups: make(map[int64]*GroupChatNode),
-	wt:     sync.RWMutex{},
-}
-
-// Saving all nodes for subscription information
-var GlobalSubscriptions = &SubscriptionNodePool{
-	subscriptions: make(map[int64]*SubsNode),
-	wt:            sync.RWMutex{},
-}
-
-// Saving the message which want sent to offline user.
-// This chan has buffer, and the cap is 10000. Every element is an array,
-// which saved the target user's id and bytes data of the message.
-var delayMessageChat = make(chan [2]interface{}, 10000)
 
 // Handle WebSocket upgrade request.
 // Before upgrading, check token by send it to UserCenter through gRPC call. Then trying to get the user's connect node
@@ -69,17 +46,21 @@ func BeginChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// try to get the user's connect node from UserNodesPool. if have not, new one and add into the UserNodesPool.
-	theNode, ok := GlobalUsers.Get(userId)
+	theNode, ok := MSGNode.GlobalUsers.Get(userId)
 	if !ok {
-		theNode = NewUserNode(userId)
+		friends, blacklist, err := ApiRPC.GetUserFriendIdList(userId)
+		if nil != err {
+			log.Printf("[error] <BeginChat> get friends and blacklist for user(%d) fail, detail: %s", userId, err)
+		}
+		theNode = MSGNode.NewUserNode(userId, friends, blacklist)
 		go theNode.ConnsWatchingLoop()
 
-		GlobalUsers.Add(theNode)
+		MSGNode.GlobalUsers.Add(theNode)
 
 	}
 
 	// create a new connector for this connection and add the new connector into theNode's conns
-	tempConnector := NewConnector(conn)
+	tempConnector := MSGNode.NewConnector(conn)
 	theNode.AddConn(tempConnector)
 
 	log.Printf("[info] <BeginChat> new WebSockt connection for user(%d)-address(%s), connector(%p)",
@@ -109,11 +90,11 @@ func MessageDispatch(senderId int64, data []byte) {
 		return
 	}
 	switch messageTypeId {
-	case UserChatMessageTypeId:
+	case MSGNode.UserChatMessageTypeId:
 		SendUserChatMessage(senderId, data)
-	case GroupChatMessageTypeId:
+	case MSGNode.GroupChatMessageTypeId:
 		SendGroupChatMessage(senderId, data)
-	case SubscriptionMessageTypeId:
+	case MSGNode.SubscriptionMessageTypeId:
 		SendSubscriptionMessage(senderId, data)
 	default:
 		SendErrorMessage(senderId, 400, ErrUnSupportMsgTypeId, nil)
@@ -122,10 +103,10 @@ func MessageDispatch(senderId int64, data []byte) {
 
 // Send error message to target user client, if the user is not online, the message will be save as delay message.
 func SendErrorMessage(receiverId int64, code int, err error, rawMessage []byte) {
-	tempMessage := ErrorMessage{
-		BasicMessage: BasicMessage{
-			TypeId:     ErrorMessageTypeId,
-			SenderId:   SystemId,
+	tempMessage := MSGNode.ErrorMessage{
+		BasicMessage: MSGNode.BasicMessage{
+			TypeId:     MSGNode.ErrorMessageTypeId,
+			SenderId:   MSGNode.SystemId,
 			ReceiverId: receiverId,
 			CreateTime: time.Now().Unix(),
 		},
@@ -135,19 +116,19 @@ func SendErrorMessage(receiverId int64, code int, err error, rawMessage []byte) 
 	}
 	message, _ := json.Marshal(tempMessage)
 
-	if node, ok := GlobalUsers.Get(receiverId); ok {
+	if node, ok := MSGNode.GlobalUsers.Get(receiverId); ok {
 		log.Printf("[info] <SendErrorMessage> send to receiver(%d) {code: %d, error: %s}",
 			receiverId, code, err.Error())
 		node.AddMessageData(message)
 	} else {
-		delayMessageChat <- [2]interface{}{receiverId, message}
+		MSGNode.DelayMessageChat <- [2]interface{}{receiverId, message}
 	}
 }
 
 // Send normal message to target user client, if the user is not online, it will record the message as a
 // WaitSendMessage into database
 func SendUserChatMessage(senderId int64, message []byte) {
-	tempMessage := new(ChatMessage)
+	tempMessage := new(MSGNode.ChatMessage)
 	err := json.Unmarshal(message, tempMessage)
 	if nil != err {
 		SendErrorMessage(senderId, 400, err, message)
@@ -161,7 +142,7 @@ func SendUserChatMessage(senderId int64, message []byte) {
 		return
 	}
 
-	recipientNode, ok := GlobalUsers.Get(tempMessage.ReceiverId)
+	recipientNode, ok := MSGNode.GlobalUsers.Get(tempMessage.ReceiverId)
 	// check whether the recipient should receive the message
 	code, err = checkWhetherReceiverShouldReceive(ok, recipientNode, senderId, tempMessage.ReceiverId)
 	if nil != err {
@@ -190,7 +171,7 @@ func SendUserChatMessage(senderId int64, message []byte) {
 		recipientNode.AddMessageData(message)
 	} else {
 		// when the receiver not online, save the message as delay message.
-		delayMessageChat <- [2]interface{}{tempMessage.ReceiverId, message}
+		MSGNode.DelayMessageChat <- [2]interface{}{tempMessage.ReceiverId, message}
 	}
 	log.Printf("[info] <SendUsertempMessage> sender(%d) send a message to receiver(%d)",
 		senderId, tempMessage.ReceiverId)
@@ -200,10 +181,15 @@ func SendUserChatMessage(senderId int64, message []byte) {
 	SendErrorMessage(senderId, 200, ErrSendMessageOk, message)
 }
 
+var (
+	ErrNotJoinedTheGroupChat = errors.New("you are not the member of the group chat")
+	ErrGroupChatFindFail     = errors.New("find the target group chat fail, may not existed")
+)
+
 // Send the message to a group chat.
 // In fact, is send the message to every other user whom joined the group chat.
 func SendGroupChatMessage(senderId int64, message []byte) {
-	tempMessage := new(ChatMessage)
+	tempMessage := new(MSGNode.ChatMessage)
 	err := json.Unmarshal(message, tempMessage)
 	if nil != err {
 		SendErrorMessage(senderId, 400, err, message)
@@ -218,15 +204,19 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 	}
 
 	// get the group chat node
-	groupChatNode, ok := GlobalGroupChats.Get(tempMessage.ReceiverId)
+	groupChatNode, ok := MSGNode.GlobalGroupChats.Get(tempMessage.ReceiverId)
 
 	if !ok {
-		groupChatNode, err = NewGroupChatNode(tempMessage.ReceiverId)
+		users, err := ApiRPC.GetGroupChatUsers(tempMessage.ReceiverId)
 		if nil != err {
-			SendErrorMessage(senderId, 500, err, message)
+			log.Printf("[error] <SendGroupChatMessage> get group chat(%d) info fail: %s",
+				tempMessage.ReceiverId, err)
+			SendErrorMessage(senderId, 500, ErrGroupChatFindFail, message)
 			return
 		}
-		GlobalGroupChats.Add(groupChatNode)
+		groupChatNode = MSGNode.NewGroupChatNode(tempMessage.ReceiverId, users)
+
+		MSGNode.GlobalGroupChats.Add(groupChatNode)
 	}
 
 	// and check weather the user has join the group chat
@@ -239,15 +229,13 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 	tempMessage.SetCreateTime()
 	message, _ = json.Marshal(tempMessage)
 
-	groupChatNode.Users.wt.RLock()
-	for memberId := range groupChatNode.Users.data {
-		if userNode, ok := GlobalUsers.Get(memberId); ok {
+	for _, memberId := range groupChatNode.Users.Keys() {
+		if userNode, ok := MSGNode.GlobalUsers.Get(memberId); ok {
 			userNode.AddMessageData(message)
 		} else {
-			delayMessageChat <- [2]interface{}{memberId, message}
+			MSGNode.DelayMessageChat <- [2]interface{}{memberId, message}
 		}
 	}
-	groupChatNode.Users.wt.RUnlock()
 
 	// add the activity count and save the group chat history
 	groupChatNode.AddActiveCount()
@@ -256,9 +244,14 @@ func SendGroupChatMessage(senderId int64, message []byte) {
 
 }
 
+var (
+	ErrSubscriptionFindFail = errors.New("find the target subscription fail, maybe not existed")
+	ErrNotSubsManager       = errors.New("you are not the subscription's manager")
+)
+
 // The manager send a message to every fans of the subscription.
 func SendSubscriptionMessage(senderId int64, message []byte) {
-	tempMessage := new(SubscriptionMessage)
+	tempMessage := new(MSGNode.SubscriptionMessage)
 	err := json.Unmarshal(message, tempMessage)
 	if nil != err {
 		SendErrorMessage(senderId, 400, err, message)
@@ -273,14 +266,18 @@ func SendSubscriptionMessage(senderId int64, message []byte) {
 	}
 
 	// try to get the subscription node, and check weather the sender is the manager of the subscription
-	subsNode, ok := GlobalSubscriptions.Get(tempMessage.ReceiverId)
+	subsNode, ok := MSGNode.GlobalSubscriptions.Get(tempMessage.ReceiverId)
 	if !ok {
-		subsNode, err = NewSubsNode(senderId, tempMessage.ReceiverId)
+		manager, fans, err := ApiRPC.GetSubscriptionInfo(tempMessage.ReceiverId)
 		if nil != err {
-			SendErrorMessage(senderId, 500, err, message)
+			SendErrorMessage(senderId, 500, ErrSubscriptionFindFail, message)
 			return
 		}
-		GlobalSubscriptions.Add(subsNode)
+		if manager != senderId {
+			SendErrorMessage(senderId, 403, ErrNotSubsManager, message)
+		}
+		subsNode = MSGNode.NewSubsNode(tempMessage.ReceiverId, manager, fans)
+		MSGNode.GlobalSubscriptions.Add(subsNode)
 	}
 
 	if subsNode.ManagerId != senderId {
@@ -292,15 +289,13 @@ func SendSubscriptionMessage(senderId int64, message []byte) {
 	tempMessage.SetCreateTime()
 	message, _ = json.Marshal(tempMessage)
 
-	subsNode.Fans.wt.RLock()
-	for memberId := range subsNode.Fans.data {
-		if userNode, ok := GlobalUsers.Get(memberId); ok {
+	for _, memberId := range subsNode.Fans.Keys() {
+		if userNode, ok := MSGNode.GlobalUsers.Get(memberId); ok {
 			userNode.AddMessageData(message)
 		} else {
-			delayMessageChat <- [2]interface{}{memberId, message}
+			MSGNode.DelayMessageChat <- [2]interface{}{memberId, message}
 		}
 	}
-	subsNode.Fans.wt.RUnlock()
 
 	// save the subscription message history
 	SaveSubscriptionHistory(tempMessage.ReceiverId, message)
@@ -310,7 +305,7 @@ func SendSubscriptionMessage(senderId int64, message []byte) {
 
 // Keep send the data to client by connector, when have a new message for it.
 // When the connector was closed, stop the goroutine.
-func SendDateLoop(userId int64, connector *Connector, clientAddr string) {
+func SendDateLoop(userId int64, connector *MSGNode.Connector, clientAddr string) {
 	defer func() {
 		recover()
 	}()
@@ -324,9 +319,9 @@ func SendDateLoop(userId int64, connector *Connector, clientAddr string) {
 			log.Printf("[info] <SendDateLoop> stop a send data goroutine for %s", userConnectInfo)
 			return
 		case data := <-connector.DataChan:
-			err := connector.conn.WriteMessage(websocket.TextMessage, data)
+			err := connector.WriteMessage(websocket.TextMessage, data)
 			if nil != err {
-				delayMessageChat <- [2]interface{}{userId, data}
+				MSGNode.DelayMessageChat <- [2]interface{}{userId, data}
 				close(connector.CloseSignal)
 				return
 			}
@@ -337,7 +332,7 @@ func SendDateLoop(userId int64, connector *Connector, clientAddr string) {
 
 // Keep trying to receive message from the client by connector.
 // When the connector was closed, stop the goroutine.
-func RecvDataLoop(userId int64, connector *Connector, clientAddr string) {
+func RecvDataLoop(userId int64, connector *MSGNode.Connector, clientAddr string) {
 	defer func() {
 		recover()
 	}()
@@ -350,7 +345,7 @@ func RecvDataLoop(userId int64, connector *Connector, clientAddr string) {
 			log.Printf("[info] <RecvDataLoop> stop a recv data goroutine for %s", userConnectInfo)
 			return
 		default:
-			_, data, err := connector.conn.ReadMessage()
+			_, data, err := connector.ReadMessage()
 			if err != nil {
 				log.Printf("[error] <RecvDataLoop> recevie data fail from %s, detail: %s", userConnectInfo, err.Error())
 				close(connector.CloseSignal)
@@ -367,7 +362,7 @@ func RecvDataLoop(userId int64, connector *Connector, clientAddr string) {
 // but if some thing error happened when save the delay message, it would only output the error log, would not block
 // the program.
 func SaveDelayMessageLoop() {
-	for message := range delayMessageChat {
+	for message := range MSGNode.DelayMessageChat {
 		receiverId := message[0].(int64)
 		messageData := message[1].([]byte)
 		err := ApiRPC.SaveDelayMessage(receiverId, messageData)
