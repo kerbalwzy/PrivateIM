@@ -37,12 +37,15 @@ func StartHttpServer() {
 
 	info.POST("/qr_code", ParseQrCode)
 	//
-	//relate := r.Group("/relation", JWTAuthMiddleware())
-	//relate.GET("/friend", GetFriend)
-	//relate.POST("/friend", AddFriend)
-	//relate.PUT("/friend", PutFriend)
-	//relate.DELETE("/friend", DeleteFriend)
-	//relate.GET("/friends", AllFriends)
+	relate := r.Group("/relation", JWTAuthMiddleware())
+	relate.GET("/users", SearchUsers)
+
+	relate.POST("/friend", AddFriend)
+	relate.PUT("/friend", PutFriend)
+	relate.GET("/friends", GetUsersFriendsInfo)
+	relate.DELETE("/friend", DeleteFriend)
+
+
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", NameValidator)

@@ -5,29 +5,19 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"../ApiRPC"
-
-	pb "../Protos"
+	"../RpcClientPbs/mysqlPb"
 )
 
-type GetFriendParams struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-}
-type GetFriendResult struct {
-	Id     int64  `json:"id"`
-	Email  string `json:"email"`
-	Name   string `json:"name"`
-	Mobile string `json:"mobile"`
-	Gender int    `json:"gender"`
-	Note   string `json:"note"`
-	Avatar string `json:"avatar"`
+type SearchUsersParam struct {
+	Email string `json:"email,omitempty"`
+	Name  string `json:"name,omitempty"`
 }
 
 // Get friend HTTP API function.
 // Search the user by email or name. Only when the friendship is effect, the value of Mobile,
 // Gender and Note can be show for searcher.
-func GetFriend(c *gin.Context) {
-	params := new(GetFriendParams)
+func SearchUsers(c *gin.Context) {
+	params := new(SearchUsersParam)
 	if err := c.ShouldBindJSON(params); nil != err {
 		c.JSON(400, gin.H{"error": "invalid params " + err.Error()})
 		return
@@ -42,73 +32,39 @@ func GetFriend(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	if len(users) == 0 {
+	if len(users.Data) == 0 {
 		c.JSON(404, gin.H{"error": "not found by params"})
 		return
 	}
 
-	// search the friendship record data of the user
-	selfId := c.MustGet(JWTGetUserId).(int64)
-	friendsIdNote, err := GetFriendsIdAndNoteOfUser(selfId)
-	if nil != err {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
+	// hide some attribute private
+	for _, user := range users.Data {
+		user.Mobile = ""
+		user.Password = ""
+		user.QrCode = ""
 	}
 
-	// organizational results
-	result := make([]*GetFriendResult, 1)
-	for _, user := range users {
-		ret := &GetFriendResult{Id: user.Id, Name: user.Name, Email: user.Email}
-		if note, ok := friendsIdNote[user.Id]; ok {
-			ret.Mobile = user.Mobile
-			ret.Gender = int(user.Gender)
-			ret.Note = note
-		}
-		data, _ := ApiRPC.GetUserAvatarById(user.Id)
-		if data != nil {
-			ret.Avatar = data.Avatar
-		}
-
-		result = append(result, ret)
-	}
-
-	c.JSON(200, gin.H{"result": result})
+	c.JSON(200, gin.H{"result": users.Data})
 }
 
 // Search users by email or name, prefer to use email
-func GetUsersByEmailOrName(params *GetFriendParams) ([]*pb.UserBasicInfo, error) {
-	users := make([]*pb.UserBasicInfo, 1)
+func GetUsersByEmailOrName(params *SearchUsersParam) (*mysqlPb.UserBasicList, error) {
+	users := new(mysqlPb.UserBasicList)
 	if params.Email != "" {
 		ret, err := ApiRPC.GetUserByEmail(params.Email)
 		if nil != err {
 			return nil, err
 		}
-		users = append(users, ret)
+		users.Data = append(users.Data, ret)
 		return users, nil
 	} else {
 		ret, err := ApiRPC.GetUsersByName(params.Name)
 		if nil != err {
 			return nil, err
 		}
-		users = append(users, ret.Data...)
+		users = ret
 		return users, nil
 	}
-}
-
-// Get the id and note of the friends, and return a map, key is id, value is note
-func GetFriendsIdAndNoteOfUser(userId int64) (map[int64]string, error) {
-	tempMap := make(map[int64]string)
-	ret, err := ApiRPC.GetFriendshipInfo(userId)
-	if nil != err {
-		return tempMap, err
-	}
-	for _, relate := range ret.Data {
-		// Judging the validity of relationship, only the effect friendship can be save
-		if relate.IsAccept && !relate.IsBlack && !relate.IsDelete {
-			tempMap[relate.FriendId] = relate.FriendNote
-		}
-	}
-	return tempMap, nil
 }
 
 type AddFriendParams struct {
@@ -146,7 +102,7 @@ func CheckAndAddFriend(selfId, friendId int64, note string) (int, error) {
 	if selfId == friendId {
 		return 400, ErrAddSelfAsFriend
 	}
-	_, err := ApiRPC.AddOneNewFriend(selfId, friendId, note)
+	err := ApiRPC.AddOneNewFriend(selfId, friendId, note)
 	if nil != err {
 		return 500, err
 	}
@@ -197,12 +153,12 @@ func PutFriend(c *gin.Context) {
 
 }
 
-// Modify note on my friends
+//// Modify note on my friends
 func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 	if params.Note == "" {
 		return 400, "note for friend not allow be an empty string"
 	}
-	if _, err := ApiRPC.PutOneFriendNote(selfId, params.FriendId, params.Note); nil != err {
+	if err := ApiRPC.PutOneFriendNote(selfId, params.FriendId, params.Note); nil != err {
 		return 500, err.Error()
 	}
 
@@ -212,14 +168,17 @@ func ModifyFriendNote(selfId int64, params *PutFriendParams) (int, string) {
 // Handle a friend relationship request
 func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
 	// check if the friend request existed
-	_, err := ApiRPC.AcceptOneNewFriend(selfId, params.FriendId, params.Note, params.IsAccept)
-
+	err := ApiRPC.AcceptOneNewFriend(selfId, params.FriendId, params.Note, params.IsAccept)
 	if nil != err {
 		return 500, err.Error()
 	}
 	if params.IsAccept {
+		ApiRPC.MSGUserNodeAddFriend(selfId, params.FriendId)
+		ApiRPC.MSGUserNodeAddFriend(params.FriendId, selfId)
+
 		return 200, "you are friend now, chat happy"
 	} else {
+		ApiRPC.MSGUserNodeAddBlacklist(selfId, params.FriendId)
 		return 200, "you refused and move the user to you blacklist"
 	}
 
@@ -227,16 +186,29 @@ func CheckAndAcceptFriend(selfId int64, params *PutFriendParams) (int, string) {
 
 // Manage the friend blacklist
 func ManageFriendShipBlacklist(selfId, friendId int64, isBlack bool) (int, string) {
-	_, err := ApiRPC.PutFriendBlacklist(selfId, friendId, isBlack)
+	err := ApiRPC.PutOneFriendIsBlack(selfId, friendId, isBlack)
 
 	if nil != err {
 		return 500, err.Error()
 	}
 	if isBlack {
+		ApiRPC.MSGUserNodeMoveFriendIntoBlacklist(selfId, friendId)
 		return 200, "move friend into blacklist successfully"
 	} else {
+		ApiRPC.MSGUserNodeMoveFriendOutFromBlacklist(selfId, friendId)
 		return 200, "move friend out from blacklist successfully"
 	}
+}
+
+// Get All the user's friends information HTTP API function
+func GetUsersFriendsInfo(c *gin.Context) {
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	ret, err := ApiRPC.GetUserFriendsInfo(selfId)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"friends": ret.Data})
 }
 
 type DeleteFriendParams struct {
@@ -251,21 +223,11 @@ func DeleteFriend(c *gin.Context) {
 		return
 	}
 	selfId := c.MustGet(JWTGetUserId).(int64)
-	_, err := ApiRPC.DeleteOneFriend(selfId, params.FriendId)
+	err := ApiRPC.DeleteOneFriend(selfId, params.FriendId)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	ApiRPC.MSGUserNodeDelFriend(selfId, params.FriendId)
 	c.JSON(200, gin.H{"message": "the record has been deleted and will not be notified to your friend."})
-}
-
-// Get All Friend HTTP API function
-func AllFriends(c *gin.Context) {
-	selfId := c.MustGet(JWTGetUserId).(int64)
-	ret, err := ApiRPC.GetFriendsBasicInfo(selfId)
-	if nil != err {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(200, gin.H{"friends": ret.Data})
 }

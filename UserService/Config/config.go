@@ -7,6 +7,9 @@ const (
 	UserAuthRPCServerAddress    = "0.0.0.0:11111"
 	MsgTransferRPCServerAddress = "0.0.0.0:12222"
 
+	// http config
+	UserCenterHttpServerAddress = "0.0.0.0:8080"
+
 	PrivateIMRootCAPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/ca.pem"
 	PrivateIMServerPem = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.pem"
 	PrivateIMServerKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/server/server.key"
@@ -14,11 +17,11 @@ const (
 	PrivateIMClientKey = "/Users/wzy/GitPrograms/PrivateIM/CATLSFiles/client/client.key"
 
 	// static file config, about operating the avatar and qrCode
-	StaticFoldPath         = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/"
-	PhotoSaveFoldPath      = "/Users/wzy/GitProrgram/PrivateIM/UserCenter/static/photos/"
+	StaticFoldPath         = "/Users/wzy/GitPrograms/PrivateIM/UserService/static/"
+	PhotoSaveFoldPath      = "/Users/wzy/GitPrograms/PrivateIM/UserService/static/photos/"
 	PhotoSuffix            = ".png"
 	PhotosUrlPrefix        = "/static/photos/" // if you use oss , should change this value
-	DefaultAvatarUrl       = "/static/photos/defaultAvatar.jpg"
+	DefaultAvatarPicName   = "defaultAvatar.jpg"
 	AvatarPicUploadMaxSize = 100 * 2 << 10
 
 	QRCodeBaseUrl = "http://127.0.0.1:8080/qrcontent/?"
