@@ -440,6 +440,14 @@ func (obj *MySQLData) GetOneGroupChatById(ctx context.Context, param *mysqlPb.Id
 	return makePBGroupChatBasic(groupChat), nil
 }
 
+func (obj *MySQLData) GetOneGroupChatByNameAndManager(ctx context.Context, param *mysqlPb.IdAndName) (*mysqlPb.GroupChatBasic, error) {
+	groupChat, err := mysqlBind.SelectOneGroupChatByNameAndManager(param.Name, param.Id)
+	if nil != err {
+		return nil, err
+	}
+	return makePBGroupChatBasic(groupChat), nil
+}
+
 func (obj *MySQLData) GetGroupChatListByName(ctx context.Context, param *mysqlPb.NameAndIsDelete) (*mysqlPb.GroupChatList, error) {
 	groupChatList, err := mysqlBind.SelectManyGroupChatByName(param.Name, param.IsDelete)
 	if nil != err {

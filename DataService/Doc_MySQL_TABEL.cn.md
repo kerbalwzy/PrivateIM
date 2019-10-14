@@ -93,9 +93,10 @@
     `manager_id` bigint(20) NOT NULL,
     `avatar` varchar(100) NOT NULL DEFAULT '',
     `qr_code` varchar(100) NOT NULL,
-    `is_delete` tinyint(1) NOT NULL DEFAULT 0,
+    `is_delete` tinyint(1) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     UNIQUE KEY `qr_code_unique` (`qr_code`),
+    UNIQUE KEY `name_manager_unique` (`name`,`manager_id`),
     KEY `manager_id_index` (`manager_id`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   ```

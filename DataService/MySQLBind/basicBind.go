@@ -431,7 +431,8 @@ type TableGroupChat struct {
 }
 
 const (
-	InsertOneNewGroupChatSQL  = `INSERT INTO tb_group_chat(id, name, manager_id, avatar, qr_code) VALUES (?,?,?,?,?)`
+	InsertOneNewGroupChatSQL = `INSERT INTO tb_group_chat(id, name, manager_id, avatar, qr_code) VALUES (?,?,?,?,?) 
+ON DUPLICATE KEY UPDATE is_delete= False, avatar= ?, qr_code= ?`
 	DeleteOneGroupChatRealSQL = `DELETE FROM tb_group_chat WHERE id = ?`
 )
 
@@ -441,7 +442,7 @@ func InsertOneNewGroupChat(name, avatar, qrCode string, managerId int64) (*Table
 
 	// generate the ID and insert the data
 	id := SnowFlakeNode.Generate().Int64()
-	err := execSqlWithTransaction(InsertOneNewGroupChatSQL, id, name, managerId, avatar, qrCode)
+	err := execSqlWithTransaction(InsertOneNewGroupChatSQL, id, name, managerId, avatar, qrCode, avatar, qrCode)
 	if nil != err {
 		return nil, err
 	}
@@ -460,10 +461,11 @@ func DeleteOneGroupChatByIdReal(id int64) error {
 }
 
 const (
-	SelectGroupChatBaseSQL         = `SELECT id, name, manager_id, avatar, qr_code, is_delete FROM tb_group_chat`
-	SelectGroupChatByIdSQL         = SelectGroupChatBaseSQL + ` WHERE id= ? AND is_delete= ?`
-	SelectGroupChatsByNameSQL      = SelectGroupChatBaseSQL + ` WHERE name= ? AND is_delete= ?`
-	SelectGroupChatsByManagerIdSQl = SelectGroupChatBaseSQL + ` WHERE manager_id=? AND is_delete= ?`
+	SelectGroupChatBaseSQL             = `SELECT id, name, manager_id, avatar, qr_code, is_delete FROM tb_group_chat`
+	SelectGroupChatByIdSQL             = SelectGroupChatBaseSQL + ` WHERE id= ? AND is_delete= ?`
+	SelectGroupChatsByNameSQL          = SelectGroupChatBaseSQL + ` WHERE name= ? AND is_delete= ?`
+	SelectGroupChatsByManagerIdSQl     = SelectGroupChatBaseSQL + ` WHERE manager_id=? AND is_delete= ?`
+	SelectGroupChatByNameAndManagerSQL = SelectGroupChatBaseSQL + ` WHERE name= ? AND manager_id= ? AND is_delete= False`
 )
 
 // Private Function:
@@ -489,6 +491,23 @@ func scanGroupChatFromRows(rows *sql.Rows) ([]*TableGroupChat, error) {
 // Select one row data from 'tb_group_chat' table by 'id'.
 func SelectOneGroupChatById(id int64, isDelete bool) (*TableGroupChat, error) {
 	row := MySQLClient.QueryRow(SelectGroupChatByIdSQL, id, isDelete)
+	temp := new(TableGroupChat)
+	err := row.Scan(&(temp.Id), &(temp.Name), &(temp.ManagerId),
+		&(temp.Avatar), &(temp.QrCode), &(temp.IsDelete))
+
+	if sql.ErrNoRows == err {
+		return nil, ErrGroupChatNotFound
+	}
+
+	if nil != err {
+		return nil, err
+	}
+	return temp, nil
+}
+
+// Select one row data from 'tb_group_chat' table by 'name' and 'manager_id', the tow field is an join unique index
+func SelectOneGroupChatByNameAndManager(name string, managerId int64) (*TableGroupChat, error) {
+	row := MySQLClient.QueryRow(SelectGroupChatByNameAndManagerSQL, name, managerId)
 	temp := new(TableGroupChat)
 	err := row.Scan(&(temp.Id), &(temp.Name), &(temp.ManagerId),
 		&(temp.Avatar), &(temp.QrCode), &(temp.IsDelete))

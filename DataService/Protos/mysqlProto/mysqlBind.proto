@@ -300,6 +300,7 @@ service MySQLBindService {
     rpc DeleteOneGroupChatReal (Id) returns (Id);
 
     rpc GetOneGroupChatById (IdAndIsDelete) returns (GroupChatBasic);
+    rpc GetOneGroupChatByNameAndManager (IdAndName) returns (GroupChatBasic);
     rpc GetGroupChatListByName (NameAndIsDelete) returns (GroupChatList);
     rpc GetGroupChatListByManagerId (IdAndIsDelete) returns (GroupChatList);
     rpc GetAllGroupChatList (EmptyParam) returns (GroupChatList);
