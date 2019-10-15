@@ -54,7 +54,7 @@ func SignUp(c *gin.Context) {
 
 	// initial some data
 	passwordHash := utils.GetPasswordHash(tempUserSignUp.Password, conf.PasswordHashSalt)
-	qrCodePicData, err := utils.CreatQRCodeBytes("user_email=" + tempUserSignUp.Email)
+	qrCodePicData, _ := utils.CreatQRCodeBytes("user_email=" + tempUserSignUp.Email)
 	qrCodePicHashName := utils.BytesDataHash(qrCodePicData)
 
 	// save user information to db

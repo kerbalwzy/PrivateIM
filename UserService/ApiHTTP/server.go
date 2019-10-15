@@ -45,7 +45,21 @@ func StartHttpServer() {
 	relate.GET("/friends", GetUsersFriendsInfo)
 	relate.DELETE("/friend", DeleteFriend)
 
+	group := r.Group("/group", JWTAuthMiddleware())
+	group.POST("/new", NewOneGroupChat)
+	group.PUT("/drop", DismissOneGroupChat)
+	group.PUT("/name", PutOneGroupChatName)
+	group.PUT("/avatar", PutOneGroupChatAvatar)
+	group.PUT("/manger", PutOneGroupChatManager)
+	group.GET("/info", GetOneGroupChatInfo)
 
+	group.GET("/search", SearchGroupChats)
+	group.POST("/join", JoinOneGroupChat)
+	group.PUT("/quit", QuitOneGroupChat)
+	group.PUT("/note", PutSelfNoteInGroupChat)
+
+	group.GET("/joined", GetGroupChatsUserJoined)
+	group.GET("/users", GetUsersInfoOfGroupChat)
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", NameValidator)
