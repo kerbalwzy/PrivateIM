@@ -44,4 +44,6 @@ const (
 
 	// redis db config
 	RedisAddr = "127.0.0.1:6379"
+
+	ElasticsearchServerAddress  = "0.0.0.0:9200"
 )

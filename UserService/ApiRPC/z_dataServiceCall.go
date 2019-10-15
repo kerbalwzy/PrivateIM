@@ -90,5 +90,32 @@ func DeleteOneFriend(selfId, friendId int64) error {
 	return err
 }
 
-// ----------------------------------------------------------------------
+func SaveOneNewGroupChat(name, avatar, qrCode string, managerId int64) (*mysqlPb.GroupChatBasic, error) {
+	param := &mysqlPb.GroupChatBasic{
+		Name:      name,
+		ManagerId: managerId,
+		Avatar:    avatar,
+		QrCode:    qrCode,
+	}
+	return GetMySQLDataClient().PostSaveOneNewGroupChat(getTimeOutCtx(3), param)
+}
 
+func GetOneGroupChatByNameAndManger(name string, managerId int64) (*mysqlPb.GroupChatBasic, error) {
+	param := &mysqlPb.IdAndName{Id: managerId, Name: name}
+	return GetMySQLDataClient().GetOneGroupChatByNameAndManager(getTimeOutCtx(3), param)
+}
+
+func GetGroupChatsInfoTheUserJoined(userId int64) (*mysqlPb.GroupChatInfoListOfUserPlus, error) {
+	param := &mysqlPb.Id{Value: userId}
+	return GetMySQLDataClient().GetUserGroupChatsInfoPlus(getTimeOutCtx(3), param)
+}
+
+func GetOneUserGroupChat(userId, groupId int64) (*mysqlPb.UserGroupChatRelate, error) {
+	param := &mysqlPb.UserAndGroupId{UserId: userId, GroupId: groupId}
+	return GetMySQLDataClient().GetOneUserGroupChat(getTimeOutCtx(3), param)
+}
+
+func GetUsersInfoOfTheGroupChat(groupId int64) (*mysqlPb.UserInfoInGroupChatListPlus, error) {
+	param := &mysqlPb.Id{Value: groupId}
+	return GetMySQLDataClient().GetGroupChatUsersInfoPlus(getTimeOutCtx(3), param)
+}
