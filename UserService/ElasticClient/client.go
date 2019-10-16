@@ -185,14 +185,17 @@ func UserIndexDocSave(id int64, name, email, avatar string, gender int32) error 
 
 }
 
+// Can search by name or email
 func UserIndexDocSearch(target string, page, perPage int) ([]byte, error) {
 	tempDataFormatStr := `{	
 	"from": %d,
 	"size": %d,
 	"query": { 
-		"bool": { 
-    		"must": [
-        		{ "match": { "name": "%s" } }],
+		"bool": {
+    		"should": [
+        		{ "match": { "name": "%s" } },
+				{ "bool" : { "must": { "term": { "email": "%s" } } } }
+			],
     		"filter": [ 
         		{ "term":  { "is_delete": false } }
     		]
@@ -201,7 +204,7 @@ func UserIndexDocSearch(target string, page, perPage int) ([]byte, error) {
 }
 `
 	fromValue := (page - 1) * perPage
-	jsonBodyStr := fmt.Sprintf(tempDataFormatStr, fromValue, perPage, target)
+	jsonBodyStr := fmt.Sprintf(tempDataFormatStr, fromValue, perPage, target, target)
 	url := fmt.Sprintf("%s%s/%s/_search", HTTPControlPrefix, conf.ElasticsearchServerAddress, UserIndexName)
 	body := bytes.NewBufferString(jsonBodyStr)
 	data, err := makeAndSendRequest("GET", url, body)

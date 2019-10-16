@@ -1,70 +1,40 @@
 package ApiHTTP
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 
 	"../ApiRPC"
-	"../RpcClientPbs/mysqlPb"
+	"../ElasticClient"
 )
 
 type SearchUsersParam struct {
-	Email string `json:"email,omitempty"`
-	Name  string `json:"name,omitempty"`
+	KW   string `json:"kw" binding:"required"`
+	Page int    `json:"page"`
+	Size int    `json:"size"`
 }
 
-// Get friend HTTP API function.
-// Search the user by email or name. Only when the friendship is effect, the value of Mobile,
-// Gender and Note can be show for searcher.
+// Search user HTTP API function.
+// search data from ElasticSearch
 func SearchUsers(c *gin.Context) {
-	params := new(SearchUsersParam)
-	if err := c.ShouldBindJSON(params); nil != err {
-		c.JSON(400, gin.H{"error": "invalid params " + err.Error()})
+	param := new(SearchUsersParam)
+	if err := c.ShouldBindJSON(param); nil != err {
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	if params.Email == "" && params.Name == "" {
-		c.JSON(400, gin.H{"error": "invalid params"})
-		return
+	if param.Page == 0 {
+		param.Page = 1
 	}
-	// search users by param, if the length of result is zero, return now.
-	users, err := GetUsersByEmailOrName(params)
+	if param.Size == 0 {
+		param.Size = 10
+	}
+	data, err := elasticClient.UserIndexDocSearch(param.KW, param.Page, param.Size)
 	if nil != err {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	if len(users.Data) == 0 {
-		c.JSON(404, gin.H{"error": "not found by params"})
-		return
-	}
-
-	// hide some attribute private
-	for _, user := range users.Data {
-		user.Mobile = ""
-		user.Password = ""
-		user.QrCode = ""
-	}
-
-	c.JSON(200, gin.H{"result": users.Data})
-}
-
-// Search users by email or name, prefer to use email
-func GetUsersByEmailOrName(params *SearchUsersParam) (*mysqlPb.UserBasicList, error) {
-	users := new(mysqlPb.UserBasicList)
-	if params.Email != "" {
-		ret, err := ApiRPC.GetUserByEmail(params.Email)
-		if nil != err {
-			return nil, err
-		}
-		users.Data = append(users.Data, ret)
-		return users, nil
-	} else {
-		ret, err := ApiRPC.GetUsersByName(params.Name)
-		if nil != err {
-			return nil, err
-		}
-		users = ret
-		return users, nil
-	}
+	c.JSON(200, data)
 }
 
 type AddFriendParams struct {

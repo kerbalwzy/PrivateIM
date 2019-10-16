@@ -9,7 +9,7 @@ var (
 	testName         = "wang王@123"
 	testEmail        = "test@demo.com"
 	testAvatar       = "<test avatar url>"
-	testGender       = 1
+	testGender int32 = 1
 )
 
 func TestUserIndexDocSave(t *testing.T) {
@@ -21,7 +21,7 @@ func TestUserIndexDocSave(t *testing.T) {
 }
 
 func TestUserIndexDocSearch(t *testing.T) {
-	data, err := UserIndexDocSearch("wang", 1, 10)
+	data, err := UserIndexDocSearch("test@demo.com", 1, 10)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -48,7 +48,7 @@ func TestGroupChatIndexDocSave(t *testing.T) {
 }
 
 func TestGroupChatIndexDocSearch(t *testing.T) {
-	data, err := GroupChatIndexDocSearch("wang", 2, 1)
+	data, err := GroupChatIndexDocSearch("wang", 1, 10)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -76,7 +76,7 @@ func TestSubscriptionIndexSave(t *testing.T) {
 }
 
 func TestSubscriptionIndexSearch(t *testing.T) {
-	data, err := SubscriptionIndexSearch("word", 1, 1)
+	data, err := SubscriptionIndexSearch("word", 1, 10)
 	if nil != err {
 		t.Fatal(err)
 	}
@@ -90,18 +90,18 @@ func TestSubscriptionIndexUpdate(t *testing.T) {
 	}
 }
 
-func TestIndexDocDelete(t *testing.T) {
-	var err error
-	err = IndexDocDelete(UserIndexName, testId)
-	if nil != err {
-		t.Fatal(err)
-	}
-	err = IndexDocDelete(GroupChatIndexName, testGId)
-	if nil != err {
-		t.Fatal(err)
-	}
-	err = IndexDocDelete(SubscriptionIndexName, testSId)
-	if nil != err {
-		t.Fatal(err)
-	}
-}
+//func TestIndexDocDelete(t *testing.T) {
+//	var err error
+//	err = IndexDocDelete(UserIndexName, testId)
+//	if nil != err {
+//		t.Fatal(err)
+//	}
+//	err = IndexDocDelete(GroupChatIndexName, testGId)
+//	if nil != err {
+//		t.Fatal(err)
+//	}
+//	err = IndexDocDelete(SubscriptionIndexName, testSId)
+//	if nil != err {
+//		t.Fatal(err)
+//	}
+//}
