@@ -124,17 +124,17 @@ func SearchGroupChats(c *gin.Context) {
 }
 
 // todo
-func JoinOneGroupChat(c *gin.Context) {
+func UserJoinOneGroupChat(c *gin.Context) {
 	c.JSON(200, "waiting implement")
 }
 
 // todo
-func QuitOneGroupChat(c *gin.Context) {
+func UserQuitOneGroupChat(c *gin.Context) {
 	c.JSON(200, "waiting implement")
 }
 
 // todo
-func PutSelfNoteInGroupChat(c *gin.Context) {
+func UserPutNoteInGroupChat(c *gin.Context) {
 	c.JSON(200, "waiting implement")
 }
 

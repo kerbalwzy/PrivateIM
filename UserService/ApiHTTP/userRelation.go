@@ -1,7 +1,6 @@
 package ApiHTTP
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 
@@ -61,9 +60,6 @@ func AddFriend(c *gin.Context) {
 		return
 	}
 	c.JSON(statusCode, gin.H{"message": "initiate and add friends successfully, wait for the target user to agree"})
-
-	// todo: Let the MessageService know the change
-	//NotifyTargetUser(params.FriendId)
 
 }
 
@@ -170,17 +166,6 @@ func ManageFriendShipBlacklist(selfId, friendId int64, isBlack bool) (int, strin
 	}
 }
 
-// Get All the user's friends information HTTP API function
-func GetUsersFriendsInfo(c *gin.Context) {
-	selfId := c.MustGet(JWTGetUserId).(int64)
-	ret, err := ApiRPC.GetUserFriendsInfo(selfId)
-	if nil != err {
-		c.JSON(500, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(200, gin.H{"friends": ret.Data})
-}
-
 type DeleteFriendParams struct {
 	FriendId int64 `json:"dst_id" binding:"required"`
 }
@@ -200,4 +185,15 @@ func DeleteFriend(c *gin.Context) {
 	}
 	ApiRPC.MSGUserNodeDelFriend(selfId, params.FriendId)
 	c.JSON(200, gin.H{"message": "the record has been deleted and will not be notified to your friend."})
+}
+
+// Get All the user's friends information HTTP API function
+func GetFriendsInfo(c *gin.Context) {
+	selfId := c.MustGet(JWTGetUserId).(int64)
+	ret, err := ApiRPC.GetUserFriendsInfo(selfId)
+	if nil != err {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"friends": ret.Data})
 }

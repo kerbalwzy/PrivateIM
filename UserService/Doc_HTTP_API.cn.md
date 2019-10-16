@@ -5,20 +5,22 @@
   | :--------- | :----- | :---------------- | :------------ | :----------------------------- |
   | [SignUp](#1)     | POST   | /auth/user        | 0             | 注册                           |
   | [SignIn](#2)     | POST   | /auth/profile     | 0             | 登录                           |
-  | [GetProfile](#3) | GET    | /info/profile     | 1             | 获取个人信息                   |
-  | [PutProfile](#4) | PUT    | /info/profile     | 1             | 修改个人信息                   |
-  | [PutPassword](#4_1) | PUT | /info/password | 1 | 修改密码 |
-  | [GetResetPasswordEmail](#4_2) | GET | /info/password | 0 | 忘记密码-发送修改链接邮件 |
-  | [ForgetPassword](#4_3) | POST | /info/password | 0 | 忘记密码-重置密码 |
-  | [GetAvatar](#5) | GET    | /info/avatar      | 1             | 获取个人头像                   |
-  | [PutAvatar](#6)  | PUT    | /info/avatar      | 1             | 更新个人头像                   |
-  | [GetQrCode](#7) | GET    | /info/qrcode      | 1             | 获取个人二维码                 |
-  | [ParseQrCode](#8) | POST | /info/qrcode | 1 | 解析上传的二维码 |
-  | [GetFriend](#9) | GET | /relation/friend | 1 | 搜索用户/获取好友信息 |
+  | [GetResetPasswordEmail](#3) | GET | /auth/password | 0 | 忘记密码-发送修改链接邮件 |
+  | [GetProfile](#4) | GET    | /info/profile     | 1             | 获取个人信息                   |
+  | [PutProfile](#5) | PUT    | /info/profile     | 1             | 修改个人信息                   |
+  | [PutAvatar](#6) | PUT | /info/avatar | 1 | 更新个人头像 |
+  | [PutPassword](#7) | PUT | /info/password | 1 | 修改密码 |
+  | [ForgetPassword](#8) | POST | /info/password | 1 | 忘记密码-重置密码 |
+  | [ParseQrCode](#9) | POST | /info/qr_code | 1 | 解析上传的二维码 |
+  |  |  |  |  |  |
+  | [SearchUser](#9) | GET | /relation/users | 1 | 搜索用户 |
   | [AddFriend](#10) | POST   | /relation/friend  | 1             | 添加好友                       |
   | [PutFriend](#11) | PUT    | /relation/friend  | 1             | 修改好友备注; 接受\拒绝好友申请; 加入\移出黑名单 |
-  | [DelFriend](#12) | DELETE | /relation/friend  | 1             | 删除好友                       |
-  | [AllFriends](#13) | GET | /relation/friends | 1 | 获取好友列表 |
+  | [DeleteFriend](#12) | DELETE | /relation/friend  | 1             | 删除好友                       |
+  | [GetFriendsInfo](#13) | GET | /relation/friends | 1 | 获取好友列表 |
+  |  |  |  |  |  |
+  | 其他接口文档待完善..... |  |  |  |  |
+  |  |  |  |  |  |
 
 ----
 
@@ -106,7 +108,25 @@ JsonBodyParams: `所有参数均为必传`
 
 ----
 
-- #### <span id="3">GetProfile 获取用户个人详细信息</span> [Top](#0)
+- #### <span id="3">GetResetPasswordEmail 忘记密码-发送修改链接邮件</span> [Top](#0)
+
+##### Request: 
+
+Path: `/info/password`	Method: `GET`
+
+QueryStringParams: `查询字符串参数, 必传`
+
+| Columns | DataType | Constraints                 | Description  |
+| ------- | -------- | --------------------------- | ------------ |
+| email   | string   | 符合邮箱格式,最多100个字符; | 注册的邮箱号 |
+
+##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
+
+----
+
+----
+
+- #### <span id="4">GetProfile 获取用户个人详细信息</span> [Top](#0)
 
 ##### Request:
 
@@ -142,7 +162,7 @@ JsonBodyResult:
 
 ----
 
-- #### <span id="4">PutProfile 修改用户的个人信息</span> [Top](#0)
+- #### <span id="5">PutProfile 修改用户的个人信息</span> [Top](#0)
 
 ##### Request:
 
@@ -162,9 +182,43 @@ JsonBodyParams: `所有参数为必填, 如果未发生改变则填写原值`
 
 ##### Response: ⚠️**与GetProfile的完全一致**
 
+----
+
+- #### <span id="6">PutAvatar 更新用户头像 </span> [Top](#0)
+
+##### Request: 
+
+Path: `/info/avatar`		Method: `PUT`
+
+Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+
+​                 `Content-Type: multipart/form-data"`
+
+FormBodyParams: `所有参数为必填`
+
+| Column     | DataType | Constraints                                                  | Description  |
+| ---------- | -------- | ------------------------------------------------------------ | ------------ |
+| new_avatar | file     | 图片文件,上传前进行裁剪压缩处理, 保证图片尺寸为618*618像素, 分辨率80, 最大体积100kb. | 用户头像文件 |
+
+##### Response: 
+
+Headers: `Content-Type: application/json;`
+
+JsonBodyResult:
+
+| Column     | DataType | Description  |
+| ---------- | -------- | ------------ |
+| avatar_url | string   | 用户头像地址 |
+
+```json
+{
+    "avatar_url": "this is the avatar url"
+}
+```
+
 ---
 
-- #### <span id="4_1">PutPassword 修改密码</span> [Top](#0)
+- #### <span id="7">PutPassword 修改密码</span> [Top](#0)
 
 ##### Request:
 
@@ -184,31 +238,15 @@ JsonBodyParams: `所有参数必传`
 
 ##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
 
-----
-
-- #### <span id="4_2">GetResetPasswordEmail 忘记密码-发送修改链接邮件</span> [Top](#0)
-
-##### Request: 
-
-Path: `/info/password`	Method: `GET`
-
-QueryStringParams: `查询字符串参数, 必传`
-
-| Columns | DataType | Constraints                 | Description  |
-| ------- | -------- | --------------------------- | ------------ |
-| email   | string   | 符合邮箱格式,最多100个字符; | 注册的邮箱号 |
-
-##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
-
 ---
 
-- #### <span id="4_3">ForgetPassword 忘记密码-重置密码</span> [Top](#0)
+- #### <span id="8">ForgetPassword 忘记密码-重置密码</span> [Top](#0)
 
 ##### Request:
 
 Path: `/info/password` 	Method: `POST`
 
-Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
+Headers: `Auth-Token: "auth token value got from email"`
 
 ​		    `Content-Type: application/json;`
 
@@ -221,85 +259,13 @@ JsonBodyParams: `所有参数必传`
 
 ##### Response: 成功则只返回200状态码, 失败返回错误状态码及错误信息.
 
-----
-
-- #### <span id="5">GetAvatar 获取用户头像</span> [Top](#0)
-
-##### Request:
-
-Path: `/info/avatar`		Method: `GET`
-
-Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
-
-##### Response: 
-
-Headers: `Content-Type: application/json;`
-
-JsonBodyResult:
-
-| Column     | DataType | Description  |
-| ---------- | -------- | ------------ |
-| avatar_url | string   | 用户头像地址 |
-
-```json
-{
-    "avatar_url": "this is the avatar url"
-}
-```
-
-----
-
-- #### <span id="6">PutAvatar 更新用户头像 </span> [Top](#0)
-
-##### Request: 
-
-Path: `/info/avatar`		Method: `PUT`
-
-Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
-
-​                 `Content-Type: multipart/form-data"`
-
-FormBodyParams: `所有参数为必填`
-
-| Column     | DataType | Constraints                                                  | Description  |
-| ---------- | -------- | ------------------------------------------------------------ | ------------ |
-| new_avatar | file     | 图片文件,上传前进行裁剪压缩处理, 保证图片尺寸为618*618像素, 分辨率80, 最大体积100kb. | 用户头像文件 |
-
-##### Response: ⚠️ 与GetAvatar完全一致
-
 ---
 
-- #### <span id="7"> GetQrCode 获取个人二维码</span> [Top](#0)
-
-##### Request:
-
-Path: `/info/qrcode`		Method: `GET`
-
-Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
-
-##### Response:
-
-Headers: `Content-Type: application/json;`
-
-JsonBodyResult:
-
-| Column      | DataType | Description    |
-| ----------- | -------- | -------------- |
-| qr_code_url | string   | 二维码链接地址 |
-
-```json
-{
-    "qr_code_url": "this is the QRCode url"
-}
-```
-
----
-
-- #### <span id="8"> ParseQrCode 解析上传的二维码</span> [Top](#0)
+- #### <span id="9"> ParseQrCode 解析上传的二维码</span> [Top](#0)
 
 ##### Requset:
 
-Path: `/info/qrcode`		Method: `POST`
+Path: `/info/qr_code`		Method: `POST`
 
 Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
@@ -329,60 +295,105 @@ JsonBodyResult:
 
 ---
 
-- #### <span id="9">GetFriend 搜索用户/获取单个好友信息</span> [Top](#0) 
+----
+
+- #### <span id="9">SearchUsers 搜索用户/获取单个好友信息</span> [Top](#0) 
 
 ##### Request:
 
-Path: `/relation/friend`		Method: `GET`
+Path: `/relation/users`		Method: `GET`
 
 Headers: `Auth-Token: "auth token value from SignUp or SignIn"`
 
-JsonBodyParams: `至少包含两个参数中的一个, 在查询时只会使用其中一个参数, 参数优先级: email > name`
+JsonBodyParams: `kw参数必传`
 
-| Column | DataType | Constraints                 | Descritption       |
-| ------ | -------- | --------------------------- | ------------------ |
-| email  | string   | 符合邮箱格式,最多100个字符; | 目标用户的邮箱地址 |
-| name   | string   | 1到10个字符                 | 目标用户的昵称     |
+| Column | DataType | Constraints  | Descritption   |
+| ------ | -------- | ------------ | -------------- |
+| kw     | string   | 不为空字符串 | 搜索关键       |
+| page   | int      | 非负数       | 页码           |
+| size   | int      | 非负数       | 每页需要的数据 |
 
 ##### Response:
 
 Headers: `Content-Type: application/json;`
 
-JsonBodyResult: `mobile, gender, note只当两个用户存在有效好友关系,且好友保存了相关信息才会返回有效值, 否则都返回数据类型的默认值; 使用name作为搜索参数时可能返回多条数据`
-
-| Column | DataType | Description                          |
-| ------ | -------- | ------------------------------------ |
-| id     | int64    | 目标用户ID                           |
-| email  | string   | 目标用户邮箱地址                     |
-| name   | string   | 目标用户昵称                         |
-| mobile | string   | 目标用户手机号(好友关系存在时有值)   |
-| gender | int      | 目标用户的性别(好友关系存在时有值)   |
-| note   | string   | 给好友备注的名称(好友关系存在时有值) |
-| avatar | string   | 用户的头像地址                       |
+JsonBodyResult: `ElasticSearch提供的原始搜索结果, 当结果中max_score的值为0时, 表示没有匹配时搜索结果`
 
 ```json
-{	// the demo result is search by name = "test"
-    "result": [
-        {	// friend
-            "id": 1162262948794597376,
-            "email": "test@test.com",
-            "name": "test",
-            "mobile": "13122222223",
-            "gender": 1,
-            "note": "Li",
-            "avatar":"http://127.0.0.1:8080/static/photo/defaultAvatar.png"
+{
+    "took": 8,
+    "timed_out": false,
+    "_shards": {
+        "total": 3,
+        "successful": 3,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 4,
+            "relation": "eq"
         },
-        {	// not friend
-            "id": 1162663753959866368,
-            "email": "demo@demo.com",
-            "name": "test",
-            "mobile": "",
-            "gender": 0,
-            "note": "",
-            "avatar":"http://127.0.0.1:8080/static/photo/defaultAvatar.png"
-        }
-        ....
-    ]
+        "max_score": 0.2706483,
+        "hits": [
+            {
+                "_index": "private_im_user",
+                "_type": "_doc",
+                "_id": "1183956383159029784",
+                "_score": 0.2706483,
+                "_source": {
+                    "id": 1183956383159029784,
+                    "name": "wang王@123",
+                    "email": "test@demo.com",
+                    "avatar": "<test avatar url>",
+                    "gender": "2",
+                    "is_delete": false
+                }
+            },
+            {
+                "_index": "private_im_user",
+                "_type": "_doc",
+                "_id": "1183956383159029780",
+                "_score": 0,
+                "_source": {
+                    "id": 1183956383159029780,
+                    "name": "cpp",
+                    "email": "test@qq.com",
+                    "avatar": "<avatar pic url>",
+                    "gender": 1,
+                    "is_delete": false
+                }
+            },
+            {
+                "_index": "private_im_user",
+                "_type": "_doc",
+                "_id": "1183956383159029786",
+                "_score": 0,
+                "_source": {
+                    "id": 1183956383159029786,
+                    "name": "golang",
+                    "email": "python@qq.com",
+                    "avatar": "<avatar pic url>",
+                    "gender": 1,
+                    "is_delete": false
+                }
+            },
+            {
+                "_index": "private_im_user",
+                "_type": "_doc",
+                "_id": "1183956383159029781",
+                "_score": 0,
+                "_source": {
+                    "id": 1183956383159029781,
+                    "name": "python",
+                    "email": "demo@qq.com",
+                    "avatar": "<avatar pic url>",
+                    "gender": 1,
+                    "is_delete": false
+                }
+            }
+        ]
+    }
 }
 ```
 
@@ -457,13 +468,13 @@ JsonBodyResult:
 ```json
 {
     "action": 3,
-    "message": "move friend into blacklist successful"
+    "message": "eg.: move friend into blacklist successful"
 }
 ```
 
 ---
 
-- #### <span id="12">DelFriend 删除好友</span> [Top](#0)
+- #### <span id="12">DeleteFriend 删除好友</span> [Top](#0)
 
 ##### Request:
 
@@ -497,7 +508,7 @@ JsonBodyResult:
 
 ---
 
-- #### <span id="13">AllFriends 获取自己的好友列表</span> [Top](#0)
+- #### <span id="13">GetFriendsInfo 获取自己的好友列表</span> [Top](#0)
 
 ##### Request:
 
@@ -525,13 +536,16 @@ JsonBodyResult:
 {
     "friends": [
         {
-            "friend_id": 1162262948794597376,
-            "name": "test",
+            "id": 1162262948794597376,
+            "note": "noteName",
             "email": "test@test.com",
+            "name": "test",
             "mobile": "13122222223",
             "gender": 1,
-            "note": "demoNote",
-            "is_black": false
+            "avatar": "<avatar pic url>",
+           	"is_accept": true,
+            "is_black": false,
+            "is_delete": false
         }
     ]
 }

@@ -4,11 +4,6 @@ package userAuthPb;
 
 // protoc -I ./ ./UserAuth.proto --go_out=plugins=grpc:./
 
-service UserAuth {
-    rpc CheckAuthToken (Token) returns (Id);
-}
-
-
 message Token {
     string value = 1;
 }
@@ -16,5 +11,10 @@ message Token {
 message Id {
     int64 value = 1;
 }
+
+service UserAuth {
+    rpc CheckAuthToken (Token) returns (Id);
+}
+
 
 

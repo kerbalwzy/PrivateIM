@@ -31,35 +31,34 @@ func StartHttpServer() {
 	info.GET("/profile", GetProfile)
 	info.PUT("/profile", PutProfile)
 	info.PUT("/avatar", PutAvatar)
-
 	info.PUT("/password", PutPassword)
 	info.POST("/password", ForgetPassword)
-
 	info.POST("/qr_code", ParseQrCode)
-	//
-	relate := r.Group("/relation", JWTAuthMiddleware())
-	relate.GET("/users", SearchUsers)
 
+	relate := r.Group("/relation", JWTAuthMiddleware())
 	relate.POST("/friend", AddFriend)
 	relate.PUT("/friend", PutFriend)
-	relate.GET("/friends", GetUsersFriendsInfo)
 	relate.DELETE("/friend", DeleteFriend)
+	relate.GET("/friends", GetFriendsInfo)
+	relate.GET("/group_chats", GetGroupChatsUserJoined)
+	relate.GET("/subscriptions", GetSubscriptionUserFollowed)
 
-	group := r.Group("/group", JWTAuthMiddleware())
-	group.POST("/new", NewOneGroupChat)
-	group.PUT("/drop", DismissOneGroupChat)
+	group := r.Group("/group_chat", JWTAuthMiddleware())
+	group.POST("/instance", NewOneGroupChat)
+	group.GET("/instance", GetOneGroupChatInfo)
+	group.DELETE("/instance", DismissOneGroupChat)
 	group.PUT("/name", PutOneGroupChatName)
 	group.PUT("/avatar", PutOneGroupChatAvatar)
 	group.PUT("/manger", PutOneGroupChatManager)
-	group.GET("/info", GetOneGroupChatInfo)
-
-	group.GET("/search", SearchGroupChats)
-	group.POST("/join", JoinOneGroupChat)
-	group.PUT("/quit", QuitOneGroupChat)
-	group.PUT("/note", PutSelfNoteInGroupChat)
-
-	group.GET("/joined", GetGroupChatsUserJoined)
+	group.POST("/user", UserJoinOneGroupChat)
+	group.DELETE("/user", UserQuitOneGroupChat)
+	group.PUT("/user", UserPutNoteInGroupChat)
 	group.GET("/users", GetUsersInfoOfGroupChat)
+
+	search := r.Group("/search", JWTAuthMiddleware())
+	search.GET("/users", SearchUsers)
+	search.GET("/group_chats", SearchGroupChats)
+	search.GET("/subscriptions", SearchSubscriptions)
 
 	// todo :subscriptions http apis router here
 
