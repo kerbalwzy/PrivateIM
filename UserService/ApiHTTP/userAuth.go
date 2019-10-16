@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"../ApiRPC"
+	"../ElasticClient"
 	"../RpcClientPbs/mysqlPb"
 	"../utils"
 
@@ -75,6 +76,15 @@ func SignUp(c *gin.Context) {
 	_ = SaveQRCodeLocal(qrCodePicData, qrCodePicHashName)
 
 	HidePasswordAndCompleteAvatarAndQrCodeURL(userBasic)
+
+	// update the index of ElasticSearch
+	_ = elasticClient.UserIndexDocSave(
+		userBasic.Id,
+		userBasic.Name,
+		userBasic.Email,
+		userBasic.Avatar,
+		userBasic.Gender)
+
 	//ok, return user detail and auth token
 	c.JSON(201, detailAndToken(userBasic))
 }

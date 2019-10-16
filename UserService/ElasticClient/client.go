@@ -167,7 +167,7 @@ func ChangeReplicaNumber(indexName string, replica int) error {
 	return err
 }
 
-func UserIndexDocSave(id int64, name, email, avatar string, gender int) error {
+func UserIndexDocSave(id int64, name, email, avatar string, gender int32) error {
 	tempDataFormatStr := `{
 	"id": %d,
 	"name": "%s",

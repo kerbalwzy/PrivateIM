@@ -6,19 +6,11 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"io/ioutil"
 	"log"
 
-	//"encoding/json"
-	//"errors"
-	//"fmt"
-	//"github.com/dgrijalva/jwt-go"
-	//"github.com/gin-gonic/gin"
-	//"github.com/gin-gonic/gin/binding"
-	//"gopkg.in/go-playground/validator.v8"
-	"io/ioutil"
-	//"time"
-
 	"../ApiRPC"
+	"../ElasticClient"
 	"../utils"
 
 	conf "../Config"
@@ -106,6 +98,8 @@ func PutProfile(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	_ = elasticClient.UserIndexDocUpdate(userId, "name", tempProfile.Name)
+	_ = elasticClient.UserIndexDocUpdate(userId, "gender", tempProfile.Gender)
 	c.JSON(200, userBasic)
 }
 
@@ -139,7 +133,9 @@ func PutAvatar(c *gin.Context) {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"avatar_url": conf.PhotosUrlPrefix + userAvatar.Avatar + conf.PhotoSuffix})
+	avatarUrl := conf.PhotosUrlPrefix + userAvatar.Avatar + conf.PhotoSuffix
+	_ = elasticClient.UserIndexDocUpdate(userId, "avatar", avatarUrl)
+	c.JSON(200, gin.H{"avatar_url": avatarUrl})
 }
 
 type TempPassword struct {

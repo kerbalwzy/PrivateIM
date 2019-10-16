@@ -61,6 +61,8 @@ func StartHttpServer() {
 	group.GET("/joined", GetGroupChatsUserJoined)
 	group.GET("/users", GetUsersInfoOfGroupChat)
 
+	// todo :subscriptions http apis router here
+
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		_ = v.RegisterValidation("nameValidator", NameValidator)
 		_ = v.RegisterValidation("emailValidator", EmailValidator)
