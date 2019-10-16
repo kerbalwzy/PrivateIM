@@ -191,14 +191,11 @@ func UserIndexDocSearch(target string, page, perPage int) ([]byte, error) {
 	"from": %d,
 	"size": %d,
 	"query": { 
-		"bool": {
-    		"should": [
-        		{ "match": { "name": "%s" } },
-				{ "bool" : { "must": { "term": { "email": "%s" } } } }
-			],
-    		"filter": [ 
-        		{ "term":  { "is_delete": false } }
-    		]
+		"bool": { 
+			"must": [
+				{"term": {"is_delete": false} },
+				{"bool": {"should": [ { "match": { "name": "%s" } }, { "term":  { "email": "%s" } }]} }
+			]
     	}
 	}
 }
@@ -258,13 +255,10 @@ func GroupChatIndexDocSearch(target string, page, perPage int) ([]byte, error) {
 	"size": %d,
 	"query": { 
 		"bool": { 
-    		"should": [
-        		{ "match": { "name": "%s" } },
-        		{ "match": { "manager_name": "%s" } }
-        	],
-    		"filter": [ 
-        		{ "term":  { "is_delete": false } }
-    		]
+    		"must": [
+				{"term": {"is_delete": false} },
+				{"bool": {"should": [ { "match": { "name": "%s" } }, { "match":  { "manager_name": "%s" } }]} }
+			]
     	}
 	}
 }`
@@ -321,14 +315,12 @@ func SubscriptionIndexSearch(target string, page, perPage int) ([]byte, error) {
 	"size": %d,
 	"query": { 
 		"bool": { 
-    		"should": [
-        		{ "match": { "name": "%s" } },
-				{ "match": { "intro": "%s" } },
-        		{ "match": { "manager_name": "%s" } }
-        	],
-    		"filter": [ 
-        		{ "term":  { "is_delete": false } }
-    		]
+    		"must": [
+				{"term": {"is_delete": false} },
+				{"bool": {"should": [ { "match": { "name": "%s" } }, 
+                                      { "match": { "intro": "%s" } }, 
+                                      { "match": { "manager_name": "%s" } } ] } }
+			]
     	}
 	}
 }`
