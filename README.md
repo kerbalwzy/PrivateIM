@@ -7,7 +7,7 @@
 `WebSocket` 
 
 - ### 简介：
-    项目为分布式项目,将服务拆分为 **DataService**, **UserService**, **MessageService** 等三个部分.
+    项目将服务拆分为 **DataService**, **UserService**, **MessageService**, **SubscriptionService** 等四个部分.
     - #### DataService
         提供数据服务, 当其他服务需要操作数据库(MySQL,MongoDB)时都要通过调用`DataService`提供的RPC服务(通过gRPC实现).
 
@@ -61,6 +61,22 @@
     ​	**9. 返回异常信息给发送者**
 
     ​	[消息类型与结构说明](./MessageService/Doc_Message_Struct.md)
-    
+
     ​	[Proto文件-节点数据更新](./MessageService/Protos/MessageNodes.proto)
+
+    ##### Future TODO:
+
+    ​	实现集群功能, 能够同时启动多个MessageService, 并且保证用户的多点登录后即时Connecter分布在不同的服务中, 也能同步消息的收发.
+
+- ### SubscriptionService (未开始)
+
+    提供订阅号创建\管理, 文章发布, 审核, 订阅消息主动推送等服务; 
+
+---
+
+### Future:
+
+​	使用微服务架构重构此项目, 使用功能划分更加合理, 提高并发能力, 和可用性.
+
+
 
