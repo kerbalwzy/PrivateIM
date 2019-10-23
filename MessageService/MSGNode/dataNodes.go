@@ -3,6 +3,7 @@ package MSGNode
 import (
 	"log"
 	"math"
+	"runtime"
 	"sort"
 	"sync"
 	"time"
@@ -311,6 +312,7 @@ func (obj *GroupChatNodePool) CleanGroupChatLoop() {
 		case <-time.After(nextCleanTime.Sub(time.Now())):
 			obj.CleanByLifeTime()
 			obj.CleanByActiveCount()
+			runtime.GC()
 		}
 
 	}
@@ -338,6 +340,7 @@ func (obj *GroupChatNodePool) CleanByLifeTime() {
 		count++
 	}
 	log.Printf("[info] <GroupChatNodePool.CleanByLifeTime> clear up the group chat node, count= %d", count)
+
 
 }
 
@@ -449,6 +452,7 @@ func (obj *SubscriptionNodePool) CleanByLifeTimeLoop() {
 		// waiting for cleaning up, would blocking here
 		case <-time.After(nextCleanTime.Sub(time.Now())):
 			obj.CleanByLifeTime()
+			runtime.GC()
 		}
 	}
 }
